@@ -36,6 +36,9 @@ quantfish-offline-runtime = "quantfish.student_exports.runtime_packages:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+quantfish = ["**/*.html", "**/*.css", "**/*.svg", "**/*.j2"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]

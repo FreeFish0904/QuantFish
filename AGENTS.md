@@ -1,4 +1,4 @@
-# QuantFish (食饭) Project Working Rules
+# QuantFish Project Working Rules
 
 This repository is expected to grow over time. Keep changes small, committed, and aligned with the design principles in `docs/design-principles.md`.
 
@@ -23,10 +23,11 @@ This repository is expected to grow over time. Keep changes small, committed, an
 
 ## Environment And Installs
 
-- This project is called QuantFish (食饭).
-- Use the project Conda environment: `QuantFish`.
-- Activate with `conda activate QuantFish`.
-- The environment targets Python 3.12.
+- This project is called QuantFish.
+- Preferred: a project virtualenv at `./.venv`; `scripts/start-quantfish.sh` uses it
+  automatically when present.
+- Fallback: the Conda environment `QuantFish` (`conda activate QuantFish`), Python 3.12.
+- Both paths target Python 3.12+ (`backend/pyproject.toml` declares `>=3.12`).
 - For future installs, use China-available mirrors when possible.
 - Prefer Conda installs from Tsinghua mirrors:
 
@@ -40,10 +41,18 @@ conda install -n QuantFish --override-channels \
 - For PyPI-only packages, prefer the Tsinghua PyPI mirror:
 
 ```bash
-conda run -n QuantFish python -m pip install \
-  -i https://pypi.tuna.tsinghua.edu.cn/simple \
-  <package>
+python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple <package>
 ```
+
+## Repository Layout
+
+- `backend/src/quantfish/` — the Python package (engine, API, queue, data releases).
+- `backend/tests/` — pytest suite; run `python -m pytest backend/tests -q` from the root.
+- `frontend/` — React + Vite SPA; one folder per screen under `frontend/src/features`.
+- `config/` — `platform.yaml` (classroom) and `platform.demo.yaml` (synthetic demo).
+- `deploy/` — Docker demo (`Dockerfile`, `docker-compose.yml`, entrypoint, seeding).
+- `scripts/` — launchers, dataset generator, backups, runtime builders.
+- Generated data lives in `data/` and `runs/`; both are git-ignored.
 
 ## Git Hygiene
 

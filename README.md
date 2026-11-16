@@ -1,325 +1,192 @@
-# QuantFish (食饭)
+<div align="center">
 
-QuantFish is a classroom factor-research and backtesting platform. It provides a
-Python data/backtest engine, a FastAPI backend, and a Vite/React web interface
-for running student strategies, managing teams, publishing learning datasets,
-and reviewing hidden-test results.
+# QuantFish
 
-The repository is organized so another instructor or maintainer can clone it,
-install dependencies, add their own licensed market data, and redeploy the
-platform on macOS, Linux, Windows, or a server.
+**An A-share factor research and backtesting platform you can actually run.**
 
-## Features
+Write a scoring script → the platform queues a real backtest with forward-adjusted
+VWAP fills, industry-neutral quintiles and long-only HS300 scoring → then shows you a
+leaderboard, a run comparison and a PDF report.
 
-- Date-aware data bundles for leak-safe student research.
-- Configurable learning and hidden-test data windows.
-- Student strategy runner for `generate_signals(data, date)` Python files.
-- Backtest reports with summary metrics, graph data, diagnostics, and yearly
-  performance tables.
-- FastAPI web backend with team, submission, leaderboard, admin, and download
-  APIs.
-- React frontend for students and instructors.
-- Student download bundles and optional packed offline runtimes.
-- GitHub Actions workflow for building platform-specific offline runtimes.
+[**Live demo**](https://promcrdog.github.io/quantfish/) ·
+[Docker demo](#-quickstart) ·
+[Architecture](docs/architecture.md) ·
+[Contributing](CONTRIBUTING.md)
 
-## Repository Layout
+[![CI](https://github.com/promcrdog/quantfish/actions/workflows/ci.yml/badge.svg)](https://github.com/promcrdog/quantfish/actions/workflows/ci.yml)
+[![Pages demo](https://github.com/promcrdog/quantfish/actions/workflows/pages.yml/badge.svg)](https://github.com/promcrdog/quantfish/actions/workflows/pages.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0f766e.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13-3776ab)
+![React](https://img.shields.io/badge/react-19-0ea5e9)
 
-```text
-config/                         Platform and course settings
-docs/                           Project, design, and student documentation
-docs/student/                   Student-facing guide and assets
-examples/strategies/            Upload-ready example strategies
-First Day Sample Strategies/    Beginner classroom sample strategies
-frontend/                       Vite/React web frontend
-scripts/                        Setup, run, runtime-build, and verification helpers
-src/quantfish/                    Python package source
-tests/                          Backend/domain/API tests
-```
+</div>
 
-Local datasets, generated reports, runtime stores, build artifacts, caches, and
-packed environments are intentionally not committed. See `.gitignore` for the
-current generated paths.
+![QuantFish landing page](docs/screenshots/landing.jpg)
 
-## Prerequisites
+QuantFish started life as a classroom platform: students upload a `generate_signals.py`,
+the platform scores it on hidden market data, and a leaderboard ranks the cohort. It grew
+into a complete research loop — data releases, a point-in-time execution engine, queued
+scoring workers, result staleness tracking, and a demo that runs the *real* engine on a
+generated dataset.
 
-- Git
-- Conda or Miniconda
-- Python 3.12
-- Node.js and npm
-- A licensed source dataset matching the configured CSMAR-style inputs
-- Optional: GitHub CLI and GitHub Actions access for publishing offline runtimes
+## Why it is interesting
 
-The default Conda environment name used by project scripts is `QuantFish`.
+- **The engine is real.** Forward-adjusted prices, T+1 VWAP fills, price-limit and
+  suspension handling, participation caps, commission/slippage/stamp duty, and a
+  long-only path with beta-adjusted active returns.
+- **The platform is real.** FastAPI + SQLite + a thread/process scoring queue, cached
+  parquet panels, job progress streaming, stale-result detection, admin console, team
+  cohorts, student data exports and offline runtime bundles.
+- **Everything is tested.** 380 backend tests (pytest) and 222 frontend tests
+  (vitest + Testing Library + MSW), plus a CI matrix on Python 3.12/3.13.
+- **The demo is honest.** The public demo is a static build with an in-browser mock API;
+  the Docker demo generates a synthetic CSMAR-style dataset and runs the actual engine,
+  queue and report writer.
 
-## Clone And Install
+## Screenshots
+
+| Dashboard | Run detail |
+| --- | --- |
+| ![Dashboard](docs/screenshots/dashboard.jpg) | ![Submission detail](docs/screenshots/submission-detail.jpg) |
+
+| Leaderboard | Run comparison |
+| --- | --- |
+| ![Leaderboard](docs/screenshots/leaderboard.jpg) | ![Compare](docs/screenshots/compare.jpg) |
+
+## 🚀 Quickstart
+
+### Option 1 — Docker, one command, real backtest (recommended)
 
 ```bash
-git clone <repo-url> quantfish
+git clone https://github.com/promcrdog/quantfish.git
 cd quantfish
-
-conda env create -f environment.yml
-conda activate QuantFish
-
-python -m pip install -e '.[dev]'
-npm --prefix frontend install --legacy-peer-deps
+docker compose -f deploy/docker-compose.yml up --build
 ```
 
-For China-based deployments, the project scripts and prior setup notes use the
-Tsinghua PyPI mirror:
+Open <http://localhost:8010>. On first boot the container
+
+1. generates a synthetic dataset (60 symbols, 2018–2024) with
+   `scripts/gen_sample_dataset.py`,
+2. materialises the `learning` / `hidden_test` releases through the normal
+   `quantfish.data.releases` pipeline,
+3. queues two demo submissions, which the running dispatcher scores **with the real
+   engine** (watch them move `queued → running → completed`).
+
+### Option 2 — Local development
 
 ```bash
-python -m pip install -e '.[dev]' -i https://pypi.tuna.tsinghua.edu.cn/simple
+python3 -m venv .venv && source .venv/bin/activate
+python -m pip install -e './backend[dev,pdf]'
+npm --prefix frontend install
+
+scripts/start-quantfish.sh --mode dev            # API + Vite dev server
+npm --prefix frontend run build                  # then a production-style build
+scripts/start-quantfish.sh --mode prod --port 8010
 ```
 
-## Configuration
-
-The main runtime configuration lives in `config/platform.yaml`.
-
-Use it to control:
-
-- raw data location
-- learning and hidden-test release output paths
-- learning and hidden-test date ranges
-- official scoring window
-- capital, price policy, group count, and long-only/long-short mode
-- execution settings such as costs, leverage, market scope, timeouts, and queue
-  concurrency
-
-Every web-app startup, including ASGI factory or embedded `create_app()` usage,
-requires these three explicit credentials:
+To work against the bundled synthetic data instead of a licensed dataset:
 
 ```bash
-export QUANTFISH_ADMIN_PASSWORD='<strong-admin-password>'
-export QUANTFISH_ADMIN_SESSION_SECRET='<random-session-secret>'
-export QUANTFISH_PARTICIPANT_SESSION_SECRET='<different-random-session-secret>'
+python scripts/gen_sample_dataset.py
+scripts/start-quantfish.sh --mode prod --port 8010 --config config/platform.demo.yaml
 ```
 
-There are no built-in web credential fallbacks. The startup scripts bind to
-`127.0.0.1` by default and generate a one-time
-random admin password plus separate session secrets when they are not already
-set. Binding to a LAN address requires all three environment variables above.
-
-## Data Setup
-
-QuantFish does not include commercial market data. Put your licensed raw data in
-the path configured by `config/platform.yaml` (`new_data/` by default), then
-build the configured learning, historical-window, and hidden-test releases:
+### Option 3 — Static, backend-free demo (GitHub Pages)
 
 ```bash
-conda activate QuantFish
-python -m quantfish.data.releases build-from-config --config config/platform.yaml
+VITE_DEMO_MODE=true npm --prefix frontend run build   # then serve frontend/dist
 ```
 
-Generated releases are written under `data_releases/` by default and remain
-untracked. The practice tracks are `learning` (the complete configured learning
-range), `learning_1` (2010–2015), `learning_2` (2015–2020), and `learning_3`
-(2020–2022). The two boundary years intentionally appear in adjacent windows.
-The hidden-test release is for official scoring and should not be distributed
-to students.
+`VITE_DEMO_MODE=true` boots an MSW service worker (`src/mocks`) that answers the whole
+REST surface, switches to hash routing and shows a demo banner, so the UI can be hosted
+with no server at all. `.github/workflows/pages.yml` publishes it on every push to `main`.
 
-To add only the historical windows without rebuilding existing releases, select
-them explicitly:
+## How a submission is scored
 
-```bash
-python -m quantfish.data.releases build-from-config --config config/platform.yaml \
-  --release learning_1 --release learning_2 --release learning_3
-```
+1. **Upload** — `POST /api/submissions` validates a Python script, stores it and enqueues
+   a job (per-team cooldown, configurable timeout).
+2. **Score worker** — a separate process runs the strategy through
+   `quantfish.factor_execution`, resolves the configured data track (`hidden_test` or a
+   historical `learning_*` window) and builds the panel.
+3. **Panel** — raw CSMAR-style tables are joined as-of, front-adjusted with
+   `cumulatefwardfactor`, filtered by market type, listing age and trading status, then
+   cached (`panel_cache`) so repeated runs stay cheap.
+4. **Execution** — signals on day *t* are filled at day *t+1* VWAP with limit-up /
+   limit-down and suspension rules, participation caps and costs; long-only mode ranks
+   names and weights them by rank.
+5. **Evaluation** — quintile group returns, industry neutralisation, Sharpe, drawdown,
+   turnover, Calmar/fitness and beta-adjusted active returns vs HS300.
+6. **Delivery** — `summary.csv`, `graph_data.json`, parquet artifacts and an optional PDF
+   report land in `runs/web_platform/reports/<submission-id>/`; the UI renders them and
+   flags runs as *stale* when the config or data release changes.
 
-## Run The Web Platform
+## Engineering notes
 
-The easiest local or classroom startup path is:
+- **One config, validated.** `config/platform.yaml` (or `platform.demo.yaml`) is parsed into
+  a frozen dataclass tree with cross-field validation; the admin console edits it through
+  the same object, and the leaderboard reports the scoring timeout from that single source.
+- **Auto-detected data contract.** `scan_catalog` recognises `distribute/`, `teacher/`,
+  CSV and parquet variants, so the same code reads a licensed CSMAR export and the
+  synthetic demo dataset. The column contract is documented in
+  [docs/architecture.md](docs/architecture.md).
+- **Two languages, no duplication.** Every screen uses `t("namespace.key")` against an
+  `en`/`zh` dictionary; the default language follows `navigator.language` until the user
+  picks one.
+- **Charts without a chart library.** `frontend/src/shared/charts` renders the equity,
+  drawdown, PnL, volume and group curves as hand-written, theme-aware SVG (no runtime
+  chart dependency, geometry is unit-tested).
+- **Staleness instead of silent drift.** Each run stores a fingerprint of the config and
+  data release; when either changes, old runs are marked stale instead of being compared
+  as if they were comparable.
+- **Offline classroom kit.** `quantfish.student_exports` builds student data zips and
+  conda-packed offline runtimes with a dependency-signature manifest, so a classroom can
+  work without internet access.
 
-```bash
-scripts/start-quantfish.sh
-```
-
-Useful modes:
-
-```bash
-scripts/start-quantfish.sh --mode setup
-scripts/start-quantfish.sh --mode dev
-scripts/start-quantfish.sh --mode prod
-scripts/start-quantfish.sh --mode verify
-```
-
-Development mode starts:
-
-- backend: `http://localhost:8000`
-- frontend: `http://localhost:5173`
-
-Production mode builds the frontend and serves the full app from FastAPI:
-
-```bash
-scripts/start-quantfish.sh --mode prod --host 0.0.0.0 --backend-port 8000
-```
-
-Then open:
+## Repository layout
 
 ```text
-http://localhost:8000/
-http://<server-lan-ip>:8000/
+backend/src/quantfish/   FastAPI app, engine, scoring queue, data releases, exports
+backend/tests/           pytest suite
+frontend/                React 19 + Vite SPA (features/* = one folder per screen)
+frontend/src/mocks/      MSW handlers powering the tests and the static demo
+config/                  platform.yaml (classroom) and platform.demo.yaml (demo)
+deploy/                  Dockerfile, compose file, entrypoint, demo seeding
+docs/                    architecture, student handbook, guides, screenshots
+examples/                runnable example strategies
+scripts/                 dataset generator, launchers, backups, runtime builders
+data/                    generated dataset location (git-ignored, see data/README.md)
 ```
 
-## Manual Deployment
-
-Use this path when deploying outside the helper script.
+## Testing
 
 ```bash
-conda activate QuantFish
-python -m pip install -e '.[dev]'
-npm --prefix frontend install --legacy-peer-deps
-npm --prefix frontend run build
-
-QUANTFISH_ADMIN_PASSWORD='<strong-admin-password>' \
-QUANTFISH_ADMIN_SESSION_SECRET='<random-session-secret>' \
-QUANTFISH_PARTICIPANT_SESSION_SECRET='<different-random-session-secret>' \
-quantfish-web --host 0.0.0.0 --port 8000 --runtime-root runs/web_platform
+python -m pytest backend/tests -q              # 380 passed
+npm --prefix frontend test -- --run            # 222 passed
+npm --prefix frontend run build                # tsc -b && vite build
 ```
 
-For a server deployment:
+The suite covers the engine (panel construction, price adjustment, limits, metrics), the
+API (auth, submissions, leaderboards, admin), export bundling, script contracts and every
+frontend feature (view + model tests) with MSW as the API double.
 
-- persist `runs/web_platform/` or your chosen `--runtime-root`
-- keep `data_releases/hidden_test/` private
-- put FastAPI behind a reverse proxy if exposing it beyond a trusted LAN
-- use HTTPS and strong admin secrets for any non-local deployment
-- back up `runs/web_platform/repositories/`, submissions, reports, and exports
+## Roadmap
 
-## Frontend Development
+- [ ] Postgres + Alembic migrations instead of SQLite
+- [ ] Progress over WebSocket instead of polling
+- [ ] Intraday / minute-bar datasets
+- [ ] Factor library with IC/IR analysis and factor correlation reports
+- [ ] Replayable benchmark snapshots per course cohort
 
-```bash
-cd frontend
-npm run dev -- --host 0.0.0.0
-npm test -- --run
-npm run build
-```
+## Data and disclaimer
 
-During frontend development, Vite proxies `/api/*` to the backend at
-`http://127.0.0.1:8000`.
+No market data is redistributed in this repository. The Docker and CI demos use a
+**synthetic** dataset produced by `scripts/gen_sample_dataset.py`: simulated prices,
+volumes, industries and a deliberately weak embedded signal, none of which carry market
+information. A real deployment points `data_releases.raw_data_root` at a licensed
+CSMAR-style export.
 
-## Student Workflow
-
-Students should start with:
-
-```text
-docs/student/README.md
-```
-
-The beginner path is:
-
-1. Read the student guide.
-2. Copy `docs/student/examples/hello_strategy.py`.
-3. Change only the `score = ...` logic at first.
-4. Run against the learning data locally.
-5. Submit the strategy file through the web platform.
-
-Student strategies expose a callable:
-
-```python
-def generate_signals(data, date):
-    ...
-```
-
-One-argument `generate_signals(data)` also works. Returned scores may be a
-`pandas.Series` indexed by stock code or a DataFrame with `code` and `score`
-columns.
-
-## Student Downloads And Offline Runtimes
-
-The web backend can publish:
-
-- `learning-data.zip`
-- starter strategy and quickstart files
-- platform-specific offline Python runtimes
-
-Relevant scripts:
-
-```bash
-scripts/build-offline-runtime.sh macos-arm64
-scripts/build-offline-runtime.sh macos-x86_64
-scripts/build-offline-runtime.ps1 windows-x86_64
-scripts/import-offline-runtime.sh <platform> <zip-path>
-scripts/verify-student-kit.sh <kit-root>
-```
-
-The GitHub Actions workflow `.github/workflows/offline-runtimes.yml` builds
-runtime artifacts for macOS ARM, macOS Intel, and Windows x86_64.
-
-## Backtest Engine
-
-Programmatic use:
-
-```python
-from quantfish.platform_config import ConfigRepository
-from quantfish.backtest import run_student_backtest
-from quantfish.backtest.report_writer import write_backtest_report
-
-config = ConfigRepository("config/platform.yaml").load()
-
-result = run_student_backtest(
-    "submissions/team_alpha/strategy.py",
-    config.data_releases.hidden_output_root,
-    config,
-)
-
-write_backtest_report(result, "outputs/team_alpha")
-```
-
-Official evaluation uses front-adjusted prices. The canonical panel joins daily
-returns with adjustment factors, computes raw VWAP, and evaluates trades with
-front-adjusted VWAP for execution and front-adjusted close for marking.
-
-## Verification
-
-Run the full project checks before publishing changes:
-
-```bash
-conda run -n QuantFish python -m pytest
-npm --prefix frontend test -- --run
-npm --prefix frontend run build
-```
-
-The helper script wraps the same checks:
-
-```bash
-scripts/start-quantfish.sh --mode verify
-```
-
-## Generated Files And Data Policy
-
-Do not commit:
-
-- raw or licensed market data
-- `data_releases/`
-- `runs/`
-- `output/`
-- `build/`, `dist/`, `frontend/dist/`
-- `.runtime-build/`
-- Python, Node, pytest, and Vite caches
-- credentials or local environment folders
-
-Commit source code, tests, documentation, small examples, and small static
-assets that are safe to redistribute.
-
-## Contributing
-
-- Keep changes focused and reviewable.
-- Follow `AGENTS.md` and `docs/design-principles.md`.
-- Prefer feature-owned modules over broad utility files.
-- Add or update tests for domain rules, service workflows, API contracts, and
-  user-visible behavior.
-- Run the verification commands above before opening a pull request.
-
-## Security Notes
-
-- Change `QUANTFISH_ADMIN_PASSWORD` for any shared deployment.
-- Set a strong `QUANTFISH_ADMIN_SESSION_SECRET`.
-- Treat hidden-test data, student submissions, and reports as sensitive.
-- Use a reverse proxy, firewall rules, and HTTPS for non-local deployments.
+Nothing here is investment advice.
 
 ## License
 
-No open-source license file is currently included in this repository. Before
-publishing or accepting external contributions, add an explicit `LICENSE` file
-and confirm that all bundled code, examples, documents, and assets can be
-redistributed under that license. Third-party market data must be licensed and
-distributed separately according to its provider terms.
+[MIT](LICENSE) © 2026 QuantFish contributors

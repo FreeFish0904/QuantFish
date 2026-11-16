@@ -1,0 +1,42 @@
+# Docker demo
+
+One command, real engine, no market data required:
+
+```bash
+docker compose -f deploy/docker-compose.yml up --build
+```
+
+Then open <http://localhost:8010>.
+
+## What happens on first boot
+
+| Step | Where | What |
+| --- | --- | --- |
+| 1 | image build | `scripts/gen_sample_dataset.py` writes a synthetic CSMAR-style dataset and builds `learning`, `learning_1..3` and `hidden_test` releases |
+| 2 | container start | `entrypoint.sh` generates admin/session secrets, prints the admin password, and verifies the releases exist |
+| 3 | container start | `seed_demo.py` creates the `Alpha Desk` and `Beta Desk` teams and queues one submission each |
+| 4 | server start | the FastAPI lifespan starts the scoring dispatcher, which scores both submissions with the real engine |
+| 5 | afterwards | results, artifacts and the PDF report are served from the `quantfish-runtime` volume |
+
+The PDF report needs `weasyprint` + Pango, which the image installs together with
+Noto CJK fonts (`pip install './backend[pdf]'`).
+
+## Useful commands
+
+```bash
+docker compose -f deploy/docker-compose.yml logs -f          # follow server logs
+docker compose -f deploy/docker-compose.yml exec quantfish \
+  python -c "import quantfish; print(quantfish.__version__)"  # sanity check
+docker compose -f deploy/docker-compose.yml down -v          # reset everything
+```
+
+## Ports and state
+
+- `8010` is the only exposed port; the API and the built frontend share it.
+- `runs/` lives in the named volume `quantfish-runtime`, so submissions survive
+  restarts. Delete the volume to get a clean demo.
+
+## Without Docker
+
+`scripts/gen_sample_dataset.py` + `scripts/start-quantfish.sh --mode prod
+--config config/platform.demo.yaml` gives you the same experience locally.

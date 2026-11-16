@@ -1,6 +1,6 @@
 # 开始之前
 
-欢迎来到 QuantFish（食饭）。
+欢迎来到 QuantFish。
 
 一句话说清楚 QuantFish 是做什么的：**你写一个 Python 函数，平台用历史数据帮你模拟交易、计算分数。**
 

@@ -123,7 +123,7 @@ if execution.get("long_only"):
 
 ### 只做多模式的可投资股票池
 
-如果你开启 `execution.long_only`，平台还会先做一次**可投资股票池过滤**，再把你策略返回的分数转成仓位。这主要包括三条规则（源码见 `src/quantfish/backtest/runner.py`）：
+如果你开启 `execution.long_only`，平台还会先做一次**可投资股票池过滤**，再把你策略返回的分数转成仓位。这主要包括三条规则（源码见 `backend/src/quantfish/backtest/runner.py`）：
 
 1. **只用信号日信息选股票**：信号日必须 `tradable == True`，`front_close`、`front_vwap` 和成交金额 `dnvaltrd` 都大于 0。平台不会偷看下一交易日的可交易状态来替换候选；下一日无法成交时由执行层保留现金或原仓位。
 2. **上市时间过滤**：上市天数也按信号日计算。由 `execution.min_listing_days` 控制，默认 `60` 天。平台缺少 `basic.company_info` 或有效上市日期列时会直接拒绝回测；只有个别股票缺少上市日期时，这些股票会被排除并计入诊断信息。
@@ -257,7 +257,7 @@ A 股不同板块的涨跌停幅度不同。平台优先使用数据源给出的
 
 ### 只做多模式：主动收益与 `raw_*` / `active_*` 字段
 
-如果你开启 `execution.long_only`，平台不会直接用原始组合收益打分，而是会计算**相对沪深 300 的主动收益**（active return）。具体流程如下（源码见 `src/quantfish/backtest/active_returns.py`）：
+如果你开启 `execution.long_only`，平台不会直接用原始组合收益打分，而是会计算**相对沪深 300 的主动收益**（active return）。具体流程如下（源码见 `backend/src/quantfish/backtest/active_returns.py`）：
 
 1. 先算组合每天的原始收益 `portfolio_return`、沪深 300 收益 `benchmark_return`，以及日无风险收益 `risk_free_return = long_only_risk_free_rate / 252`。默认年化无风险利率是 `1.75%`。
 2. 用超额收益的协方差/方差估算组合的 **beta**：

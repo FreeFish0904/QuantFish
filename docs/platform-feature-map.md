@@ -1,4 +1,4 @@
-# QuantFish (食饭) Platform Feature Map
+# QuantFish Platform Feature Map
 
 ![QuantFish platform feature map](platform-feature-map.png)
 
@@ -24,7 +24,7 @@ The React app is organized around route-owned features in `frontend/src/features
 
 ## Backend Layer
 
-FastAPI wires feature-owned routers in `src/quantfish/web_app/app.py`:
+FastAPI wires feature-owned routers in `backend/src/quantfish/web_app/app.py`:
 
 - `/api/session` handles participant session login/logout.
 - `/api/submissions` handles strategy upload, history, options, and detail payloads.

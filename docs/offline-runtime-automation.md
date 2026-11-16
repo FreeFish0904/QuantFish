@@ -67,7 +67,7 @@ The workflow at `.github/workflows/offline-runtimes.yml` builds:
 - `windows-x86_64`
 
 Run **Build Offline Runtimes** manually, or let it run after changes to
-`pyproject.toml`, `environment.yml`, `src/quantfish/**`, or the runtime scripts.
+`pyproject.toml`, `environment.yml`, `backend/src/quantfish/**`, or the runtime scripts.
 Download the three `offline-runtime-*` artifacts, then import each zip and JSON
 manifest on the QuantFish host:
 

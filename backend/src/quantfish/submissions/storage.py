@@ -76,8 +76,7 @@ class SubmissionStorage:
     def quickstart_text(self) -> str:
         return (
             "Save your strategy as generate_signals.py, then run:\n\n"
-            "conda activate QuantFish\n"
-            "python -m pytest tests/test_factor_execution.py -v\n\n"
+            "python -m pytest backend/tests/test_factor_execution.py -v\n\n"
             "Your file must define generate_signals(data) and return code/score values.\n"
         )
 

@@ -10,7 +10,28 @@ HOST="127.0.0.1"
 BACKEND_PORT="8000"
 FRONTEND_PORT="5173"
 RUNTIME_ROOT="runs/web_platform"
+CONFIG_PATH="${QUANTFISH_CONFIG:-config/platform.yaml}"
 SKIP_INSTALL="0"
+
+uses_venv() {
+  [ -x "./.venv/bin/quantfish-web" ] && [ "${QUANTFISH_USE_VENV:-1}" = "1" ]
+}
+
+python_cmd() {
+  if uses_venv; then
+    ./.venv/bin/python "$@"
+  else
+    conda run -n "$CONDA_ENV" python "$@"
+  fi
+}
+
+run_quantfish_web() {
+  if uses_venv; then
+    ./.venv/bin/quantfish-web "$@"
+  else
+    conda run -n "$CONDA_ENV" quantfish-web "$@"
+  fi
+}
 
 usage() {
   cat <<'USAGE'
@@ -28,12 +49,17 @@ Options:
       Bind address. Default: 127.0.0.1. Use 0.0.0.0 explicitly for LAN access.
   --backend-port PORT
       FastAPI port. Default: 8000
+  --port PORT
+      Alias for --backend-port.
   --frontend-port PORT
       Vite dev server port. Default: 5173
   --runtime-root PATH
       Runtime directory for submissions/reports. Default: runs/web_platform
+  --config PATH
+      Platform config file. Default: config/platform.yaml
+      (use config/platform.demo.yaml for the synthetic demo dataset)
   --conda-env NAME
-      Conda environment name. Default: QuantFish
+      Conda environment name used when ./.venv is absent. Default: QuantFish
   --skip-install
       Do not run pip/npm install before startup.
   -h, --help
@@ -74,12 +100,20 @@ while [ "$#" -gt 0 ]; do
       BACKEND_PORT="${2:-}"
       shift 2
       ;;
+    --port)
+      BACKEND_PORT="${2:-}"
+      shift 2
+      ;;
     --frontend-port)
       FRONTEND_PORT="${2:-}"
       shift 2
       ;;
     --runtime-root)
       RUNTIME_ROOT="${2:-}"
+      shift 2
+      ;;
+    --config)
+      CONFIG_PATH="${2:-}"
       shift 2
       ;;
     --conda-env)
@@ -111,6 +145,11 @@ esac
 cd "$PROJECT_ROOT"
 
 install_backend() {
+  if uses_venv; then
+    log "Installing backend package into ./.venv"
+    python_cmd -m pip install -e './backend[dev]'
+    return
+  fi
   log "Installing backend package into conda env '${CONDA_ENV}'"
   conda run -n "$CONDA_ENV" python -m pip install -e './backend[dev]' \
     -i https://pypi.tuna.tsinghua.edu.cn/simple
@@ -122,7 +161,11 @@ install_frontend() {
 }
 
 ensure_dependencies() {
-  need_command conda
+  if uses_venv; then
+    log "Using project virtualenv at ./.venv"
+  else
+    need_command conda
+  fi
   need_command npm
   need_command curl
   need_command python3
@@ -153,7 +196,7 @@ ensure_admin_password() {
 run_verify() {
   ensure_dependencies
   log "Running Python tests"
-  conda run -n "$CONDA_ENV" python -m pytest
+  python_cmd -m pytest backend/tests -q
   log "Running frontend tests"
   npm --prefix frontend test -- --run
   log "Building frontend"
@@ -191,10 +234,11 @@ ensure_session_secrets() {
 }
 
 start_backend() {
-  log "Starting backend on ${HOST}:${BACKEND_PORT}"
-  conda run -n "$CONDA_ENV" quantfish-web \
+  log "Starting backend on ${HOST}:${BACKEND_PORT} (config: ${CONFIG_PATH})"
+  run_quantfish_web \
     --host "$HOST" \
     --port "$BACKEND_PORT" \
+    --config "$CONFIG_PATH" \
     --runtime-root "$RUNTIME_ROOT" &
   BACKEND_PID="$!"
 }

@@ -1244,7 +1244,7 @@ def test_submission_storage_validates_uploads_and_generates_student_text(
     assert "numeric_columns" in starter_text
     assert "pd.DataFrame" in starter_text
     assert "generate_signals.py" in storage.quickstart_text()
-    assert "conda activate QuantFish" in storage.quickstart_text()
+    assert "pytest backend/tests/test_factor_execution.py" in storage.quickstart_text()
 
 
 @dataclass(frozen=True)

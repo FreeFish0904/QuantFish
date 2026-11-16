@@ -32,7 +32,7 @@
 网页上传 strategy.py
         │
         ▼
-src/quantfish/submissions/routes.py
+backend/src/quantfish/submissions/routes.py
         │  接收 HTTP 请求，取出文件和参数
         ▼
 service.py
@@ -127,7 +127,7 @@ return pd.DataFrame({"code": stock_codes, "score": score_values})
 
 这一步就像在餐厅里给所有菜打分，然后决定每道菜夹多少筷子。
 
-你的策略只负责“打分”，平台负责“夹菜”。核心规则写在 `src/quantfish/backtest/panel.py` 的 `preprocess_signals` 里。
+你的策略只负责“打分”，平台负责“夹菜”。核心规则写在 `backend/src/quantfish/backtest/panel.py` 的 `preprocess_signals` 里。
 
 ### 3.1 多空模式 `longshort`
 
@@ -168,7 +168,7 @@ score_proportional:
 - 默认 `rank_equal` 下，分数只决定能否入选；入选且分数为正的股票等权。
 - `score_proportional` 下，正分越高，权重越大。
 
-只做多模式还会额外做三件事（源码见 `src/quantfish/backtest/runner.py` 和 `src/quantfish/backtest/simulator.py`）：
+只做多模式还会额外做三件事（源码见 `backend/src/quantfish/backtest/runner.py` 和 `backend/src/quantfish/backtest/simulator.py`）：
 
 1. **可投资股票池过滤**：平台只用信号日已知的信息，剔除 `tradable == False`、缺失有效 `front_close` / `front_vwap` / 成交金额、在信号日上市天数不足 `min_listing_days`（默认 60 天）、或缺少上市日期的股票。如果启用了上市天数过滤但整个 `basic.company_info` 数据源不可用，回测会直接失败。下一交易日能否成交不会反过来改变入选名单。
 2. **单票权重上限**：由 `max_position_weight`（默认 `0.05`）控制。超出的权重会在其他已入选且仍有容量的股票之间重新分配；总容量不足时才留现金。
@@ -340,7 +340,7 @@ max_daily_change = max_participation_rate * dnvaltrd / capital
 
 ### 只做多模式下的“主动收益”指标
 
-在 `longonly` 模式下，上表里的 `total_return`、`annual_return`、`sharpe`、`max_drawdown`、`calmar` 并不是直接基于原始组合收益，而是基于**主动收益**（active return）。计算过程如下（源码见 `src/quantfish/backtest/active_returns.py`）：
+在 `longonly` 模式下，上表里的 `total_return`、`annual_return`、`sharpe`、`max_drawdown`、`calmar` 并不是直接基于原始组合收益，而是基于**主动收益**（active return）。计算过程如下（源码见 `backend/src/quantfish/backtest/active_returns.py`）：
 
 ```text
 rf_daily = long_only_risk_free_rate / 252

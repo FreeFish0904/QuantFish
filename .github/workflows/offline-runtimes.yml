@@ -9,9 +9,9 @@ on:
         default: https://pypi.tuna.tsinghua.edu.cn/simple
   push:
     paths:
-      - pyproject.toml
-      - environment.yml
-      - src/quantfish/**
+      - backend/pyproject.toml
+      - backend/environment.yml
+      - backend/src/quantfish/**
       - scripts/build-offline-runtime.*
       - scripts/import-offline-runtime.*
       - .github/workflows/offline-runtimes.yml
@@ -50,7 +50,7 @@ jobs:
       - name: Build runtime package
         env:
           QUANTFISH_PIP_INDEX_URL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs['pip-index-url'] || 'https://pypi.tuna.tsinghua.edu.cn/simple' }}
-          PYTHONPATH: ${{ github.workspace }}/src
+          PYTHONPATH: ${{ github.workspace }}/backend/src
         run: |
           if [ "$RUNNER_OS" = "Windows" ]; then
             CONDA_EXE="$CONDA/Scripts/conda.exe"

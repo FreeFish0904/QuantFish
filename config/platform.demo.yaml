@@ -1,0 +1,70 @@
+# QuantFish demo config: small synthetic dataset, short windows.
+# Used by scripts/gen_sample_dataset.py and the Docker demo.
+course:
+  name: QuantFish Demo
+data_releases:
+  raw_data_root: data/sample/raw
+  learning_output_root: data/sample/releases/learning
+  hidden_output_root: data/sample/releases/hidden_test
+  learning_start: '2018-01-01'
+  learning_end: '2022-12-31'
+  hidden_start: '2023-01-01'
+  hidden_end: '2024-12-31'
+  learning_1_output_root: data/sample/releases/learning_1
+  learning_1_start: '2018-01-01'
+  learning_1_end: '2019-12-31'
+  learning_2_output_root: data/sample/releases/learning_2
+  learning_2_start: '2020-01-01'
+  learning_2_end: '2021-12-31'
+  learning_3_output_root: data/sample/releases/learning_3
+  learning_3_start: '2022-01-01'
+  learning_3_end: '2022-12-31'
+backtest:
+  data_start: '2018-01-01'
+  scoring_start: '2023-01-01'
+  scoring_end: '2024-12-31'
+  capital: 1000000
+  group_count: 5
+  industry_neutralization: true
+  price_policy: front_adjusted
+  execution_price: vwap
+  mark_price: close
+  long_only_benchmark: hs300
+  long_only_risk_free_rate: 0.0175
+  long_only_min_beta_observations: 20
+scoring:
+  sharpe_weight: 40
+  sharpe_target: 2
+  annual_return_weight: 60
+  annual_return_target: 0.3
+  drawdown_weight: 15
+  drawdown_limit: 0.3
+  turnover_weight: 5
+  turnover_limit: 3
+  short_profit_weight: 100
+  short_profit_target: 0.3
+  minimum_slice_trading_days: 1
+execution:
+  commission_rate: 0.0003
+  slippage_rate: 0.0005
+  sell_stamp_duty_rate: 0.0005
+  max_leverage: 1
+  top_k: null
+  allowed_market_types:
+  - 1
+  - 4
+  - 16
+  - 32
+  - 64
+  submissions_enabled: true
+  hidden_test_enabled: true
+  max_concurrent_scoring: 2
+  submission_timeout_seconds: 300
+  submission_timeout_enabled: true
+  long_only: true
+  long_only_weighting: rank_equal
+  long_only_target_count: 10
+  max_position_weight: 0.2
+  max_participation_rate: 0.1
+  min_listing_days: 60
+  terminal_stale_position_policy: reject

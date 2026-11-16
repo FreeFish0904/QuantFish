@@ -70,6 +70,7 @@ export type SubmissionDetailModel = {
   metricRows: MetricRow[];
   performanceRows: PerformanceRow[];
   tradeSummaryRows: TradeSummaryRow[];
+  pdfReportAvailable: boolean;
 };
 
 export type SubmissionDetailDisplay = {
@@ -296,7 +297,8 @@ export function toSubmissionDetailModel(backendDetail: BackendSubmissionDetail):
     bestGroupId,
     metricRows: buildMetricRows(metrics, summary),
     performanceRows: buildPerformanceRows(backendDetail.performance_table),
-    tradeSummaryRows: buildTradeSummaryRows(summary)
+    tradeSummaryRows: buildTradeSummaryRows(summary),
+    pdfReportAvailable: backendDetail.pdf_report_available ?? false
   };
 }
 

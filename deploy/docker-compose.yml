@@ -1,0 +1,31 @@
+name: quantfish-demo
+
+services:
+  quantfish:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: quantfish-demo:latest
+    ports:
+      - "8010:8010"
+    environment:
+      QUANTFISH_HOST: 0.0.0.0
+      QUANTFISH_PORT: "8010"
+      QUANTFISH_CONFIG: config/platform.demo.yaml
+      QUANTFISH_RUNTIME_ROOT: runs/web_platform
+    volumes:
+      - quantfish-runtime:/app/runs
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8010/api/health').status==200 else 1)
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  quantfish-runtime:

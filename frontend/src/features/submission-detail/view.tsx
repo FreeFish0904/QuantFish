@@ -297,7 +297,7 @@ export function SubmissionDetailView() {
         <div className={styles.headerAside}>
           <Badge status={badge.status} label={t(badge.labelKey)} />
           <div className={styles.downloads}>
-            {data.status === "completed" ? (
+            {data.status === "completed" && data.pdfReportAvailable ? (
               <a
                 className={styles.downloadLink}
                 href={`/api/submissions/${encodeURIComponent(data.submissionId)}/report`}

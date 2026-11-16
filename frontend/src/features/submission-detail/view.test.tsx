@@ -64,6 +64,7 @@ const backendDetail: BackendSubmissionDetail = {
     engine_version: "1.0"
   },
   original_filename: "strategy.py",
+  pdf_report_available: true,
   metrics: {
     total_return: 0.184,
     annual_return: 0.52,

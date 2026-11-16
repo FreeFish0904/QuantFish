@@ -654,6 +654,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/submissions/{submission_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Pdf Report
+         * @description Download PDF backtest report for a completed submission.
+         */
+        get: operations["download_pdf_report_api_submissions__submission_id__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/leaderboard": {
         parameters: {
             query?: never;
@@ -1453,6 +1473,11 @@ export interface components {
             score_breakdown: components["schemas"]["SubmissionScoreContribution"][];
             /** Score Calculation */
             score_calculation?: string | null;
+            /**
+             * Pdf Report Available
+             * @default false
+             */
+            pdf_report_available: boolean;
         };
         /** SubmissionExecutionParameters */
         SubmissionExecutionParameters: {
@@ -2943,6 +2968,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubmissionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_pdf_report_api_submissions__submission_id__report_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submission_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

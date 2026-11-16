@@ -178,6 +178,7 @@ class SubmissionDetail(SubmissionSummary):
     performance_table: list[SubmissionPerformanceRow]
     score_breakdown: list[SubmissionScoreContribution]
     score_calculation: str | None = None
+    pdf_report_available: bool = False
 
 
 class SubmissionListResponse(_FrozenModel):

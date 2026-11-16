@@ -44,6 +44,10 @@ export const translations = {
       },
       stack: "React 19 · FastAPI · Parquet panels · pure SVG charts · one-command Docker demo"
     },
+    demo: {
+      badge: "Demo",
+      message: "Bundled sample data — the workflow matches the real platform."
+    },
     nav: {
       dashboard: "Dashboard",
       dashboardShort: "Home",
@@ -951,6 +955,10 @@ export const translations = {
         step4: "对比与导出"
       },
       stack: "React 19 · FastAPI · Parquet 面板 · 纯 SVG 图表 · Docker 一键演示"
+    },
+    demo: {
+      badge: "演示",
+      message: "内置示例数据，交互流程与正式平台一致。"
     },
     nav: {
       dashboard: "仪表盘",

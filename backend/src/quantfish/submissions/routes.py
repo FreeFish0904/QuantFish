@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import importlib.util
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -262,6 +263,7 @@ def submission_detail(request: Request, submission_id: str) -> dict[str, Any]:
     payload["score_calculation"] = (
         score_calculation_text(score_summary, weights) if score is not None else None
     )
+    payload["pdf_report_available"] = _pdf_report_available(report_dir)
     return payload
 
 
@@ -295,11 +297,30 @@ def download_pdf_report(request: Request, submission_id: str):
             media_type="application/pdf",
             filename=f"report_{submission.submission_number or submission_id[:8]}.pdf",
         )
+    except ModuleNotFoundError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "PDF report support is not installed; install the optional "
+                "extra with `pip install 'quantfish[pdf]'`"
+            ),
+        ) from exc
     except Exception as exc:
         raise HTTPException(
             status_code=500,
             detail=f"failed to generate report: {exc}",
         ) from exc
+
+
+def _pdf_report_available(report_dir: Path) -> bool:
+    """True when a PDF exists or the optional PDF dependencies are installed."""
+
+    if (report_dir / "report.pdf").exists():
+        return True
+    return (
+        importlib.util.find_spec("weasyprint") is not None
+        and importlib.util.find_spec("jinja2") is not None
+    )
 
 
 def _score_summary(submission: Any, artifacts: dict[str, Any]) -> dict[str, Any]:

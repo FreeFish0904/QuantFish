@@ -139,7 +139,14 @@ def run_student_backtest(
     )
     scoring_result = _scoring_result(simulated, group_returns, scoring_start, scoring_end)
     benchmark = load_hs300_benchmark(bundle, scoring_start, scoring_end)
-    raw_metrics = calculate_backtest_metrics(scoring_result)
+    risk_free_rate = float(
+        _config_value(backtest_config, "long_only_risk_free_rate", 0.0175)
+    )
+    risk_free_daily_return = risk_free_rate / TRADING_DAYS_PER_YEAR
+    raw_metrics = calculate_backtest_metrics(
+        scoring_result,
+        risk_free_daily_return=risk_free_daily_return,
+    )
     metrics = raw_metrics
     scoring_return_column = "portfolio_return"
     active_scoring_summary: dict[str, Any] = {}
@@ -154,9 +161,6 @@ def run_student_backtest(
                 f"unsupported long_only_benchmark: {long_only_benchmark_name}"
             )
         if long_only_benchmark_name == "hs300":
-            risk_free_rate = float(
-                _config_value(backtest_config, "long_only_risk_free_rate", 0.0175)
-            )
             active = calculate_long_only_active_returns(
                 scoring_result.daily,
                 benchmark,
@@ -169,7 +173,6 @@ def run_student_backtest(
                 ),
                 risk_free_rate=risk_free_rate,
             )
-            risk_free_daily_return = risk_free_rate / TRADING_DAYS_PER_YEAR
             raw_excess_returns = (
                 pd.to_numeric(scoring_result.daily["portfolio_return"], errors="coerce")
                 .fillna(0.0)
@@ -184,6 +187,7 @@ def run_student_backtest(
             metrics = calculate_backtest_metrics(
                 scoring_result,
                 return_column=scoring_return_column,
+                risk_free_daily_return=risk_free_daily_return,
             )
             long_only_scoring_basis = "beta_adjusted_active_return"
             active_scoring_summary = {

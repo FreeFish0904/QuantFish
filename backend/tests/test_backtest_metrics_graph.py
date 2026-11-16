@@ -1,4 +1,5 @@
 import json
+import math
 
 import pytest
 import pandas as pd
@@ -733,3 +734,91 @@ def test_graph_data_limits_benchmark_and_alpha_to_strategy_dates() -> None:
     assert strategy_dates == ["2023-01-03", "2023-01-04"]
     assert [point["date"] for point in graph_data["benchmark"]] == strategy_dates
     assert [point["date"] for point in graph_data["alpha"]] == strategy_dates
+
+
+def _daily_returns_result(returns: list[float]) -> BacktestResult:
+    return BacktestResult(
+        daily=pd.DataFrame(
+            {
+                "date": pd.bdate_range("2023-01-03", periods=len(returns)),
+                "portfolio_return": returns,
+            }
+        ),
+        positions=pd.DataFrame(),
+        group_returns=pd.DataFrame(),
+    )
+
+
+def test_metrics_report_geometric_basis_alongside_arithmetic_basis() -> None:
+    returns = [0.10, -0.05, 0.02]
+    metrics = calculate_backtest_metrics(_daily_returns_result(returns))
+    summary = metrics.summary
+    series = pd.Series(returns)
+    growth = float((1.0 + series).prod())
+
+    assert summary["all_return"] == pytest.approx(0.07)
+    assert summary["annual_return"] == pytest.approx(0.07 / 3 * 252)
+    assert summary["compounded_total_return"] == pytest.approx(growth - 1.0)
+    assert summary["cagr"] == pytest.approx(growth ** (252 / 3) - 1.0)
+    assert summary["compounded_max_drawdown"] == pytest.approx(
+        1.0 - (1.10 * 0.95) / 1.10
+    )
+    assert summary["compounded_calmar"] == pytest.approx(
+        summary["cagr"] / summary["compounded_max_drawdown"]
+    )
+    assert summary["volatility"] == pytest.approx(float(series.std(ddof=1)) * math.sqrt(252))
+    assert summary["t_stat"] == pytest.approx(
+        float(series.mean() / series.std(ddof=1) * math.sqrt(3))
+    )
+    assert summary["t_stat_p_value"] == pytest.approx(
+        math.erfc(abs(summary["t_stat"]) / math.sqrt(2.0))
+    )
+
+
+def test_metrics_sortino_uses_the_risk_free_rate_as_mar() -> None:
+    returns = [0.01, -0.02, 0.03, 0.0]
+    risk_free_daily_return = 0.0175 / 252
+
+    summary = calculate_backtest_metrics(
+        _daily_returns_result(returns),
+        risk_free_daily_return=risk_free_daily_return,
+    ).summary
+    excess = pd.Series(returns) - risk_free_daily_return
+    downside_deviation = math.sqrt(float((excess.clip(upper=0.0) ** 2).mean()))
+
+    assert summary["sortino"] == pytest.approx(
+        math.sqrt(252) * float(excess.mean()) / downside_deviation
+    )
+
+
+def test_metrics_compounded_drawdown_differs_from_arithmetic_for_volatile_path() -> None:
+    summary = calculate_backtest_metrics(_daily_returns_result([0.5, -0.4])).summary
+
+    assert summary["all_return"] == pytest.approx(0.1)
+    assert summary["max_drawdown"] == pytest.approx(1.0 - 1.1 / 1.5)
+    assert summary["compounded_max_drawdown"] == pytest.approx(1.0 - 0.9 / 1.5)
+    assert summary["compounded_max_drawdown"] > summary["max_drawdown"]
+
+
+def test_metrics_mark_undefined_statistics_missing_instead_of_infinite() -> None:
+    flat = calculate_backtest_metrics(_daily_returns_result([0.0, 0.0, 0.0])).summary
+    assert flat["cagr"] == pytest.approx(0.0)
+    assert flat["compounded_total_return"] == pytest.approx(0.0)
+    assert flat["volatility"] == pytest.approx(0.0)
+    assert flat["sortino"] is None
+    assert flat["t_stat"] is None
+    assert flat["t_stat_p_value"] is None
+
+    wiped_out = calculate_backtest_metrics(_daily_returns_result([0.05, -1.0])).summary
+    assert wiped_out["all_return"] == pytest.approx(-0.95)
+    assert wiped_out["cagr"] is None
+    assert wiped_out["compounded_total_return"] is None
+    assert wiped_out["compounded_max_drawdown"] is None
+    assert wiped_out["compounded_calmar"] is None
+
+    single_day = calculate_backtest_metrics(_daily_returns_result([0.01])).summary
+    assert single_day["cagr"] == pytest.approx(1.01**252 - 1.0)
+    assert single_day["volatility"] is None
+    assert single_day["sortino"] is None
+    assert single_day["t_stat"] is None
+

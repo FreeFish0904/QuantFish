@@ -168,26 +168,34 @@ def _cover_cards(metrics, summary):
     m = {**summary, **metrics}
     return [
         {"label": "Sharpe", "value": _fmt(m.get("sharpe"), 3)},
-        {"label": "Annual Return", "value": _fmt_pct(m.get("annual_return"))},
+        {"label": "Sortino", "value": _fmt(m.get("sortino"), 3)},
+        {"label": "CAGR", "value": _fmt_pct(m.get("cagr"))},
+        {"label": "Annual Return (arith.)", "value": _fmt_pct(m.get("annual_return"))},
         {"label": "Total Return", "value": _fmt_pct(m.get("total_return"))},
         {"label": "Max Drawdown", "value": _fmt_pct(m.get("max_drawdown"))},
         {"label": "Calmar", "value": _fmt(m.get("calmar"), 3)},
+        {"label": "t-stat", "value": _fmt(m.get("t_stat"), 2)},
         {"label": "Avg Turnover", "value": _fmt_pct(m.get("average_turnover"))},
         {"label": "Win Rate", "value": _fmt_pct(m.get("win_rate"))},
-        {"label": "Trading Days", "value": _fmt_int(m.get("trading_days"))},
-        {"label": "Beta", "value": _fmt(m.get("beta"), 3)},
         {"label": "Info Ratio", "value": _fmt(m.get("information_ratio"), 3)},
+        {"label": "Trading Days", "value": _fmt_int(m.get("trading_days"))},
     ]
 
 
 def _risk_rows(metrics, summary):
     m = {**summary, **metrics}
     return [
-        ("Annual Return", _fmt_pct(m.get("annual_return"))),
-        ("Annual Volatility", _fmt_pct(m.get("annual_volatility", m.get("volatility")))),
-        ("Max Drawdown", _fmt_pct(m.get("max_drawdown"))),
+        ("CAGR (geometric)", _fmt_pct(m.get("cagr"))),
+        ("Annual Return (arithmetic, scored)", _fmt_pct(m.get("annual_return"))),
+        ("Annual Volatility", _fmt_pct(m.get("volatility"))),
+        ("Max Drawdown (arithmetic)", _fmt_pct(m.get("max_drawdown"))),
+        ("Max Drawdown (compounded)", _fmt_pct(m.get("compounded_max_drawdown"))),
         ("Sharpe Ratio", _fmt(m.get("sharpe"), 3)),
-        ("Calmar Ratio", _fmt(m.get("calmar"), 3)),
+        ("Sortino Ratio", _fmt(m.get("sortino"), 3)),
+        ("Calmar Ratio (arithmetic)", _fmt(m.get("calmar"), 3)),
+        ("Calmar Ratio (compounded)", _fmt(m.get("compounded_calmar"), 3)),
+        ("Mean Return t-stat", _fmt(m.get("t_stat"), 3)),
+        ("t-stat p-value (normal approx.)", _fmt(m.get("t_stat_p_value"), 4)),
         ("Information Ratio", _fmt(m.get("information_ratio"), 3)),
         ("Win Rate", _fmt_pct(m.get("win_rate"))),
         ("Beta", _fmt(m.get("beta"), 3)),

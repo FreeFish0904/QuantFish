@@ -60,16 +60,17 @@ dropdown updates after the command finishes.
 
 ## Build In GitHub Actions
 
-The workflow at `.github/workflows/offline-runtimes.yml` builds:
+Run **Build Offline Runtimes** manually from the Actions tab. It is intentionally
+not wired to `push`, because it spins up three full `conda-pack` builds (macOS
+arm64, macOS x86_64, Windows) and takes tens of minutes:
 
 - `macos-arm64`
 - `macos-x86_64`
 - `windows-x86_64`
 
-Run **Build Offline Runtimes** manually, or let it run after changes to
-`pyproject.toml`, `environment.yml`, `backend/src/quantfish/**`, or the runtime scripts.
-Download the three `offline-runtime-*` artifacts, then import each zip and JSON
-manifest on the QuantFish host:
+Rebuild when `backend/pyproject.toml`, `backend/environment.yml`, the runtime
+scripts or the student runner change. Download the three `offline-runtime-*`
+artifacts, then import each zip and JSON manifest on the QuantFish host:
 
 ```bash
 cd /path/to/quantfish

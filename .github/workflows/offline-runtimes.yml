@@ -7,14 +7,6 @@ on:
         description: PyPI index used while building runtime packages
         required: false
         default: https://pypi.tuna.tsinghua.edu.cn/simple
-  push:
-    paths:
-      - backend/pyproject.toml
-      - backend/environment.yml
-      - backend/src/quantfish/**
-      - scripts/build-offline-runtime.*
-      - scripts/import-offline-runtime.*
-      - .github/workflows/offline-runtimes.yml
 
 jobs:
   build-runtime:
@@ -36,7 +28,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v3

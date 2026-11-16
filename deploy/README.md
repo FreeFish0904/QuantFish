@@ -40,3 +40,21 @@ docker compose -f deploy/docker-compose.yml down -v          # reset everything
 
 `scripts/gen_sample_dataset.py` + `scripts/start-quantfish.sh --mode prod
 --config config/platform.demo.yaml` gives you the same experience locally.
+
+## GitHub Pages demo (one-time setup)
+
+`.github/workflows/pages.yml` publishes the static mock-api build to
+`https://<owner>.github.io/<repo>/` on every push to `main`. GitHub does not let
+the workflow create the site itself, so a repository admin enables it once:
+
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions**
+2. Re-run the `Demo (GitHub Pages)` workflow (or push to `main`)
+
+The base path comes from `github.event.repository.name`, so the site keeps
+working if the repository is renamed. To publish the same build anywhere else:
+
+```bash
+VITE_DEMO_MODE=true VITE_BASE_PATH=/quantfish/ npm --prefix frontend run build
+# frontend/dist/ is a fully static bundle, no backend needed
+```
+

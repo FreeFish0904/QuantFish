@@ -68,11 +68,12 @@ data/                    placeholder for generated datasets (git-ignored)
 - **Config over constants.** Tunables belong in `config/platform.yaml` and are
   validated by `quantfish.platform_config`. Avoid duplicate defaults in code.
 - **Types at the boundary.** API contracts come from the FastAPI models;
-  regenerate the frontend types with
-  `npx --prefix frontend openapi-typescript ../backend/openapi.json` when the
-  schema changes.
+  regenerate the frontend types from the running server:
+  `curl -s http://127.0.0.1:7860/openapi.json -o /tmp/openapi.json && npx --prefix frontend openapi-typescript /tmp/openapi.json -o frontend/src/shared/api/generated/api-types.ts`
 - **No secrets in git.** `.env` is ignored; never commit real admin passwords or
   session secrets.
+- **Forking?** `scripts/set-repo-owner.sh <owner> [repo]` re-points the README
+  badges, clone URLs, Pages link and the landing page CTA in one step.
 
 ## Pull requests
 

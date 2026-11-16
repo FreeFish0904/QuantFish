@@ -9,7 +9,7 @@ Datago sentiment/search tables under `teacher/behavioral_finance/datago` follow 
 ## Build Releases
 
 ```bash
-cd "/Users/promcrdog/Documents/Vector lab/Qclass/platform6"
+cd /path/to/quantfish
 conda activate QuantFish
 python -m pip install -e .
 

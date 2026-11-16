@@ -169,29 +169,29 @@ data_catalog.json	distribute	teacher
 
 `cd` 是 change directory 的缩写，意思是“切换文件夹”。
 
-例如，如果你的 QuantFish 项目放在了 `Documents/platform6`，你可以这样进入它：
+例如，如果你的 QuantFish 项目放在了 `Documents/quantfish`，你可以这样进入它：
 
 ```bash
-cd Documents/platform6
+cd Documents/quantfish
 ```
 
 如果路径里包含空格，需要用英文引号包起来，例如：
 
 ```bash
-cd "Vector lab/Qclass/platform6"
+cd "My Project/quantfish"
 ```
 
 **这行在做什么：**
 
 - `cd` 后面跟着文件夹路径。
-- 运行后，终端的“当前位置”就变成了 `Documents/platform6`，之后你运行的命令都会在这个位置执行。
+- 运行后，终端的“当前位置”就变成了 `Documents/quantfish`，之后你运行的命令都会在这个位置执行。
 
 ### 2. 什么是路径
 
 路径就是文件或文件夹在电脑里的地址。
 
-- 相对路径：相对于你当前所在文件夹的位置。例如你已经在 `platform6` 里，`config/platform.yaml` 就是指 `platform6` 下面的 `config` 文件夹里的 `platform.yaml`。
-- 绝对路径：从电脑最顶层开始的完整地址。例如 macOS 上可能是 `/Users/你的名字/Documents/Vector lab/Qclass/platform6`。
+- 相对路径：相对于你当前所在文件夹的位置。例如你已经在 `quantfish` 里，`config/platform.yaml` 就是指 `quantfish` 下面的 `config` 文件夹里的 `platform.yaml`。
+- 绝对路径：从电脑最顶层开始的完整地址。例如 macOS 上可能是 `/Users/你的名字/Documents/quantfish`。
 
 QuantFish 的文档大多使用相对路径，因为你已经在项目根目录里了。
 

@@ -29,7 +29,7 @@ inside an x86_64 Conda/Rosetta setup. Build `windows-x86_64` on Windows.
 macOS:
 
 ```bash
-cd "/Users/promcrdog/Documents/Vector lab/Qclass/platform6"
+cd /path/to/quantfish
 conda activate QuantFish
 python -m pip install conda-pack
 
@@ -44,7 +44,7 @@ scripts/import-offline-runtime.sh \
 Windows PowerShell:
 
 ```powershell
-cd "C:\path\to\platform6"
+cd "C:\path\to\quantfish"
 conda activate QuantFish
 python -m pip install conda-pack
 
@@ -72,7 +72,7 @@ Download the three `offline-runtime-*` artifacts, then import each zip and JSON
 manifest on the QuantFish host:
 
 ```bash
-cd "/Users/promcrdog/Documents/Vector lab/Qclass/platform6"
+cd /path/to/quantfish
 conda activate QuantFish
 
 scripts/import-offline-runtime.sh macos-arm64 ~/Downloads/macos-arm64.zip ~/Downloads/macos-arm64.json

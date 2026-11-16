@@ -11,6 +11,10 @@ This repository is expected to grow over time. Keep changes small, committed, an
 - Prefer feature-owned modules over shared utility files.
 - Add boundaries only when they clarify ownership or isolate change; avoid layer theater.
 - Keep contracts generated or centralized when frontend, backend, docs, and tests must agree.
+- Metric definitions are contracts too: any new `summary.csv` key must be documented in
+  `docs/metrics-definitions.md`, added to `SubmissionMetrics` (dataclass, response model and
+  generated TypeScript), and rendered on the detail page — and it must never silently
+  change the arithmetic basis that scoring depends on.
 - Design for deletion: a feature should be removable with limited unrelated damage.
 
 ## Coding Standards

@@ -44,6 +44,30 @@ and the compiled frontend from `frontend/dist`.
    polls until the status becomes `completed`, then renders metrics, charts and
    download links.
 
+### Metric bases
+
+`backtest/metrics.py` is the single source for both reported return bases, and they are
+deliberately kept apart:
+
+- **Arithmetic** — `all_return`, `annual_return`, `max_drawdown`, `calmar`, the yearly
+  table and the `fitness` helper. These feed scoring, ranking and staleness detection, so
+  they are frozen: `engine_version` is unchanged and historical submissions stay
+  comparable.
+- **Geometric** — `compounded_total_return`, `cagr`, `compounded_max_drawdown`,
+  `compounded_calmar`, `volatility`, `sortino`, `t_stat`, `t_stat_p_value`. Reported
+  alongside the arithmetic block and never used for ordering.
+
+`calculate_backtest_metrics(..., risk_free_daily_return=...)` receives the risk-free rate
+resolved once by the runner from `backtest.long_only_risk_free_rate`, so Sortino's MAR is
+identical for the raw and the beta-adjusted active series. Undefined statistics are emitted
+as `null` rather than clamped to 0 or `inf`. The full formula table, the null rules and the
+arithmetic-vs-geometric rationale live in
+[docs/metrics-definitions.md](metrics-definitions.md).
+
+Because the fields are additive, `SubmissionMetrics`, the FastAPI response model and the
+generated TypeScript contract all gained the same eight keys in one change; older stored
+reports simply return `null` for them.
+
 ### Data contract
 
 `scan_catalog` auto-detects the layout of a data release, so both the bundled

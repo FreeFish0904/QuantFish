@@ -11,6 +11,7 @@ leaderboard, a run comparison and a PDF report.
 [**Live demo**](https://FreeFish0904.github.io/QuantFish/) ·
 [Docker demo](#-quickstart) ·
 [Architecture](docs/architecture.md) ·
+[Metric definitions](docs/metrics-definitions.md) ·
 [Contributing](CONTRIBUTING.md)
 
 [![CI](https://github.com/FreeFish0904/QuantFish/actions/workflows/ci.yml/badge.svg)](https://github.com/FreeFish0904/QuantFish/actions/workflows/ci.yml)
@@ -115,7 +116,9 @@ with no server at all. `.github/workflows/pages.yml` publishes it on every push 
    limit-down and suspension rules, participation caps and costs; long-only mode ranks
    names and weights them by rank.
 5. **Evaluation** — quintile group returns, industry neutralisation, Sharpe, drawdown,
-   turnover, Calmar/fitness and beta-adjusted active returns vs HS300.
+   turnover, Calmar/fitness and beta-adjusted active returns vs HS300, each reported on the
+   arithmetic (scored) and the geometric (compounded CAGR, Sortino, t-stat) basis — see
+   [docs/metrics-definitions.md](docs/metrics-definitions.md).
 6. **Delivery** — `summary.csv`, `graph_data.json`, parquet artifacts and an optional PDF
    report land in `runs/web_platform/reports/<submission-id>/`; the UI renders them and
    flags runs as *stale* when the config or data release changes.

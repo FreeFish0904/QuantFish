@@ -253,6 +253,30 @@ A 股不同板块的涨跌停幅度不同。平台优先使用数据源给出的
 
 这些指标会一起决定你的策略排名。不要只看 `total_return`，因为一个收益很高但回撤巨大的策略，通常不如收益稳定、夏普高的策略。
 
+### 算术口径与复利口径：为什么同一份结果有两套数字
+
+上面表格里的 `total_return`、`annual_return`、`max_drawdown`、`calmar` 用的是**算术口径**：每天的 `daily_return` 直接相加，年化就是「累计收益 × 252 ÷ 交易日数」。这是历史评分一直使用的口径，评分权重（`config/platform.yaml` 里的 `sharpe_weight`、`annual_return_weight` 等）也是按它调好的，所以它不会变，排行榜也不会因为口径调整而出现前后不可比的情况。
+
+但算术年化是线性外推，忽略了一个事实：**亏损之后要更大的涨幅才能回本**（波动拖累）。所以从某个版本开始，`summary.csv` 里在同一行结果旁边额外输出一组**复利口径**的指标，用来回答“如果按复利真实滚动，这条曲线到底年化多少”：
+
+| 字段 | 公式 | 说明 |
+|---|---|---|
+| `compounded_total_return` | `∏(1 + r_i) − 1` | 复利累计收益。 |
+| `cagr` | `(∏(1 + r_i))^(252 / n) − 1` | 年化复合增长率。提交详情页第二张 KPI 卡显示的就是它。 |
+| `compounded_max_drawdown` | 复利净值（从 1.0 起算）的峰谷最大跌幅。 | 波动越大，它通常比 `max_drawdown` 更深。 |
+| `compounded_calmar` | `cagr / compounded_max_drawdown`。 | 复利口径的收益回撤比。 |
+| `volatility` | `std(daily_return) × sqrt(252)`。 | 年化波动率。 |
+| `sortino` | `sqrt(252) × mean(r − rf_d) / DD`，`DD = sqrt(mean(min(r − rf_d, 0)²))` | 只惩罚下行波动的收益风险比；`rf_d = long_only_risk_free_rate / 252`（默认 1.75%）。 |
+| `t_stat` | `mean(r) / std(r) × sqrt(n)` | 日收益均值的 t 值，用来判断「收益是不是运气」。 |
+| `t_stat_p_value` | `erfc(abs(t) / sqrt(2))` | 正态近似的双侧 p 值。 |
+
+几条容易踩到的边界（这些字段取 `null` 而不是硬凑一个 0 或无穷大）：
+
+- 交易日不足 2 天：`volatility`、`sortino`、`t_stat`、`t_stat_p_value` 为空。
+- 任何一天收益 ≤ −100%（净值归零）：`cagr`、`compounded_total_return`、`compounded_max_drawdown`、`compounded_calmar` 为空，算术字段照常输出。
+- 全程零收益：`cagr = 0`，但 `sortino` 和 `t_stat` 为空（分母为 0）。
+- 推荐看盘顺序：先用算术口径对比排名（与评分一致），再用 `cagr` / `compounded_max_drawdown` 判断这条曲线在真实复利下是否仍然漂亮。完整定义见 `docs/metrics-definitions.md`。
+
 `performance_by_year.csv` 的年度回撤现在也使用与 `summary.csv` 相同的相对回撤定义：先构造 `1 + 累计收益`，再计算相对历史峰值的跌幅，避免同一个结果页出现两套不兼容的回撤口径。
 
 ### 只做多模式：主动收益与 `raw_*` / `active_*` 字段

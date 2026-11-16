@@ -45,6 +45,10 @@ data/sample/
 .env.*
 !.env.example
 
+# Local archives (source backups, offline runtime bundles)
+*.tar.gz
+*.tgz
+
 # Editor and OS noise
 .vscode/*
 !.vscode/extensions.json

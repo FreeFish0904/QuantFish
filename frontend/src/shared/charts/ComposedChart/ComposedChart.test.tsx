@@ -270,7 +270,7 @@ describe("ComposedChart", () => {
 
   it("keeps tooltip date text using the theme text token", () => {
     expect(chartStylesText).toContain(".tooltipDate");
-    expect(chartStylesText).toContain("color: var(--sf-text)");
+    expect(chartStylesText).toContain("color: var(--qf-text)");
   });
 
   it("uses a string tooltip label as the date when payload dates are missing", () => {

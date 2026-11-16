@@ -77,4 +77,23 @@ describe("I18nProvider", () => {
 
     expect(screen.getByTestId("language")).toHaveTextContent("zh");
   });
+
+  it("follows the browser language when no preference is stored", () => {
+    Object.defineProperty(window.navigator, "language", { value: "en-US", configurable: true });
+    Object.defineProperty(window.navigator, "languages", { value: ["en-US"], configurable: true });
+
+    try {
+      render(
+        <I18nProvider>
+          <Consumer />
+        </I18nProvider>
+      );
+
+      expect(screen.getByTestId("language")).toHaveTextContent("en");
+      expect(screen.getByTestId("page")).toHaveTextContent("Page 2 of 5");
+    } finally {
+      Object.defineProperty(window.navigator, "language", { value: "zh-CN", configurable: true });
+      Object.defineProperty(window.navigator, "languages", { value: ["zh-CN"], configurable: true });
+    }
+  });
 });

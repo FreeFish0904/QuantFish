@@ -1,12 +1,12 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--sf-space-2);
-  padding: var(--sf-space-4);
+  gap: var(--qf-space-2);
+  padding: var(--qf-space-4);
 }
 
 .label {
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -20,17 +20,17 @@
 }
 
 .positive {
-  color: var(--sf-emerald);
+  color: var(--qf-emerald);
 }
 
 .warning {
-  color: var(--sf-amber);
+  color: var(--qf-amber);
 }
 
 .danger {
-  color: var(--sf-red);
+  color: var(--qf-red);
 }
 
 .neutral {
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
 }

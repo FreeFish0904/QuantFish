@@ -1,12 +1,12 @@
 .tableRegion {
   display: grid;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   min-width: 0;
 }
 
 .wrap {
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
   min-width: 0;
   overscroll-behavior-x: contain;
   overflow: auto;
@@ -14,7 +14,7 @@
 }
 
 .wrap:focus-visible {
-  box-shadow: var(--sf-focus-ring);
+  box-shadow: var(--qf-focus-ring);
   outline: none;
 }
 
@@ -34,26 +34,26 @@
 
 .table th,
 .table td {
-  border-bottom: 1px solid var(--sf-border);
-  padding: var(--sf-space-3) var(--sf-space-3);
+  border-bottom: 1px solid var(--qf-border);
+  padding: var(--qf-space-3) var(--qf-space-3);
   text-align: left;
   white-space: nowrap;
 }
 
 .table th {
-  background: var(--sf-slate-soft);
-  color: var(--sf-text-muted);
-  font-size: var(--sf-text-xs);
+  background: var(--qf-slate-soft);
+  color: var(--qf-text-muted);
+  font-size: var(--qf-text-xs);
   font-weight: 800;
 }
 
 .table td {
-  color: var(--sf-text);
-  font-size: var(--sf-text-sm);
+  color: var(--qf-text);
+  font-size: var(--qf-text-sm);
 }
 
 .table tbody tr:hover td {
-  background: var(--sf-slate-soft-hover);
+  background: var(--qf-slate-soft-hover);
 }
 
 .table tr:last-child td {
@@ -61,11 +61,11 @@
 }
 
 .selectedRow td {
-  background: var(--sf-cyan-soft);
+  background: var(--qf-cyan-soft);
 }
 
 .table tbody tr.selectedRow:hover td {
-  background: var(--sf-cyan-soft-hover);
+  background: var(--qf-cyan-soft-hover);
 }
 
 .sort {
@@ -74,7 +74,7 @@
   color: inherit;
   display: inline-flex;
   align-items: center;
-  gap: var(--sf-space-1);
+  gap: var(--qf-space-1);
   font: inherit;
   font-weight: inherit;
   padding: 0;
@@ -82,14 +82,14 @@
 }
 
 .sort:hover {
-  color: var(--sf-text);
+  color: var(--qf-text);
   text-decoration: underline;
 }
 
 .sort:focus-visible {
-  box-shadow: var(--sf-focus-ring);
+  box-shadow: var(--qf-focus-ring);
   outline: none;
-  border-radius: var(--sf-radius-sm);
+  border-radius: var(--qf-radius-sm);
 }
 
 .alignRight {
@@ -98,10 +98,10 @@
 
 .scrollHint {
   align-items: center;
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
   display: inline-flex;
-  font-size: var(--sf-text-xs);
-  gap: var(--sf-space-2);
+  font-size: var(--qf-text-xs);
+  gap: var(--qf-space-2);
   justify-self: end;
   margin: 0;
 }

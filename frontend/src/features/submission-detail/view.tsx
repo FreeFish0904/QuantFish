@@ -1,9 +1,10 @@
-import { CircleQuestionMark } from "lucide-react";
+import { CircleQuestionMark, FileDown, TableProperties } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useI18n } from "../../shared/i18n";
 import { ComposedChart } from "../../shared/charts/ComposedChart/ComposedChart";
+import { downloadTextFile, toCsv } from "../../shared/downloads/download";
 import { Badge, type BadgeStatus } from "../../shared/ui/Badge/Badge";
 import { dataTrackLabelKey } from "../../shared/submissions/dataTrack";
 import { ExecutionParametersTable } from "../../shared/submissions/ExecutionParametersTable";
@@ -227,6 +228,55 @@ export function SubmissionDetailView() {
     !data.performanceAvailability.hasBenchmark || (alphaApplicable && !data.performanceAvailability.hasAlpha);
   const benchmarkEnabled = data.performanceAvailability.hasBenchmark;
   const alphaEnabled = alphaApplicable && data.performanceAvailability.hasAlpha;
+
+  const downloadCurveCsv = () => {
+    const columns = [
+      "date",
+      "strategy_equity",
+      "strategy_pct_change",
+      "benchmark",
+      "alpha",
+      "drawdown",
+      "daily_pnl"
+    ];
+    const rows = data.equityCurve.map((point) => ({
+      date: point.date,
+      strategy_equity: point.strategyEquityCny,
+      strategy_pct_change: point.strategyPercentChange,
+      benchmark: point.benchmark,
+      alpha: point.alpha,
+      drawdown: point.drawdown,
+      daily_pnl: point.dailyPnl
+    }));
+    downloadTextFile(
+      `${data.submissionId}-equity-curve.csv`,
+      toCsv(rows, columns),
+      "text/csv;charset=utf-8"
+    );
+  };
+
+  const downloadMetricsJson = () => {
+    const payload = {
+      submission_id: data.submissionId,
+      submission_label: data.submissionLabel,
+      team: data.teamName,
+      status: data.status,
+      stale: data.isStale,
+      submitted_at: data.submittedAt,
+      scored_at: data.scoredAt ?? null,
+      kpis: Object.fromEntries(display.kpis.map((kpi) => [kpi.id, kpi.value])),
+      metrics: Object.fromEntries(display.metricRows.map((row) => [row.metric, row.value])),
+      trade_summary: Object.fromEntries(
+        display.tradeSummaryRows.map((row) => [row.label, row.value])
+      )
+    };
+    downloadTextFile(
+      `${data.submissionId}-metrics.json`,
+      JSON.stringify(payload, null, 2),
+      "application/json"
+    );
+  };
+
   return (
     <section className={styles.view} aria-labelledby="submission-detail-title">
       <header className={styles.header}>
@@ -244,7 +294,38 @@ export function SubmissionDetailView() {
             {t("submissionDetail.submittedAt", { time: new Date(data.submittedAt).toLocaleString() })}
           </p>
         </div>
-        <Badge status={badge.status} label={t(badge.labelKey)} />
+        <div className={styles.headerAside}>
+          <Badge status={badge.status} label={t(badge.labelKey)} />
+          <div className={styles.downloads}>
+            {data.status === "completed" ? (
+              <a
+                className={styles.downloadLink}
+                href={`/api/submissions/${encodeURIComponent(data.submissionId)}/report`}
+              >
+                <FileDown aria-hidden="true" size={15} />
+                {t("submissionDetail.downloadPdf")}
+              </a>
+            ) : null}
+            <button
+              className={styles.downloadLink}
+              disabled={data.equityCurve.length === 0}
+              onClick={downloadCurveCsv}
+              type="button"
+            >
+              <TableProperties aria-hidden="true" size={15} />
+              {t("submissionDetail.downloadCurve")}
+            </button>
+            <button
+              className={styles.downloadLink}
+              disabled={display.metricRows.length === 0}
+              onClick={downloadMetricsJson}
+              type="button"
+            >
+              <FileDown aria-hidden="true" size={15} />
+              {t("submissionDetail.downloadMetrics")}
+            </button>
+          </div>
+        </div>
       </header>
 
       {data.isStale ? (

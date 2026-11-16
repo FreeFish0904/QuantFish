@@ -4,16 +4,16 @@
   background:
     radial-gradient(
       circle at 18% 0%,
-      color-mix(in srgb, var(--sf-cyan) calc(var(--sf-bg-gradient-accent-alpha) * 100%), transparent),
+      color-mix(in srgb, var(--qf-cyan) calc(var(--qf-bg-gradient-accent-alpha) * 100%), transparent),
       transparent 32%
     ),
     linear-gradient(
       135deg,
-      var(--sf-bg-gradient-start) 0%,
-      var(--sf-bg-gradient-mid) 48%,
-      var(--sf-bg-gradient-end) 100%
+      var(--qf-bg-gradient-start) 0%,
+      var(--qf-bg-gradient-mid) 48%,
+      var(--qf-bg-gradient-end) 100%
     );
-  color: var(--sf-text);
+  color: var(--qf-text);
 }
 
 .sidebar {
@@ -22,13 +22,13 @@
   width: 248px;
   height: 100vh;
   flex: 0 0 248px;
-  border-right: 1px solid var(--sf-border);
-  background: var(--sf-overlay);
+  border-right: 1px solid var(--qf-border);
+  background: var(--qf-overlay);
   backdrop-filter: blur(18px);
   display: flex;
   flex-direction: column;
-  padding: var(--sf-space-4) var(--sf-space-3);
-  transition: width var(--sf-transition-base), flex-basis var(--sf-transition-base);
+  padding: var(--qf-space-4) var(--qf-space-3);
+  transition: width var(--qf-transition-base), flex-basis var(--qf-transition-base);
 }
 
 .sidebarCollapsed {
@@ -39,21 +39,23 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   min-height: 46px;
-  margin-bottom: var(--sf-space-4);
-  padding: var(--sf-space-1-5);
+  margin-bottom: var(--qf-space-4);
+  padding: var(--qf-space-1-5);
+  color: inherit;
+  text-decoration: none;
 }
 
 .brandMark {
   width: 36px;
   height: 36px;
-  border: 1px solid var(--sf-border-strong);
-  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--qf-border-strong);
+  border-radius: var(--qf-radius-md);
   display: grid;
   place-items: center;
-  color: var(--sf-cyan);
-  background: var(--sf-cyan-soft);
+  color: var(--qf-cyan);
+  background: var(--qf-cyan-soft);
   font-weight: 800;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -73,7 +75,7 @@
 
 .nav {
   display: grid;
-  gap: var(--sf-space-1);
+  gap: var(--qf-space-1);
 }
 
 .collapse {
@@ -92,19 +94,19 @@
   top: 0;
   z-index: 4;
   min-height: 72px;
-  border-bottom: 1px solid var(--sf-border);
-  background: var(--sf-chrome-surface);
+  border-bottom: 1px solid var(--qf-border);
+  background: var(--qf-chrome-surface);
   backdrop-filter: blur(18px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sf-space-5);
-  padding: var(--sf-space-3) var(--sf-space-6);
+  gap: var(--qf-space-5);
+  padding: var(--qf-space-3) var(--qf-space-6);
 }
 
 .eyebrow {
-  margin: 0 0 var(--sf-space-1);
-  color: var(--sf-text-muted);
+  margin: 0 0 var(--qf-space-1);
+  color: var(--qf-text-muted);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -112,55 +114,55 @@
 
 .pageTitle {
   margin: 0;
-  font-size: var(--sf-text-xl);
-  font-weight: var(--sf-font-weight-semibold);
-  line-height: var(--sf-line-height-heading);
+  font-size: var(--qf-text-xl);
+  font-weight: var(--qf-font-weight-semibold);
+  line-height: var(--qf-line-height-heading);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
 }
 
 .topbarControl {
   min-height: 40px;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  background: var(--sf-surface);
-  color: var(--sf-text);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  background: var(--qf-surface);
+  color: var(--qf-text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition:
-    background-color var(--sf-transition-fast),
-    border-color var(--sf-transition-fast),
-    color var(--sf-transition-fast),
-    box-shadow var(--sf-transition-fast);
+    background-color var(--qf-transition-fast),
+    border-color var(--qf-transition-fast),
+    color var(--qf-transition-fast),
+    box-shadow var(--qf-transition-fast);
 }
 
 .topbarControl:hover:not(:disabled) {
-  background: var(--sf-surface-strong);
-  border-color: var(--sf-border-strong);
+  background: var(--qf-surface-strong);
+  border-color: var(--qf-border-strong);
 }
 
 .topbarControl:focus-visible {
   outline: none;
-  box-shadow: var(--sf-focus-ring);
+  box-shadow: var(--qf-focus-ring);
 }
 
 .topbarControl:disabled {
   opacity: 0.55;
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
 }
 
 .livePill {
   composes: topbarControl;
-  gap: var(--sf-space-2);
-  padding: 0 var(--sf-space-3);
-  color: var(--sf-emerald);
-  font-weight: var(--sf-font-weight-bold);
-  font-size: var(--sf-text-sm);
+  gap: var(--qf-space-2);
+  padding: 0 var(--qf-space-3);
+  color: var(--qf-emerald);
+  font-weight: var(--qf-font-weight-bold);
+  font-size: var(--qf-text-sm);
 }
 
 .iconButton {
@@ -170,26 +172,26 @@
 
 .accountBox {
   align-items: center;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  background: var(--sf-surface);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  background: var(--qf-surface);
   display: inline-flex;
-  gap: var(--sf-space-1);
+  gap: var(--qf-space-1);
   min-height: 40px;
-  padding: 0 var(--sf-space-1) 0 var(--sf-space-3);
+  padding: 0 var(--qf-space-1) 0 var(--qf-space-3);
 }
 
 .accountIdentity {
   align-items: center;
-  color: var(--sf-text);
+  color: var(--qf-text);
   display: inline-flex;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   min-width: 0;
 }
 
 .accountText {
-  font-size: var(--sf-text-sm);
-  font-weight: var(--sf-font-weight-bold);
+  font-size: var(--qf-text-sm);
+  font-weight: var(--qf-font-weight-bold);
   max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -198,31 +200,31 @@
 
 .loginLink {
   composes: topbarControl;
-  gap: var(--sf-space-1);
-  padding: 0 var(--sf-space-3);
+  gap: var(--qf-space-1);
+  padding: 0 var(--qf-space-3);
   text-decoration: none;
-  font-size: var(--sf-text-sm);
-  font-weight: var(--sf-font-weight-bold);
+  font-size: var(--qf-text-sm);
+  font-weight: var(--qf-font-weight-bold);
 }
 
 .languageToggle {
   composes: topbarControl;
   min-width: 44px;
-  padding: 0 var(--sf-space-3);
-  font-weight: var(--sf-font-weight-bold);
+  padding: 0 var(--qf-space-3);
+  font-weight: var(--qf-font-weight-bold);
 }
 
 .pulseDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--sf-emerald);
-  box-shadow: 0 0 0 var(--sf-emerald-pulse);
+  background: var(--qf-emerald);
+  box-shadow: 0 0 0 var(--qf-emerald-pulse);
   animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 var(--sf-emerald-pulse); }
+  0% { box-shadow: 0 0 0 0 var(--qf-emerald-pulse); }
   70% { box-shadow: 0 0 0 8px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
@@ -238,7 +240,7 @@
 .main {
   width: min(1380px, 100%);
   margin: 0 auto;
-  padding: var(--sf-space-6) var(--sf-space-6) 92px;
+  padding: var(--qf-space-6) var(--qf-space-6) 92px;
   flex: 1;
 }
 
@@ -252,11 +254,11 @@
   }
 
   .topbar {
-    padding: var(--sf-space-3) var(--sf-space-4);
+    padding: var(--qf-space-3) var(--qf-space-4);
   }
 
   .main {
-    padding: var(--sf-space-4) var(--sf-space-4) 88px;
+    padding: var(--qf-space-4) var(--qf-space-4) 88px;
   }
 
   .mobileNav {
@@ -266,14 +268,14 @@
     bottom: 0;
     z-index: 8;
     height: 68px;
-    border-top: 1px solid var(--sf-border);
-    background: var(--sf-chrome-surface);
+    border-top: 1px solid var(--qf-border);
+    background: var(--qf-chrome-surface);
     backdrop-filter: blur(18px);
     display: flex;
-    gap: var(--sf-space-0-5);
+    gap: var(--qf-space-0-5);
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    padding: var(--sf-space-1-5);
+    padding: var(--qf-space-1-5);
     scrollbar-width: none;
   }
 
@@ -300,7 +302,7 @@
   .topbar {
     align-items: flex-start;
     flex-direction: column;
-    gap: var(--sf-space-3);
+    gap: var(--qf-space-3);
   }
 
   .actions {
@@ -325,7 +327,7 @@
 
   .accountBox[data-authenticated="false"] {
     flex: 0 0 auto;
-    padding-left: var(--sf-space-1);
+    padding-left: var(--qf-space-1);
   }
 
   .accountBox[data-authenticated="false"] .accountIdentity {
@@ -333,13 +335,13 @@
   }
 
   .loginLink {
-    padding: 0 var(--sf-space-2);
+    padding: 0 var(--qf-space-2);
   }
 }
 
 @media (max-width: 360px) {
   .mobileNav {
-    gap: var(--sf-space-0-5);
-    padding: var(--sf-space-1);
+    gap: var(--qf-space-0-5);
+    padding: var(--qf-space-1);
   }
 }

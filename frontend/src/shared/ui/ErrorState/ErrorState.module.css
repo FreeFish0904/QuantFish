@@ -1,18 +1,18 @@
 .state {
   align-items: center;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
   display: grid;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   justify-items: center;
   min-height: 190px;
-  padding: var(--sf-space-6);
+  padding: var(--qf-space-6);
   text-align: center;
-  color: var(--sf-text);
+  color: var(--qf-text);
 }
 
 .state svg {
-  color: var(--sf-red);
+  color: var(--qf-red);
 }
 
 .state h3 {
@@ -21,6 +21,6 @@
 }
 
 .state p {
-  margin: var(--sf-space-1) 0 0;
-  color: var(--sf-text-muted);
+  margin: var(--qf-space-1) 0 0;
+  color: var(--qf-text-muted);
 }

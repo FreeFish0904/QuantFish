@@ -15,7 +15,6 @@ class WebSettings:
     frontend_dist: Path = Path("frontend/dist")
     max_upload_bytes: int = 1_000_000
     submission_cooldown_seconds: float = 2.0
-    scoring_timeout_seconds: int = 120
     engine_version: str = field(default_factory=lambda: _default_engine_version())
     cors_allowed_origins: tuple[str, ...] = field(
         default_factory=lambda: _cors_allowed_origins()

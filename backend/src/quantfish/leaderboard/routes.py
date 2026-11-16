@@ -117,16 +117,15 @@ def dashboard(request: Request) -> dict[str, Any]:
     course = settings.get("course") or {}
     visible_team_ids = _visible_history_team_ids(services)
     status_counts = _status_counts(visible_submissions)
+    runner_status = _runner_status(settings, status_counts)
     return {
         "submission_count": len(visible_submissions),
         "team_count": len(visible_team_ids),
         "course_name": course.get("name"),
-        "scoring_timeout_seconds": settings.get("execution", {}).get(
-            "submission_timeout_seconds"
-        ),
+        "scoring_timeout_seconds": runner_status["scoring_timeout_seconds"],
         "latest": _latest_rows(ranked),
         "status_counts": status_counts,
-        "runner_status": _runner_status(settings, status_counts),
+        "runner_status": runner_status,
     }
 
 

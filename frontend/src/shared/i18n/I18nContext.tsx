@@ -16,6 +16,17 @@ function parseLanguage(value: unknown): Language | null {
   return value === "en" || value === "zh" ? value : null;
 }
 
+function detectBrowserLanguage(fallback: Language): Language {
+  if (typeof navigator === "undefined") {
+    return fallback;
+  }
+  const candidate = navigator.languages?.[0] ?? navigator.language ?? "";
+  if (!candidate) {
+    return fallback;
+  }
+  return candidate.toLowerCase().startsWith("zh") ? "zh" : "en";
+}
+
 function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
   return path.split(".").reduce<unknown>((current, key) => {
     if (current === null || current === undefined) {
@@ -34,13 +45,17 @@ function interpolate(template: string, variables: Record<string, string | number
 
 export function I18nProvider({
   children,
-  defaultLanguage = "zh"
+  defaultLanguage
 }: {
   children: ReactNode;
   defaultLanguage?: Language;
 }) {
   const [language, setLanguageState] = useState<Language>(() =>
-    readPreference(LANGUAGE_STORAGE_KEY, defaultLanguage, parseLanguage)
+    readPreference(
+      LANGUAGE_STORAGE_KEY,
+      defaultLanguage ?? detectBrowserLanguage("zh"),
+      parseLanguage
+    )
   );
 
   const setLanguage = useCallback((next: Language) => {

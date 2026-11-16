@@ -1,65 +1,65 @@
 .chart {
-  --sf-profit: var(--sf-emerald);
-  --sf-loss: var(--sf-red);
+  --qf-profit: var(--qf-emerald);
+  --qf-loss: var(--qf-red);
   display: grid;
   gap: 10px;
   min-width: 0;
 }
 
 .chartTitle {
-  color: var(--sf-text);
-  font-size: var(--sf-text-lg);
+  color: var(--qf-text);
+  font-size: var(--qf-text-lg);
   font-weight: 700;
-  line-height: var(--sf-line-height-tight);
+  line-height: var(--qf-line-height-tight);
   margin: 0;
 }
 
 .legend {
   align-items: center;
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--sf-text-xs);
+  font-size: var(--qf-text-xs);
   font-weight: 800;
-  gap: var(--sf-space-3);
+  gap: var(--qf-space-3);
 }
 
 .legendItem {
   align-items: center;
-  border-radius: var(--sf-radius-sm);
+  border-radius: var(--qf-radius-sm);
   display: inline-flex;
   gap: 6px;
   padding: 2px 6px;
-  transition: background-color var(--sf-transition-fast);
+  transition: background-color var(--qf-transition-fast);
 }
 
 .legendItem:hover {
-  background-color: var(--sf-slate-soft);
+  background-color: var(--qf-slate-soft);
 }
 
 .legendUnavailable {
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
   opacity: 0.62;
   text-decoration: line-through;
 }
 
 .unitLabel {
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-sm);
-  color: var(--sf-text);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-sm);
+  color: var(--qf-text);
   font-size: 11px;
   padding: 2px 6px;
 }
 
 .swatch {
-  border-radius: var(--sf-radius-full);
+  border-radius: var(--qf-radius-full);
   display: inline-block;
   height: 8px;
   width: 18px;
 }
 
 .dotSwatch {
-  border-radius: var(--sf-radius-full);
+  border-radius: var(--qf-radius-full);
   display: inline-block;
   height: 8px;
   width: 8px;
@@ -80,7 +80,7 @@
 }
 
 .axisRail {
-  color: var(--sf-text-muted);
+  color: var(--qf-text-muted);
   font-size: 10px;
   font-weight: 800;
   line-height: 1;
@@ -88,7 +88,7 @@
 }
 
 .axisRailTitle {
-  color: var(--sf-text);
+  color: var(--qf-text);
   font-size: 10px;
   left: 0;
   letter-spacing: 0.02em;
@@ -131,25 +131,25 @@
 }
 
 .axisTickRule {
-  background: color-mix(in srgb, var(--sf-text-muted) 52%, transparent);
+  background: color-mix(in srgb, var(--qf-text-muted) 52%, transparent);
   flex: 0 0 12px;
   height: 1px;
 }
 
 .tooltip {
-  background: var(--sf-overlay);
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text);
+  background: var(--qf-overlay);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text);
   display: grid;
-  font-size: var(--sf-text-xs);
+  font-size: var(--qf-text-xs);
   gap: 6px;
   min-width: 154px;
   padding: 8px 10px;
 }
 
 .tooltipDate {
-  color: var(--sf-text);
+  color: var(--qf-text);
   font-weight: 900;
 }
 
@@ -168,7 +168,7 @@
 }
 
 .tooltipSwatch {
-  border-radius: var(--sf-radius-full);
+  border-radius: var(--qf-radius-full);
   display: inline-block;
   height: 7px;
   width: 14px;
@@ -181,8 +181,8 @@
 }
 
 .frame {
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
   min-height: 260px;
   overflow: hidden;
   position: relative;
@@ -190,13 +190,13 @@
 }
 
 .frameScrollable {
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
   min-height: 260px;
   overflow-x: auto;
   overflow-y: hidden;
   position: relative;
-  scrollbar-color: var(--sf-cyan) transparent;
+  scrollbar-color: var(--qf-cyan) transparent;
   width: 100%;
 }
 

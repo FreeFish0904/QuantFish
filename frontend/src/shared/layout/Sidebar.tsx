@@ -1,4 +1,5 @@
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { useI18n } from "../i18n";
 import { navItems } from "./navConfig";
@@ -21,14 +22,14 @@ export function Sidebar({
       className={[styles.sidebar, collapsed ? styles.sidebarCollapsed : ""].join(" ")}
       aria-expanded={!collapsed}
     >
-      <div className={styles.brand}>
+      <Link className={styles.brand} to="/" title={t("brand.name")}>
         <div className={styles.brandMark}>{t("brand.shortMark")}</div>
         {!collapsed && (
           <div className={styles.brandTitle}>
             <strong className={styles.brandName}>{t("brand.name")}</strong>
           </div>
         )}
-      </div>
+      </Link>
       <nav aria-label={t("common.primaryNavigation")} className={styles.nav}>
         {navItems.map((item) => (
           <NavButton

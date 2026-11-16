@@ -1,6 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 import { lazy, Suspense, type ReactNode } from "react";
-import type { RouteObject } from "react-router-dom";
+import { Navigate, type RouteObject } from "react-router-dom";
 
 import { App } from "./app/App";
 import { useI18n } from "./shared/i18n";
@@ -14,6 +14,7 @@ const AdminCohortSubmissionsView = lazy(() =>
 const CompareView = lazy(() => import("./features/compare").then((module) => ({ default: module.CompareView })));
 const DashboardView = lazy(() => import("./features/dashboard").then((module) => ({ default: module.DashboardView })));
 const HistoryView = lazy(() => import("./features/history").then((module) => ({ default: module.HistoryView })));
+const LandingView = lazy(() => import("./features/landing").then((module) => ({ default: module.LandingView })));
 const LeaderboardView = lazy(() => import("./features/leaderboard").then((module) => ({ default: module.LeaderboardView })));
 const LoginView = lazy(() => import("./features/session").then((module) => ({ default: module.LoginView })));
 const SubmissionDetailView = lazy(() =>
@@ -54,10 +55,14 @@ function RouteElement({ children }: { children: ReactNode }) {
 export const routes: RouteObject[] = [
   {
     path: "/",
+    element: <RouteElement><LandingView /></RouteElement>,
+    errorElement: <RouteError />
+  },
+  {
     element: <App />,
     errorElement: <RouteError />,
     children: [
-      { index: true, element: <RouteElement><DashboardView /></RouteElement>, errorElement: <RouteError /> },
+      { path: "dashboard", element: <RouteElement><DashboardView /></RouteElement>, errorElement: <RouteError /> },
       { path: "login", element: <RouteElement><LoginView /></RouteElement>, errorElement: <RouteError /> },
       { path: "submit", element: <RouteElement><SubmissionView /></RouteElement>, errorElement: <RouteError /> },
       { path: "leaderboard", element: <RouteElement><LeaderboardView /></RouteElement>, errorElement: <RouteError /> },
@@ -65,7 +70,8 @@ export const routes: RouteObject[] = [
       { path: "submissions/:submissionId", element: <RouteElement><SubmissionDetailView /></RouteElement>, errorElement: <RouteError /> },
       { path: "compare", element: <RouteElement><CompareView /></RouteElement>, errorElement: <RouteError /> },
       { path: "admin", element: <RouteElement><AdminConsoleView /></RouteElement>, errorElement: <RouteError /> },
-      { path: "admin/cohorts/:cohortId/submissions", element: <RouteElement><AdminCohortSubmissionsView /></RouteElement>, errorElement: <RouteError /> }
+      { path: "admin/cohorts/:cohortId/submissions", element: <RouteElement><AdminCohortSubmissionsView /></RouteElement>, errorElement: <RouteError /> },
+      { path: "*", element: <Navigate replace to="/" /> }
     ]
   }
 ];

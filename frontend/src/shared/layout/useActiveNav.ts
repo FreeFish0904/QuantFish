@@ -8,8 +8,10 @@ export function useActiveNav() {
 
   const activeItem = location.pathname.startsWith("/submissions/")
     ? navItems.find((item) => item.key === "leaderboard")
-    : navItems.find((item) =>
-        item.href === "/" ? location.pathname === "/" : location.pathname.startsWith(item.href)
+    : navItems.find(
+        (item) =>
+          location.pathname === item.href ||
+          location.pathname.startsWith(`${item.href}/`)
       );
 
   return {

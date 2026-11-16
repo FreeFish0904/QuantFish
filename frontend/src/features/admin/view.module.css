@@ -1,78 +1,78 @@
 .admin {
   width: min(1260px, 100%);
   margin: 0 auto;
-  padding: var(--sf-space-4);
-  color: var(--sf-text);
+  padding: var(--qf-space-4);
+  color: var(--qf-text);
 }
 
 .loginShell {
   align-items: center;
-  color: var(--sf-text);
+  color: var(--qf-text);
   display: flex;
   justify-content: center;
   min-height: min(640px, calc(100vh - 96px));
-  padding: var(--sf-space-4);
+  padding: var(--qf-space-4);
 }
 
 .loginForm {
-  background: var(--sf-overlay-light);
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
+  background: var(--qf-overlay-light);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
   display: grid;
-  gap: var(--sf-space-3);
+  gap: var(--qf-space-3);
   max-width: 380px;
-  padding: var(--sf-space-5);
+  padding: var(--qf-space-5);
   width: 100%;
 }
 
 .loginTitle {
-  font-size: var(--sf-text-2xl);
-  font-weight: var(--sf-font-weight-bold);
-  line-height: var(--sf-line-height-tight);
+  font-size: var(--qf-text-2xl);
+  font-weight: var(--qf-font-weight-bold);
+  line-height: var(--qf-line-height-tight);
   margin: 0;
 }
 
 .loginField {
   display: grid;
-  gap: var(--sf-space-1);
+  gap: var(--qf-space-1);
 }
 
 .loginField span {
-  color: var(--sf-text-muted);
-  font-size: var(--sf-text-xs);
+  color: var(--qf-text-muted);
+  font-size: var(--qf-text-xs);
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .loginField input {
-  background: var(--sf-bg);
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text);
+  background: var(--qf-bg);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text);
   font: inherit;
   min-height: 42px;
-  padding: 0 var(--sf-space-3);
+  padding: 0 var(--qf-space-3);
   width: 100%;
 }
 
 .loginField input:focus-visible {
-  box-shadow: var(--sf-focus-ring);
+  box-shadow: var(--qf-focus-ring);
   outline: none;
 }
 
 .loginHint {
-  color: var(--sf-text-muted);
-  font-size: var(--sf-text-xs);
+  color: var(--qf-text-muted);
+  font-size: var(--qf-text-xs);
   margin: 0;
 }
 
 .loading {
   align-items: center;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text-muted);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text-muted);
   display: flex;
-  gap: var(--sf-space-3);
+  gap: var(--qf-space-3);
   justify-content: center;
   min-height: 320px;
 }
@@ -85,30 +85,30 @@
   align-items: center;
   display: flex;
   justify-content: space-between;
-  gap: var(--sf-space-4);
-  margin-bottom: var(--sf-space-3);
+  gap: var(--qf-space-4);
+  margin-bottom: var(--qf-space-3);
 }
 
 .kicker {
-  color: var(--sf-text-muted);
-  font-size: var(--sf-text-xs);
+  color: var(--qf-text-muted);
+  font-size: var(--qf-text-xs);
   font-weight: 800;
   margin: 0;
   text-transform: uppercase;
 }
 
 .title {
-  font-size: var(--sf-text-2xl);
-  font-weight: var(--sf-font-weight-bold);
-  line-height: var(--sf-line-height-tight);
-  margin: var(--sf-space-1) 0 0;
+  font-size: var(--qf-text-2xl);
+  font-weight: var(--qf-font-weight-bold);
+  line-height: var(--qf-line-height-tight);
+  margin: var(--qf-space-1) 0 0;
 }
 
 .statusGroup {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   justify-content: flex-end;
 }
 
@@ -116,45 +116,45 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   justify-content: flex-end;
 }
 
 .status span {
   align-items: center;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text-muted);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text-muted);
   display: inline-flex;
-  font-size: var(--sf-text-xs);
+  font-size: var(--qf-text-xs);
   font-weight: 800;
   min-height: 28px;
   padding: 0 10px;
 }
 
 .panel {
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  background: var(--sf-overlay-light);
-  margin-top: var(--sf-space-3);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  background: var(--qf-overlay-light);
+  margin-top: var(--qf-space-3);
   min-height: 320px;
-  padding: var(--sf-space-4);
+  padding: var(--qf-space-4);
 }
 
 .datasetToast {
   align-items: center;
-  background: var(--sf-surface);
-  border: 1px solid var(--sf-cyan-soft-border);
-  border-radius: var(--sf-radius-md);
-  box-shadow: var(--sf-shadow);
-  color: var(--sf-text);
+  background: var(--qf-surface);
+  border: 1px solid var(--qf-cyan-soft-border);
+  border-radius: var(--qf-radius-md);
+  box-shadow: var(--qf-shadow);
+  color: var(--qf-text);
   display: flex;
-  gap: var(--sf-space-2);
-  max-width: min(360px, calc(100vw - var(--sf-space-4) * 2));
-  padding: var(--sf-space-2) var(--sf-space-3);
+  gap: var(--qf-space-2);
+  max-width: min(360px, calc(100vw - var(--qf-space-4) * 2));
+  padding: var(--qf-space-2) var(--qf-space-3);
   pointer-events: none;
   position: fixed;
-  right: var(--sf-space-4);
+  right: var(--qf-space-4);
   top: 50%;
   transform: translateY(-50%);
   width: max-content;
@@ -163,7 +163,7 @@
 
 .datasetToastIcon {
   align-items: center;
-  color: var(--sf-cyan);
+  color: var(--qf-cyan);
   display: inline-flex;
   flex: 0 0 auto;
   justify-content: center;
@@ -176,37 +176,37 @@
 }
 
 .datasetToastText strong {
-  font-size: var(--sf-text-sm);
+  font-size: var(--qf-text-sm);
   line-height: 1.2;
 }
 
 .datasetToastText small {
-  color: var(--sf-text-muted);
-  font-size: var(--sf-text-xs);
+  color: var(--qf-text-muted);
+  font-size: var(--qf-text-xs);
   line-height: 1.3;
 }
 
 .datasetToastSuccess {
-  background: var(--sf-emerald-soft);
-  border-color: var(--sf-emerald-soft-border);
+  background: var(--qf-emerald-soft);
+  border-color: var(--qf-emerald-soft-border);
 }
 
 .datasetToastSuccess .datasetToastIcon {
-  color: var(--sf-emerald);
+  color: var(--qf-emerald);
 }
 
 .datasetToastError {
-  background: var(--sf-red-soft);
-  border-color: var(--sf-red-soft-border);
+  background: var(--qf-red-soft);
+  border-color: var(--qf-red-soft-border);
 }
 
 .datasetToastError .datasetToastIcon {
-  color: var(--sf-red);
+  color: var(--qf-red);
 }
 
 .datasetToastDismiss {
   min-height: 28px;
-  padding: 0 var(--sf-space-2);
+  padding: 0 var(--qf-space-2);
   pointer-events: auto;
 }
 
@@ -216,27 +216,27 @@
 
 .buttonLink {
   align-items: center;
-  background: var(--sf-slate-soft);
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text);
+  background: var(--qf-slate-soft);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text);
   display: inline-flex;
   font: inherit;
   font-weight: 700;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   justify-content: center;
   min-height: 36px;
-  padding: 0 var(--sf-space-3);
+  padding: 0 var(--qf-space-3);
   text-decoration: none;
-  transition: background-color var(--sf-transition-fast), border-color var(--sf-transition-fast);
+  transition: background-color var(--qf-transition-fast), border-color var(--qf-transition-fast);
 }
 
 .buttonLink:hover {
-  background: var(--sf-slate-soft-hover);
+  background: var(--qf-slate-soft-hover);
 }
 
 .buttonLink:focus-visible {
-  box-shadow: var(--sf-focus-ring);
+  box-shadow: var(--qf-focus-ring);
   outline: none;
 }
 
@@ -246,7 +246,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .datasetToast {
-    animation: datasetToastEnter var(--sf-transition-base) ease-out;
+    animation: datasetToastEnter var(--qf-transition-base) ease-out;
   }
 
   .datasetToastSpinner {
@@ -281,7 +281,7 @@
 
 @media (max-width: 920px) {
   .admin {
-    padding: var(--sf-space-3);
+    padding: var(--qf-space-3);
   }
 
   .header {
@@ -294,10 +294,10 @@
   }
 
   .datasetToast {
-    bottom: var(--sf-space-3);
-    left: var(--sf-space-3);
-    max-width: calc(100vw - var(--sf-space-3) * 2);
-    right: var(--sf-space-3);
+    bottom: var(--qf-space-3);
+    left: var(--qf-space-3);
+    max-width: calc(100vw - var(--qf-space-3) * 2);
+    right: var(--qf-space-3);
     top: auto;
     transform: none;
     width: auto;

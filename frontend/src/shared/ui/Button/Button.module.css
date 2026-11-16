@@ -1,21 +1,21 @@
 .button {
   align-items: center;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text);
   display: inline-flex;
   font: inherit;
   font-weight: 700;
-  gap: var(--sf-space-2);
+  gap: var(--qf-space-2);
   justify-content: center;
   min-height: 36px;
-  padding: 0 var(--sf-space-3);
+  padding: 0 var(--qf-space-3);
   text-decoration: none;
-  transition: background-color var(--sf-transition-fast), border-color var(--sf-transition-fast);
+  transition: background-color var(--qf-transition-fast), border-color var(--qf-transition-fast);
 }
 
 .button:focus-visible {
-  box-shadow: var(--sf-focus-ring);
+  box-shadow: var(--qf-focus-ring);
   outline: none;
 }
 
@@ -29,18 +29,18 @@
 }
 
 .primary {
-  background: var(--sf-cyan-soft);
-  border-color: var(--sf-cyan-soft-strong);
+  background: var(--qf-cyan-soft);
+  border-color: var(--qf-cyan-soft-strong);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--sf-cyan-soft-hover);
+  background: var(--qf-cyan-soft-hover);
 }
 
 .ghost {
-  background: var(--sf-slate-soft);
+  background: var(--qf-slate-soft);
 }
 
 .ghost:hover:not(:disabled) {
-  background: var(--sf-slate-soft-hover);
+  background: var(--qf-slate-soft-hover);
 }

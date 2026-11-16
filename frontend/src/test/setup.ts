@@ -1,6 +1,17 @@
 import "@testing-library/jest-dom/vitest";
 import { server } from "./server";
 
+// Pin the jsdom locale so component tests keep the Chinese default while the
+// i18n suite can still override `navigator.language` to assert detection.
+Object.defineProperty(window.navigator, "language", {
+  value: "zh-CN",
+  configurable: true
+});
+Object.defineProperty(window.navigator, "languages", {
+  value: ["zh-CN"],
+  configurable: true
+});
+
 // Node.js 25+ exposes a built-in globalThis.localStorage stub that lacks
 // Storage methods and emits a warning on access. jsdom under Vitest can
 // inherit it, so we install a minimal in-memory Storage when needed.

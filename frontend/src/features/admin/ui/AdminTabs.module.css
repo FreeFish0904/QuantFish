@@ -1,17 +1,17 @@
 .tabs {
-  border-radius: var(--sf-radius-md);
+  border-radius: var(--qf-radius-md);
 }
 
 .tablist {
   align-items: center;
-  background: var(--sf-overlay);
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
+  background: var(--qf-overlay);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
   display: flex;
-  gap: var(--sf-space-1);
+  gap: var(--qf-space-1);
   min-height: 44px;
   overflow-x: auto;
-  padding: var(--sf-space-1);
+  padding: var(--qf-space-1);
 }
 
 .tab {
@@ -21,9 +21,9 @@
 }
 
 .tab.active {
-  background: var(--sf-cyan-soft);
-  border-color: var(--sf-cyan-soft-border);
-  color: var(--sf-text);
+  background: var(--qf-cyan-soft);
+  border-color: var(--qf-cyan-soft-border);
+  color: var(--qf-text);
 }
 
 @media (max-width: 920px) {
@@ -34,9 +34,9 @@
   }
 
   .tab {
-    flex: 1 1 calc(33.333% - var(--sf-space-1));
+    flex: 1 1 calc(33.333% - var(--qf-space-1));
     min-width: 0;
-    padding: 0 var(--sf-space-2);
+    padding: 0 var(--qf-space-2);
   }
 
   .tab span {
@@ -47,7 +47,7 @@
 
 @media (max-width: 560px) {
   .tab {
-    flex: 1 1 calc(50% - var(--sf-space-1));
+    flex: 1 1 calc(50% - var(--qf-space-1));
   }
 }
 

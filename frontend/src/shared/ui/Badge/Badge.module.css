@@ -1,38 +1,38 @@
 .badge {
   align-items: center;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-full);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-full);
   display: inline-flex;
-  font-size: var(--sf-text-xs);
+  font-size: var(--qf-text-xs);
   font-weight: 800;
-  gap: var(--sf-space-1-5);
+  gap: var(--qf-space-1-5);
   min-height: 28px;
   padding: 0 10px;
   white-space: nowrap;
 }
 
 .positive {
-  background: var(--sf-emerald-soft);
-  border-color: var(--sf-emerald-soft-border);
-  color: var(--sf-emerald);
+  background: var(--qf-emerald-soft);
+  border-color: var(--qf-emerald-soft-border);
+  color: var(--qf-emerald);
 }
 
 .warning {
-  background: var(--sf-amber-soft);
-  border-color: var(--sf-amber-soft-border);
-  color: var(--sf-amber);
+  background: var(--qf-amber-soft);
+  border-color: var(--qf-amber-soft-border);
+  color: var(--qf-amber);
 }
 
 .danger {
-  background: var(--sf-red-soft);
-  border-color: var(--sf-red-soft-border);
-  color: var(--sf-red);
+  background: var(--qf-red-soft);
+  border-color: var(--qf-red-soft-border);
+  color: var(--qf-red);
 }
 
 .neutral {
-  background: var(--sf-cyan-soft);
-  border-color: var(--sf-cyan-soft-border);
-  color: var(--sf-cyan);
+  background: var(--qf-cyan-soft);
+  border-color: var(--qf-cyan-soft-border);
+  color: var(--qf-cyan);
 }
 
 .spin {

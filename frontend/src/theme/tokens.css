@@ -2,229 +2,229 @@
   color-scheme: dark;
 
   /* Base palette (dark finance-cockpit) */
-  --sf-bg: #07111d;
-  --sf-bg-elevated: #0a1624;
-  --sf-surface: #0d1a2a;
-  --sf-surface-strong: #122235;
+  --qf-bg: #07111d;
+  --qf-bg-elevated: #0a1624;
+  --qf-surface: #0d1a2a;
+  --qf-surface-strong: #122235;
 
   /* Semantic colors */
-  --sf-text: #e6edf7;
-  --sf-text-muted: #8da2ba;
-  --sf-cyan: #22d3ee;
-  --sf-emerald: #34d399;
-  --sf-amber: #fbbf24;
-  --sf-red: #fb7185;
-  --sf-violet: #a78bfa;
+  --qf-text: #e6edf7;
+  --qf-text-muted: #8da2ba;
+  --qf-cyan: #22d3ee;
+  --qf-emerald: #34d399;
+  --qf-amber: #fbbf24;
+  --qf-red: #fb7185;
+  --qf-violet: #a78bfa;
 
   /* Semantic aliases */
-  --sf-success: var(--sf-emerald);
-  --sf-warning: var(--sf-amber);
-  --sf-error: var(--sf-red);
-  --sf-info: var(--sf-cyan);
-  --sf-profit: var(--sf-emerald);
-  --sf-loss: var(--sf-red);
+  --qf-success: var(--qf-emerald);
+  --qf-warning: var(--qf-amber);
+  --qf-error: var(--qf-red);
+  --qf-info: var(--qf-cyan);
+  --qf-profit: var(--qf-emerald);
+  --qf-loss: var(--qf-red);
 
   /* Soft accent surfaces (auto-adapt to light/dark via color-mix) */
-  --sf-cyan-soft: color-mix(in srgb, var(--sf-cyan) 12%, transparent);
-  --sf-cyan-soft-hover: color-mix(in srgb, var(--sf-cyan) 18%, transparent);
-  --sf-cyan-soft-strong: color-mix(in srgb, var(--sf-cyan) 24%, transparent);
-  --sf-cyan-soft-border: color-mix(in srgb, var(--sf-cyan) 24%, transparent);
-  --sf-emerald-soft: color-mix(in srgb, var(--sf-emerald) 12%, transparent);
-  --sf-emerald-soft-hover: color-mix(in srgb, var(--sf-emerald) 18%, transparent);
-  --sf-emerald-soft-strong: color-mix(in srgb, var(--sf-emerald) 24%, transparent);
-  --sf-emerald-soft-border: color-mix(in srgb, var(--sf-emerald) 28%, transparent);
-  --sf-emerald-pulse: color-mix(in srgb, var(--sf-emerald) 44%, transparent);
-  --sf-amber-soft: color-mix(in srgb, var(--sf-amber) 12%, transparent);
-  --sf-amber-soft-hover: color-mix(in srgb, var(--sf-amber) 18%, transparent);
-  --sf-amber-soft-strong: color-mix(in srgb, var(--sf-amber) 24%, transparent);
-  --sf-amber-soft-border: color-mix(in srgb, var(--sf-amber) 28%, transparent);
-  --sf-red-soft: color-mix(in srgb, var(--sf-red) 12%, transparent);
-  --sf-red-soft-hover: color-mix(in srgb, var(--sf-red) 18%, transparent);
-  --sf-red-soft-strong: color-mix(in srgb, var(--sf-red) 24%, transparent);
-  --sf-red-soft-border: color-mix(in srgb, var(--sf-red) 28%, transparent);
-  --sf-violet-soft: color-mix(in srgb, var(--sf-violet) 12%, transparent);
-  --sf-violet-soft-hover: color-mix(in srgb, var(--sf-violet) 18%, transparent);
-  --sf-violet-soft-strong: color-mix(in srgb, var(--sf-violet) 24%, transparent);
-  --sf-violet-soft-border: color-mix(in srgb, var(--sf-violet) 28%, transparent);
-  --sf-slate-soft: color-mix(in srgb, var(--sf-text-muted) 8%, transparent);
-  --sf-slate-soft-hover: color-mix(in srgb, var(--sf-text-muted) 14%, transparent);
-  --sf-slate-soft-strong: color-mix(in srgb, var(--sf-text-muted) 20%, transparent);
-  --sf-slate-soft-border: color-mix(in srgb, var(--sf-text-muted) 24%, transparent);
+  --qf-cyan-soft: color-mix(in srgb, var(--qf-cyan) 12%, transparent);
+  --qf-cyan-soft-hover: color-mix(in srgb, var(--qf-cyan) 18%, transparent);
+  --qf-cyan-soft-strong: color-mix(in srgb, var(--qf-cyan) 24%, transparent);
+  --qf-cyan-soft-border: color-mix(in srgb, var(--qf-cyan) 24%, transparent);
+  --qf-emerald-soft: color-mix(in srgb, var(--qf-emerald) 12%, transparent);
+  --qf-emerald-soft-hover: color-mix(in srgb, var(--qf-emerald) 18%, transparent);
+  --qf-emerald-soft-strong: color-mix(in srgb, var(--qf-emerald) 24%, transparent);
+  --qf-emerald-soft-border: color-mix(in srgb, var(--qf-emerald) 28%, transparent);
+  --qf-emerald-pulse: color-mix(in srgb, var(--qf-emerald) 44%, transparent);
+  --qf-amber-soft: color-mix(in srgb, var(--qf-amber) 12%, transparent);
+  --qf-amber-soft-hover: color-mix(in srgb, var(--qf-amber) 18%, transparent);
+  --qf-amber-soft-strong: color-mix(in srgb, var(--qf-amber) 24%, transparent);
+  --qf-amber-soft-border: color-mix(in srgb, var(--qf-amber) 28%, transparent);
+  --qf-red-soft: color-mix(in srgb, var(--qf-red) 12%, transparent);
+  --qf-red-soft-hover: color-mix(in srgb, var(--qf-red) 18%, transparent);
+  --qf-red-soft-strong: color-mix(in srgb, var(--qf-red) 24%, transparent);
+  --qf-red-soft-border: color-mix(in srgb, var(--qf-red) 28%, transparent);
+  --qf-violet-soft: color-mix(in srgb, var(--qf-violet) 12%, transparent);
+  --qf-violet-soft-hover: color-mix(in srgb, var(--qf-violet) 18%, transparent);
+  --qf-violet-soft-strong: color-mix(in srgb, var(--qf-violet) 24%, transparent);
+  --qf-violet-soft-border: color-mix(in srgb, var(--qf-violet) 28%, transparent);
+  --qf-slate-soft: color-mix(in srgb, var(--qf-text-muted) 8%, transparent);
+  --qf-slate-soft-hover: color-mix(in srgb, var(--qf-text-muted) 14%, transparent);
+  --qf-slate-soft-strong: color-mix(in srgb, var(--qf-text-muted) 20%, transparent);
+  --qf-slate-soft-border: color-mix(in srgb, var(--qf-text-muted) 24%, transparent);
 
   /* Borders */
-  --sf-border: rgba(148, 163, 184, 0.18);
-  --sf-border-strong: rgba(34, 211, 238, 0.42);
+  --qf-border: rgba(148, 163, 184, 0.18);
+  --qf-border-strong: rgba(34, 211, 238, 0.42);
 
   /* Surfaces */
-  --sf-overlay: rgba(7, 17, 29, 0.84);
-  --sf-overlay-light: rgba(7, 17, 29, 0.72);
-  --sf-backdrop: rgba(4, 12, 20, 0.5);
-  --sf-chrome-surface: var(--sf-overlay);
+  --qf-overlay: rgba(7, 17, 29, 0.84);
+  --qf-overlay-light: rgba(7, 17, 29, 0.72);
+  --qf-backdrop: rgba(4, 12, 20, 0.5);
+  --qf-chrome-surface: var(--qf-overlay);
 
   /* Shell gradient */
-  --sf-bg-gradient-start: #07111d;
-  --sf-bg-gradient-mid: #111827;
-  --sf-bg-gradient-end: #0a1726;
-  --sf-bg-gradient-accent-alpha: 0.08;
+  --qf-bg-gradient-start: #07111d;
+  --qf-bg-gradient-mid: #111827;
+  --qf-bg-gradient-end: #0a1726;
+  --qf-bg-gradient-accent-alpha: 0.08;
 
   /* Shadows */
-  --sf-shadow: 0 22px 54px rgba(0, 0, 0, 0.28);
-  --sf-focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.5);
+  --qf-shadow: 0 22px 54px rgba(0, 0, 0, 0.28);
+  --qf-focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.5);
 
   /* Spacing */
-  --sf-space-0-5: 2px;
-  --sf-space-1: 4px;
-  --sf-space-1-5: 6px;
-  --sf-space-2: 8px;
-  --sf-space-3: 12px;
-  --sf-space-4: 16px;
-  --sf-space-5: 20px;
-  --sf-space-6: 24px;
-  --sf-space-7: 28px;
-  --sf-space-8: 32px;
-  --sf-space-10: 40px;
-  --sf-space-12: 48px;
-  --sf-space-16: 64px;
+  --qf-space-0-5: 2px;
+  --qf-space-1: 4px;
+  --qf-space-1-5: 6px;
+  --qf-space-2: 8px;
+  --qf-space-3: 12px;
+  --qf-space-4: 16px;
+  --qf-space-5: 20px;
+  --qf-space-6: 24px;
+  --qf-space-7: 28px;
+  --qf-space-8: 32px;
+  --qf-space-10: 40px;
+  --qf-space-12: 48px;
+  --qf-space-16: 64px;
 
   /* Radius */
-  --sf-radius-sm: 6px;
-  --sf-radius-md: 8px;
-  --sf-radius-lg: 12px;
-  --sf-radius-full: 999px;
+  --qf-radius-sm: 6px;
+  --qf-radius-md: 8px;
+  --qf-radius-lg: 12px;
+  --qf-radius-full: 999px;
 
   /* Motion */
-  --sf-transition-none: 1ms ease;
-  --sf-transition-fast: 120ms ease;
-  --sf-transition-base: 160ms ease;
-  --sf-transition-slow: 240ms ease;
+  --qf-transition-none: 1ms ease;
+  --qf-transition-fast: 120ms ease;
+  --qf-transition-base: 160ms ease;
+  --qf-transition-slow: 240ms ease;
 
   /* Typography */
-  --sf-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --sf-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --qf-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --qf-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
-  --sf-text-2xs: 0.625rem;
-  --sf-text-xs: 0.75rem;
-  --sf-text-sm: 0.875rem;
-  --sf-text-base: 1rem;
-  --sf-text-lg: 1.125rem;
-  --sf-text-xl: 1.25rem;
-  --sf-text-2xl: 1.5rem;
-  --sf-text-3xl: 1.875rem;
+  --qf-text-2xs: 0.625rem;
+  --qf-text-xs: 0.75rem;
+  --qf-text-sm: 0.875rem;
+  --qf-text-base: 1rem;
+  --qf-text-lg: 1.125rem;
+  --qf-text-xl: 1.25rem;
+  --qf-text-2xl: 1.5rem;
+  --qf-text-3xl: 1.875rem;
 
-  --sf-line-height-tight: 1.2;
-  --sf-line-height-heading: 1.25;
-  --sf-line-height-base: 1.5;
-  --sf-line-height-relaxed: 1.65;
+  --qf-line-height-tight: 1.2;
+  --qf-line-height-heading: 1.25;
+  --qf-line-height-base: 1.5;
+  --qf-line-height-relaxed: 1.65;
 
-  --sf-font-weight-normal: 400;
-  --sf-font-weight-medium: 500;
-  --sf-font-weight-semibold: 600;
-  --sf-font-weight-bold: 700;
+  --qf-font-weight-normal: 400;
+  --qf-font-weight-medium: 500;
+  --qf-font-weight-semibold: 600;
+  --qf-font-weight-bold: 700;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     color-scheme: light;
 
-    --sf-bg: #e6f0f8;
-    --sf-bg-elevated: #dcebf5;
-    --sf-surface: #f1f7fc;
-    --sf-surface-strong: #e8f3fb;
+    --qf-bg: #e6f0f8;
+    --qf-bg-elevated: #dcebf5;
+    --qf-surface: #f1f7fc;
+    --qf-surface-strong: #e8f3fb;
 
-    --sf-text: #0f172a;
-    --sf-text-muted: #52657a;
-    --sf-cyan: #0891b8;
-    --sf-emerald: #059669;
-    --sf-amber: #b45309;
-    --sf-red: #e11d48;
-    --sf-violet: #7c3aed;
+    --qf-text: #0f172a;
+    --qf-text-muted: #52657a;
+    --qf-cyan: #0891b8;
+    --qf-emerald: #059669;
+    --qf-amber: #b45309;
+    --qf-red: #e11d48;
+    --qf-violet: #7c3aed;
 
-    --sf-border: rgba(42, 86, 120, 0.18);
-    --sf-border-strong: rgba(8, 145, 178, 0.42);
+    --qf-border: rgba(42, 86, 120, 0.18);
+    --qf-border-strong: rgba(8, 145, 178, 0.42);
 
-    --sf-overlay: rgba(221, 237, 248, 0.84);
-    --sf-overlay-light: rgba(232, 243, 251, 0.82);
-    --sf-backdrop: rgba(10, 25, 40, 0.45);
+    --qf-overlay: rgba(221, 237, 248, 0.84);
+    --qf-overlay-light: rgba(232, 243, 251, 0.82);
+    --qf-backdrop: rgba(10, 25, 40, 0.45);
 
-    --sf-shadow: 0 18px 44px rgba(33, 73, 103, 0.13);
-    --sf-focus-ring: 0 0 0 3px rgba(8, 145, 178, 0.45);
+    --qf-shadow: 0 18px 44px rgba(33, 73, 103, 0.13);
+    --qf-focus-ring: 0 0 0 3px rgba(8, 145, 178, 0.45);
   }
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --sf-bg: #e6f0f8;
-  --sf-bg-elevated: #dcebf5;
-  --sf-surface: #f1f7fc;
-  --sf-surface-strong: #e8f3fb;
+  --qf-bg: #e6f0f8;
+  --qf-bg-elevated: #dcebf5;
+  --qf-surface: #f1f7fc;
+  --qf-surface-strong: #e8f3fb;
 
-  --sf-text: #0f172a;
-  --sf-text-muted: #52657a;
-  --sf-cyan: #0891b8;
-  --sf-emerald: #059669;
-  --sf-amber: #b45309;
-  --sf-red: #e11d48;
-  --sf-violet: #7c3aed;
+  --qf-text: #0f172a;
+  --qf-text-muted: #52657a;
+  --qf-cyan: #0891b8;
+  --qf-emerald: #059669;
+  --qf-amber: #b45309;
+  --qf-red: #e11d48;
+  --qf-violet: #7c3aed;
 
-  --sf-border: rgba(42, 86, 120, 0.18);
-  --sf-border-strong: rgba(8, 145, 178, 0.42);
+  --qf-border: rgba(42, 86, 120, 0.18);
+  --qf-border-strong: rgba(8, 145, 178, 0.42);
 
-  --sf-overlay: rgba(221, 237, 248, 0.84);
-  --sf-overlay-light: rgba(232, 243, 251, 0.82);
-  --sf-backdrop: rgba(10, 25, 40, 0.45);
+  --qf-overlay: rgba(221, 237, 248, 0.84);
+  --qf-overlay-light: rgba(232, 243, 251, 0.82);
+  --qf-backdrop: rgba(10, 25, 40, 0.45);
 
-  --sf-bg-gradient-start: #e6f0f8;
-  --sf-bg-gradient-mid: #d5e8f4;
-  --sf-bg-gradient-end: #eaf5fb;
-  --sf-bg-gradient-accent-alpha: 0.12;
+  --qf-bg-gradient-start: #e6f0f8;
+  --qf-bg-gradient-mid: #d5e8f4;
+  --qf-bg-gradient-end: #eaf5fb;
+  --qf-bg-gradient-accent-alpha: 0.12;
 
-  --sf-shadow: 0 18px 44px rgba(33, 73, 103, 0.13);
-  --sf-focus-ring: 0 0 0 3px rgba(8, 145, 178, 0.45);
+  --qf-shadow: 0 18px 44px rgba(33, 73, 103, 0.13);
+  --qf-focus-ring: 0 0 0 3px rgba(8, 145, 178, 0.45);
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --sf-bg: #07111d;
-  --sf-bg-elevated: #0a1624;
-  --sf-surface: #0d1a2a;
-  --sf-surface-strong: #122235;
+  --qf-bg: #07111d;
+  --qf-bg-elevated: #0a1624;
+  --qf-surface: #0d1a2a;
+  --qf-surface-strong: #122235;
 
-  --sf-text: #e6edf7;
-  --sf-text-muted: #8da2ba;
-  --sf-cyan: #22d3ee;
-  --sf-emerald: #34d399;
-  --sf-amber: #fbbf24;
-  --sf-red: #fb7185;
-  --sf-violet: #a78bfa;
+  --qf-text: #e6edf7;
+  --qf-text-muted: #8da2ba;
+  --qf-cyan: #22d3ee;
+  --qf-emerald: #34d399;
+  --qf-amber: #fbbf24;
+  --qf-red: #fb7185;
+  --qf-violet: #a78bfa;
 
-  --sf-border: rgba(148, 163, 184, 0.18);
-  --sf-border-strong: rgba(34, 211, 238, 0.42);
+  --qf-border: rgba(148, 163, 184, 0.18);
+  --qf-border-strong: rgba(34, 211, 238, 0.42);
 
-  --sf-overlay: rgba(7, 17, 29, 0.84);
-  --sf-overlay-light: rgba(7, 17, 29, 0.72);
-  --sf-backdrop: rgba(4, 12, 20, 0.5);
+  --qf-overlay: rgba(7, 17, 29, 0.84);
+  --qf-overlay-light: rgba(7, 17, 29, 0.72);
+  --qf-backdrop: rgba(4, 12, 20, 0.5);
 
-  --sf-shadow: 0 22px 54px rgba(0, 0, 0, 0.28);
-  --sf-focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.5);
+  --qf-shadow: 0 22px 54px rgba(0, 0, 0, 0.28);
+  --qf-focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --sf-transition-fast: var(--sf-transition-none);
-    --sf-transition-base: var(--sf-transition-none);
-    --sf-transition-slow: var(--sf-transition-none);
+    --qf-transition-fast: var(--qf-transition-none);
+    --qf-transition-base: var(--qf-transition-none);
+    --qf-transition-slow: var(--qf-transition-none);
   }
 }
 
 @media (forced-colors: active) {
   :root {
-    --sf-border: CanvasText;
-    --sf-border-strong: Highlight;
-    --sf-focus-ring: 0 0 0 3px Highlight;
-    --sf-shadow: none;
-    --sf-overlay: Canvas;
-    --sf-overlay-light: Canvas;
+    --qf-border: CanvasText;
+    --qf-border-strong: Highlight;
+    --qf-focus-ring: 0 0 0 3px Highlight;
+    --qf-shadow: none;
+    --qf-overlay: Canvas;
+    --qf-overlay-light: Canvas;
   }
 }

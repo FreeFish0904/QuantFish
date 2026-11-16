@@ -3,17 +3,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sf-space-3);
+  gap: var(--qf-space-3);
   min-height: 60vh;
-  padding: var(--sf-space-6);
-  color: var(--sf-text-muted);
+  padding: var(--qf-space-6);
+  color: var(--qf-text-muted);
   text-align: center;
 }
 
 .spinner {
   width: 28px;
   height: 28px;
-  color: var(--sf-cyan);
+  color: var(--qf-cyan);
   animation: spin 1s linear infinite;
 }
 
@@ -34,5 +34,5 @@
   align-items: center;
   justify-content: center;
   min-height: 60vh;
-  padding: var(--sf-space-6);
+  padding: var(--qf-space-6);
 }

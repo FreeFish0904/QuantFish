@@ -16,10 +16,10 @@ import type { CompareResponse } from "./api";
 import { fetchCompareSubmissions } from "./api";
 
 export const COMPARE_COLORS = [
-  "var(--sf-cyan)",
-  "var(--sf-amber)",
-  "var(--sf-emerald)",
-  "var(--sf-violet)"
+  "var(--qf-cyan)",
+  "var(--qf-amber)",
+  "var(--qf-emerald)",
+  "var(--qf-violet)"
 ];
 
 export type CompareSubmission = {

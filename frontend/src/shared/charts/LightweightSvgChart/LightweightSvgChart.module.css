@@ -13,22 +13,22 @@
 }
 
 .gridLine {
-  stroke: color-mix(in srgb, var(--sf-text-muted) 16%, transparent);
+  stroke: color-mix(in srgb, var(--qf-text-muted) 16%, transparent);
   stroke-dasharray: 2 5;
 }
 
 .axisLine {
-  stroke: color-mix(in srgb, var(--sf-text-muted) 52%, transparent);
+  stroke: color-mix(in srgb, var(--qf-text-muted) 52%, transparent);
 }
 
 .axisLabel {
-  fill: var(--sf-text-muted);
+  fill: var(--qf-text-muted);
   font-size: 11px;
   font-weight: 700;
 }
 
 .hoverRule {
-  stroke: color-mix(in srgb, var(--sf-text) 42%, transparent);
+  stroke: color-mix(in srgb, var(--qf-text) 42%, transparent);
   stroke-dasharray: 3 4;
 }
 
@@ -41,19 +41,19 @@
 }
 
 .tooltip {
-  background: var(--sf-overlay);
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  color: var(--sf-text);
+  background: var(--qf-overlay);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  color: var(--qf-text);
   display: grid;
-  font-size: var(--sf-text-xs);
+  font-size: var(--qf-text-xs);
   gap: 6px;
   min-width: 132px;
   padding: 8px 10px;
 }
 
 .tooltipDate {
-  color: var(--sf-text);
+  color: var(--qf-text);
   font-weight: 900;
 }
 
@@ -72,7 +72,7 @@
 }
 
 .tooltipSwatch {
-  border-radius: var(--sf-radius-full);
+  border-radius: var(--qf-radius-full);
   display: inline-block;
   height: 7px;
   width: 14px;

@@ -15,6 +15,35 @@ export const translations = {
       pageTitle: "QuantFish · A-share factor research & backtesting",
       shortMark: "QF"
     },
+    landing: {
+      badge: "Factor research · backtest · scoring",
+      title: "An A-share factor research stack you can run end to end",
+      subtitle:
+        "Submit a scoring script and get a forward-adjusted VWAP backtest with industry-neutral quintiles, active-return scoring and a PDF report. Built for classroom leaderboards, reproducible research and portfolio demos.",
+      primaryCta: "Open the live demo",
+      secondaryCta: "View the source",
+      demoHint: "The public demo runs on bundled sample data, and every screen is clickable.",
+      featuresTitle: "What is inside",
+      features: {
+        engineTitle: "Realistic execution",
+        engineBody:
+          "Forward-adjusted prices, T+1 VWAP fills, limit-up / limit-down handling, suspended-day carry plus configurable commission and slippage.",
+        scoringTitle: "Scoring you can defend",
+        scoringBody:
+          "Industry-neutral quintile portfolios, long-only HS300 benchmark, active return, information ratio and turnover-aware execution assumptions.",
+        opsTitle: "Queue-based platform",
+        opsBody:
+          "FastAPI job queue with progress streaming, cached parquet panels, result staleness detection, student data exports and offline runtime bundles."
+      },
+      pipeline: {
+        title: "From idea to leaderboard in four steps",
+        step1: "Write a score",
+        step2: "Submit the script",
+        step3: "Queued backtest",
+        step4: "Compare and export"
+      },
+      stack: "React 19 · FastAPI · Parquet panels · pure SVG charts · one-command Docker demo"
+    },
     nav: {
       dashboard: "Dashboard",
       dashboardShort: "Home",
@@ -272,6 +301,9 @@ export const translations = {
     },
     submissionDetail: {
       errorTitle: "Could not load submission",
+      downloadPdf: "PDF report",
+      downloadCurve: "Equity curve CSV",
+      downloadMetrics: "Metrics JSON",
       loadingTitle: "Loading submission",
       loadingDescription: "Fetching run metrics and cumulative return history.",
       teamLabel: "{team}",
@@ -891,6 +923,35 @@ export const translations = {
       pageTitle: "QuantFish · A股因子研究与回测平台",
       shortMark: "QF"
     },
+    landing: {
+      badge: "因子研究 · 回测 · 评分",
+      title: "能真正跑起来的 A 股因子研究平台",
+      subtitle:
+        "上传打分脚本，平台完成前复权 VWAP 撮合、行业中性化分组、主动收益打分，并生成 PDF 报告。适合课堂排行榜、可复现研究与作品演示。",
+      primaryCta: "进入在线演示",
+      secondaryCta: "查看源码",
+      demoHint: "公开演示使用内置示例数据，所有页面均可点击浏览。",
+      featuresTitle: "平台能力",
+      features: {
+        engineTitle: "贴近真实的撮合",
+        engineBody:
+          "前复权价格、T+1 VWAP 成交、涨跌停与停牌处理，佣金与滑点可配置，回测结果可复现。",
+        scoringTitle: "经得起追问的评分",
+        scoringBody:
+          "行业中性化五分组、沪深 300 单多头基准、主动收益、信息比率与换手假设，指标口径全部写进文档。",
+        opsTitle: "队列化的平台",
+        opsBody:
+          "FastAPI 任务队列与进度推送、Parquet 面板缓存、结果失效检测、学生数据导出与离线运行包。"
+      },
+      pipeline: {
+        title: "从想法到排行榜只需四步",
+        step1: "写打分逻辑",
+        step2: "上传脚本",
+        step3: "队列回测",
+        step4: "对比与导出"
+      },
+      stack: "React 19 · FastAPI · Parquet 面板 · 纯 SVG 图表 · Docker 一键演示"
+    },
     nav: {
       dashboard: "仪表盘",
       dashboardShort: "首页",
@@ -1148,6 +1209,9 @@ export const translations = {
     },
     submissionDetail: {
       errorTitle: "无法加载提交",
+      downloadPdf: "PDF 报告",
+      downloadCurve: "净值曲线 CSV",
+      downloadMetrics: "指标 JSON",
       loadingTitle: "加载提交中",
       loadingDescription: "正在获取运行指标和累计收益历史。",
       teamLabel: "{team}",

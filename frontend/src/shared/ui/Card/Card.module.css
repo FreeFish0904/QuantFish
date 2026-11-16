@@ -1,8 +1,8 @@
 .card {
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-md);
-  background: linear-gradient(180deg, var(--sf-surface-strong), var(--sf-surface));
-  box-shadow: var(--sf-shadow);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius-md);
+  background: linear-gradient(180deg, var(--qf-surface-strong), var(--qf-surface));
+  box-shadow: var(--qf-shadow);
   min-width: 0;
 }
 
@@ -10,19 +10,19 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--sf-space-3);
-  padding: var(--sf-space-4);
-  border-bottom: 1px solid var(--sf-border);
+  gap: var(--qf-space-3);
+  padding: var(--qf-space-4);
+  border-bottom: 1px solid var(--qf-border);
 }
 
 .header h2 {
-  color: var(--sf-text);
-  font-size: var(--sf-text-lg);
+  color: var(--qf-text);
+  font-size: var(--qf-text-lg);
   font-weight: 700;
-  line-height: var(--sf-line-height-tight);
+  line-height: var(--qf-line-height-tight);
   margin: 0;
 }
 
 .body {
-  padding: var(--sf-space-4);
+  padding: var(--qf-space-4);
 }

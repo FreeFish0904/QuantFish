@@ -5,7 +5,7 @@ import { useI18n } from "../../shared/i18n";
 import { useTheme } from "../../shared/theme/ThemeContext";
 import styles from "./view.module.css";
 
-export const REPOSITORY_URL = "https://github.com/FreeFish0904/quantfish";
+export const REPOSITORY_URL = "https://github.com/FreeFish0904/QuantFish";
 
 const featureCards = [
   { key: "engine", icon: Zap, tone: styles.toneCyan },

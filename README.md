@@ -8,13 +8,13 @@ Write a scoring script → the platform queues a real backtest with forward-adju
 VWAP fills, industry-neutral quintiles and long-only HS300 scoring → then shows you a
 leaderboard, a run comparison and a PDF report.
 
-[**Live demo**](https://FreeFish0904.github.io/quantfish/) ·
+[**Live demo**](https://FreeFish0904.github.io/QuantFish/) ·
 [Docker demo](#-quickstart) ·
 [Architecture](docs/architecture.md) ·
 [Contributing](CONTRIBUTING.md)
 
-[![CI](https://github.com/FreeFish0904/quantfish/actions/workflows/ci.yml/badge.svg)](https://github.com/FreeFish0904/quantfish/actions/workflows/ci.yml)
-[![Pages demo](https://github.com/FreeFish0904/quantfish/actions/workflows/pages.yml/badge.svg)](https://github.com/FreeFish0904/quantfish/actions/workflows/pages.yml)
+[![CI](https://github.com/FreeFish0904/QuantFish/actions/workflows/ci.yml/badge.svg)](https://github.com/FreeFish0904/QuantFish/actions/workflows/ci.yml)
+[![Pages demo](https://github.com/FreeFish0904/QuantFish/actions/workflows/pages.yml/badge.svg)](https://github.com/FreeFish0904/QuantFish/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0f766e.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13-3776ab)
 ![React](https://img.shields.io/badge/react-19-0ea5e9)
@@ -58,7 +58,7 @@ generated dataset.
 ### Option 1 — Docker, one command, real backtest (recommended)
 
 ```bash
-git clone https://github.com/FreeFish0904/quantfish.git
+git clone https://github.com/FreeFish0904/QuantFish.git
 cd quantfish
 docker compose -f deploy/docker-compose.yml up --build
 ```

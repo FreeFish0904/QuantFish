@@ -14,7 +14,7 @@ student, leaderboard and admin experiences.
 ## Local setup
 
 ```bash
-git clone https://github.com/FreeFish0904/quantfish.git
+git clone https://github.com/FreeFish0904/QuantFish.git
 cd quantfish
 
 # Backend: editable install with dev extras

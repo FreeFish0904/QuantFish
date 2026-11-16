@@ -1620,6 +1620,22 @@ export interface components {
             active_max_drawdown?: number | null;
             /** Active Calmar */
             active_calmar?: number | null;
+            /** Compounded Total Return */
+            compounded_total_return?: number | null;
+            /** Cagr */
+            cagr?: number | null;
+            /** Compounded Max Drawdown */
+            compounded_max_drawdown?: number | null;
+            /** Compounded Calmar */
+            compounded_calmar?: number | null;
+            /** Volatility */
+            volatility?: number | null;
+            /** Sortino */
+            sortino?: number | null;
+            /** T Stat */
+            t_stat?: number | null;
+            /** T Stat P Value */
+            t_stat_p_value?: number | null;
         };
         /** SubmissionOptionsResponse */
         SubmissionOptionsResponse: {

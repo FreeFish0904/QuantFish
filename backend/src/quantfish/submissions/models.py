@@ -151,6 +151,16 @@ class SubmissionMetrics:
     active_annual_return: float | None = None
     active_max_drawdown: float | None = None
     active_calmar: float | None = None
+    # Geometric reporting basis (see docs/metrics-definitions.md). Scoring keeps
+    # using the arithmetic annual_return above.
+    compounded_total_return: float | None = None
+    cagr: float | None = None
+    compounded_max_drawdown: float | None = None
+    compounded_calmar: float | None = None
+    volatility: float | None = None
+    sortino: float | None = None
+    t_stat: float | None = None
+    t_stat_p_value: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -186,6 +196,14 @@ class SubmissionMetrics:
             "active_annual_return": self.active_annual_return,
             "active_max_drawdown": self.active_max_drawdown,
             "active_calmar": self.active_calmar,
+            "compounded_total_return": self.compounded_total_return,
+            "cagr": self.cagr,
+            "compounded_max_drawdown": self.compounded_max_drawdown,
+            "compounded_calmar": self.compounded_calmar,
+            "volatility": self.volatility,
+            "sortino": self.sortino,
+            "t_stat": self.t_stat,
+            "t_stat_p_value": self.t_stat_p_value,
         }
 
     @classmethod
@@ -239,6 +257,18 @@ class SubmissionMetrics:
             active_annual_return=_optional_float(summary.get("active_annual_return")),
             active_max_drawdown=_optional_float(summary.get("active_max_drawdown")),
             active_calmar=_optional_float(summary.get("active_calmar")),
+            compounded_total_return=_optional_float(
+                summary.get("compounded_total_return")
+            ),
+            cagr=_optional_float(summary.get("cagr")),
+            compounded_max_drawdown=_optional_float(
+                summary.get("compounded_max_drawdown")
+            ),
+            compounded_calmar=_optional_float(summary.get("compounded_calmar")),
+            volatility=_optional_float(summary.get("volatility")),
+            sortino=_optional_float(summary.get("sortino")),
+            t_stat=_optional_float(summary.get("t_stat")),
+            t_stat_p_value=_optional_float(summary.get("t_stat_p_value")),
         )
 
 

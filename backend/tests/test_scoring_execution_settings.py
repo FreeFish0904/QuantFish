@@ -184,3 +184,52 @@ def test_submission_metrics_reads_new_scoring_fields_from_summary() -> None:
     assert metrics.max_stale_gross_exposure == 0.40
     assert metrics.average_stale_gross_exposure == 0.10
     assert metrics.trading_days == 200
+
+
+def test_submission_metrics_exposes_geometric_basis_fields() -> None:
+    metrics = SubmissionMetrics.from_summary(
+        {
+            "annual_return": 0.24,
+            "cagr": 0.18,
+            "compounded_total_return": 0.55,
+            "compounded_max_drawdown": 0.12,
+            "compounded_calmar": 1.5,
+            "volatility": 0.21,
+            "sortino": 1.8,
+            "t_stat": 2.4,
+            "t_stat_p_value": 0.0164,
+        }
+    )
+
+    assert metrics.annual_return == 0.24
+    assert metrics.cagr == 0.18
+    assert metrics.compounded_total_return == 0.55
+    assert metrics.compounded_max_drawdown == 0.12
+    assert metrics.compounded_calmar == 1.5
+    assert metrics.volatility == 0.21
+    assert metrics.sortino == 1.8
+    assert metrics.t_stat == 2.4
+    assert metrics.t_stat_p_value == 0.0164
+
+    payload = metrics.to_dict()
+    assert payload["cagr"] == 0.18
+    assert payload["sortino"] == 1.8
+    assert payload["t_stat"] == 2.4
+
+
+def test_submission_metrics_leaves_geometric_basis_missing_for_legacy_reports() -> None:
+    metrics = SubmissionMetrics.from_summary({"total_return": 0.1, "annual_return": 0.2})
+
+    assert metrics.total_return == 0.1
+    for field in (
+        "cagr",
+        "compounded_total_return",
+        "compounded_max_drawdown",
+        "compounded_calmar",
+        "volatility",
+        "sortino",
+        "t_stat",
+        "t_stat_p_value",
+    ):
+        assert getattr(metrics, field) is None
+        assert metrics.to_dict()[field] is None

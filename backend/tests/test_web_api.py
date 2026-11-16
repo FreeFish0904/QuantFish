@@ -2946,6 +2946,23 @@ def test_admin_downloads_routes(tmp_path: Path) -> None:
     assert "pd.DataFrame" in starter_response.text
 
 
+def test_submission_metrics_schema_exposes_geometric_basis(tmp_path: Path) -> None:
+    app = create_app(_settings(tmp_path))
+    schema = app.openapi()["components"]["schemas"]["SubmissionMetrics"]["properties"]
+
+    for field in (
+        "cagr",
+        "compounded_total_return",
+        "compounded_max_drawdown",
+        "compounded_calmar",
+        "volatility",
+        "sortino",
+        "t_stat",
+        "t_stat_p_value",
+    ):
+        assert field in schema
+
+
 def test_mini_game_routes_are_removed(tmp_path: Path) -> None:
     app = create_app(_settings(tmp_path))
     removed_paths = {

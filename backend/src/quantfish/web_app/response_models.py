@@ -87,6 +87,15 @@ class SubmissionMetrics(_FrozenModel):
     active_annual_return: float | None = None
     active_max_drawdown: float | None = None
     active_calmar: float | None = None
+    # Geometric reporting basis; arithmetic annual_return still drives scoring.
+    compounded_total_return: float | None = None
+    cagr: float | None = None
+    compounded_max_drawdown: float | None = None
+    compounded_calmar: float | None = None
+    volatility: float | None = None
+    sortino: float | None = None
+    t_stat: float | None = None
+    t_stat_p_value: float | None = None
 
 
 _DATA_TRACK_LITERAL = Literal[

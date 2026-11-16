@@ -352,7 +352,7 @@ describe("SubmissionDetailView", () => {
     });
 
     expect(screen.getByText("Active total return")).toBeInTheDocument();
-    expect(screen.getByText("Active annual return")).toBeInTheDocument();
+    expect(screen.getByText("Active CAGR")).toBeInTheDocument();
     expect(screen.getByText("Information ratio (active Sharpe)")).toBeInTheDocument();
     expect(screen.getByText("Active max drawdown")).toBeInTheDocument();
     expect(

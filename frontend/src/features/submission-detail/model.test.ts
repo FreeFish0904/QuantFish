@@ -32,7 +32,15 @@ const backendDetail: BackendSubmissionDetail = {
     short_total_return: 0.06,
     annualized_short_profit: 0.12,
     win_rate: 0.58,
-    trading_days: 120
+    trading_days: 120,
+    compounded_total_return: 0.29,
+    cagr: 0.31,
+    compounded_max_drawdown: 0.06,
+    compounded_calmar: 5.17,
+    volatility: 0.21,
+    sortino: 2.42,
+    t_stat: 3.1,
+    t_stat_p_value: 0.0019
   },
   score: 53.65,
   score_breakdown: [
@@ -164,7 +172,15 @@ const backendDetail: BackendSubmissionDetail = {
       short_total_return: 0.06,
       win_rate: 0.58,
       trading_days: 120,
-      average_position_count: 4.2
+      average_position_count: 4.2,
+      compounded_total_return: 0.29,
+      cagr: 0.31,
+      compounded_max_drawdown: 0.06,
+      compounded_calmar: 5.17,
+      volatility: 0.21,
+      sortino: 2.42,
+      t_stat: 3.1,
+      t_stat_p_value: 0.0019
     }
   }
 };
@@ -202,9 +218,38 @@ describe("toSubmissionDetailModel", () => {
     expect(model.kpis).toHaveLength(4);
     expect(model.kpis.find((kpi) => kpi.id === "score")).toBeUndefined();
     expect(model.kpis.find((kpi) => kpi.id === "total-return")?.value).toBe("18.40%");
+    expect(model.kpis.find((kpi) => kpi.id === "cagr")?.value).toBe("31.00%");
+    expect(model.kpis.find((kpi) => kpi.id === "cagr")?.label).toBe("CAGR");
     expect(model.kpis.find((kpi) => kpi.id === "sharpe")?.value).toBe("1.82");
     expect(model.kpis.find((kpi) => kpi.id === "max-drawdown")?.value).toBe("4.00%");
     expect(model.kpis.find((kpi) => kpi.id === "max-drawdown")?.tone).toBe("danger");
+  });
+
+  it("falls back to the arithmetic annual return when a run predates CAGR", () => {
+    const legacy = {
+      ...backendDetail,
+      metrics: { ...backendDetail.metrics, cagr: null }
+    };
+    const model = toSubmissionDetailModel(legacy);
+
+    expect(model.kpis.find((kpi) => kpi.id === "cagr")?.value).toBe("52.00%");
+  });
+
+  it("renders the geometric basis rows with percent and ratio formatting", () => {
+    const model = toSubmissionDetailModel(backendDetail);
+    const rowValue = (metric: string) => model.metricRows.find((row) => row.metric === metric)?.value;
+    const rowNote = (metric: string) => model.metricRows.find((row) => row.metric === metric)?.note;
+
+    expect(rowValue("CAGR")).toBe("31.00%");
+    expect(rowValue("Compounded Total Return")).toBe("29.00%");
+    expect(rowValue("Compounded Max Drawdown")).toBe("6.00%");
+    expect(rowValue("Compounded Calmar")).toBe("5.1700");
+    expect(rowValue("Volatility")).toBe("21.00%");
+    expect(rowValue("Sortino")).toBe("2.4200");
+    expect(rowValue("t-stat")).toBe("3.1000");
+    expect(rowValue("t-stat p-value")).toBe("0.0019");
+    expect(rowNote("CAGR")).toBe("Geometric annualized");
+    expect(rowNote("Sortino")).toBe("Downside risk-adjusted");
   });
 
   it("aligns graph artifacts into a single CNY performance series", () => {

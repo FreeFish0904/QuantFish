@@ -39,14 +39,14 @@ function mapStatusToBadge(status: string): { status: BadgeStatus; labelKey: stri
 
 const kpiLabelKeys: Record<string, string> = {
   "total-return": "compare.totalReturn",
-  "annual-return": "compare.annualReturn",
+  cagr: "compare.cagr",
   sharpe: "leaderboard.sharpe",
   "max-drawdown": "compare.maxDrawdown"
 };
 
 const longOnlyKpiLabelKeys: Record<string, string> = {
   "total-return": "submissionDetail.activeTotalReturnKpi",
-  "annual-return": "submissionDetail.activeAnnualReturnKpi",
+  cagr: "submissionDetail.activeCagrKpi",
   sharpe: "submissionDetail.activeSharpeKpi",
   "max-drawdown": "submissionDetail.activeMaxDrawdownKpi"
 };
@@ -97,7 +97,15 @@ const metricNoteKeys: Record<string, string> = {
   "Active risk": "submissionDetail.activeRisk",
   "Active Sharpe": "submissionDetail.activeSharpe",
   "Beta-adjusted": "submissionDetail.betaAdjusted",
-  "Cumulative active return": "submissionDetail.cumulativeActiveReturn"
+  "Cumulative active return": "submissionDetail.cumulativeActiveReturn",
+  "Geometric annualized": "submissionDetail.geometricAnnualized",
+  Compounded: "submissionDetail.compounded",
+  "Compounded equity": "submissionDetail.compoundedEquity",
+  "CAGR / compounded drawdown": "submissionDetail.cagrOverCompoundedDrawdown",
+  "Annualized stdev": "submissionDetail.annualizedStdev",
+  "Downside risk-adjusted": "submissionDetail.downsideRiskAdjusted",
+  "Mean / standard error": "submissionDetail.meanOverStandardError",
+  "Normal approx.": "submissionDetail.normalApproximation"
 };
 
 type Translator = (key: string, values?: Record<string, string | number>) => string;

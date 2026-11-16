@@ -122,7 +122,7 @@ function toTone(value: number | null | undefined, mode: "higher-better" | "lower
 
 function buildKpiCards(metrics: Record<string, number>): KpiCard[] {
   const totalReturn = metrics.total_return ?? metrics.all_return ?? 0;
-  const annualReturn = metrics.annual_return ?? 0;
+  const cagr = metrics.cagr ?? metrics.annual_return ?? 0;
   const sharpe = metrics.sharpe ?? 0;
   const maxDrawdown = metrics.max_drawdown ?? 0;
   const maxDrawdownMagnitude = Number.isFinite(maxDrawdown) ? Math.abs(maxDrawdown) : maxDrawdown;
@@ -135,10 +135,10 @@ function buildKpiCards(metrics: Record<string, number>): KpiCard[] {
       tone: toTone(totalReturn, "higher-better")
     },
     {
-      id: "annual-return",
-      label: "Annual return",
-      value: formatPercent(annualReturn),
-      tone: toTone(annualReturn, "higher-better")
+      id: "cagr",
+      label: "CAGR",
+      value: formatPercent(cagr),
+      tone: toTone(cagr, "higher-better")
     },
     {
       id: "sharpe",
@@ -155,9 +155,14 @@ function buildKpiCards(metrics: Record<string, number>): KpiCard[] {
   ];
 }
 
+const PERCENT_METRICS = new Set(["cagr", "compounded_total_return", "volatility"]);
+
 function formatMetricRowValue(metric: string, value: number | null | undefined): string {
-  if (metric === "max_drawdown") {
+  if (metric === "max_drawdown" || metric === "compounded_max_drawdown") {
     return formatDrawdownPercent(value);
+  }
+  if (PERCENT_METRICS.has(metric)) {
+    return formatPercent(value);
   }
   return typeof value === "number" && Number.isFinite(value) ? value.toFixed(4) : String(value ?? "—");
 }
@@ -165,7 +170,10 @@ function formatMetricRowValue(metric: string, value: number | null | undefined):
 function formatMetricRowName(metric: string): string {
   const displayNames: Record<string, string> = {
     active_total_return: "Alpha",
-    beta: "Beta"
+    beta: "Beta",
+    cagr: "CAGR",
+    t_stat: "t-stat",
+    t_stat_p_value: "t-stat p-value"
   };
   return displayNames[metric] ?? metric.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
@@ -215,7 +223,15 @@ function buildMetricRows(metrics: Record<string, number>, summary: Record<string
     active_total_return: "Cumulative active return",
     active_annual_return: "Beta-adjusted",
     active_max_drawdown: "Beta-adjusted",
-    active_calmar: "Beta-adjusted"
+    active_calmar: "Beta-adjusted",
+    cagr: "Geometric annualized",
+    compounded_total_return: "Compounded",
+    compounded_max_drawdown: "Compounded equity",
+    compounded_calmar: "CAGR / compounded drawdown",
+    volatility: "Annualized stdev",
+    sortino: "Downside risk-adjusted",
+    t_stat: "Mean / standard error",
+    t_stat_p_value: "Normal approx."
   };
 
   return Object.entries(source).map(([metric, value]) => ({

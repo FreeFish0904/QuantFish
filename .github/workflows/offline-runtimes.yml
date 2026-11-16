@@ -1,0 +1,76 @@
+name: Build Offline Runtimes
+
+on:
+  workflow_dispatch:
+    inputs:
+      pip-index-url:
+        description: PyPI index used while building runtime packages
+        required: false
+        default: https://pypi.tuna.tsinghua.edu.cn/simple
+  push:
+    paths:
+      - pyproject.toml
+      - environment.yml
+      - src/quantfish/**
+      - scripts/build-offline-runtime.*
+      - scripts/import-offline-runtime.*
+      - .github/workflows/offline-runtimes.yml
+
+jobs:
+  build-runtime:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-arm64
+            os: macos-15
+          - platform: macos-x86_64
+            os: macos-15-intel
+          - platform: windows-x86_64
+            os: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: "3.12"
+
+      - name: Install conda-pack
+        run: python -m pip install conda-pack
+
+      - name: Build runtime package
+        env:
+          QUANTFISH_PIP_INDEX_URL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs['pip-index-url'] || 'https://pypi.tuna.tsinghua.edu.cn/simple' }}
+          PYTHONPATH: ${{ github.workspace }}/src
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            CONDA_EXE="$CONDA/Scripts/conda.exe"
+          else
+            CONDA_EXE="conda"
+          fi
+          python -m quantfish.student_exports.runtime_packages build \
+            --platform "${{ matrix.platform }}" \
+            --project-root "${{ github.workspace }}" \
+            --output-dir "${{ github.workspace }}/dist/offline-runtimes" \
+            --build-root "${{ runner.temp }}/quantfish-offline-runtimes" \
+            --conda "$CONDA_EXE" \
+            --pip-index-url "$QUANTFISH_PIP_INDEX_URL"
+
+      - name: Upload runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-runtime-${{ matrix.platform }}
+          path: |
+            dist/offline-runtimes/${{ matrix.platform }}.zip
+            dist/offline-runtimes/${{ matrix.platform }}.json
+          if-no-files-found: error
+          retention-days: 14

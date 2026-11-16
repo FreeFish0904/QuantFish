@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1600, initial-scale=1">
+  <title>原始数据因子排序引导练习任务图</title>
+  <style>
+    :root {
+      --bg: #f6f3ea;
+      --ink: #18334a;
+      --muted: #61717c;
+      --paper: #fffdf7;
+      --line: #d7cdbc;
+      --blue: #2f78d0;
+      --green: #2f9e6d;
+      --red: #c94d57;
+      --yellow: #e8aa2f;
+      --teal: #238c90;
+      --soft-blue: #e9f2ff;
+      --soft-green: #e8f6ef;
+      --soft-red: #fff0f1;
+      --soft-yellow: #fff6db;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 1600px;
+      min-height: 2100px;
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    .poster {
+      width: 1600px;
+      min-height: 2100px;
+      padding: 76px 96px 70px;
+      background:
+        linear-gradient(rgba(213, 204, 188, 0.52) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(213, 204, 188, 0.52) 2px, transparent 2px),
+        var(--bg);
+      background-size: 58px 58px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 38px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff7dc;
+      font-size: 23px;
+      font-weight: 780;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--yellow);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 1010px;
+      font-size: 68px;
+      line-height: 1.02;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      margin: 24px 0 0;
+      max-width: 1040px;
+      color: var(--muted);
+      font-size: 31px;
+      line-height: 1.28;
+      font-weight: 650;
+    }
+
+    .boundary-card {
+      padding: 28px 30px;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      background: var(--soft-yellow);
+      box-shadow: 0 16px 28px rgba(24, 51, 74, 0.14);
+    }
+
+    .boundary-card strong {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 30px;
+      line-height: 1.14;
+    }
+
+    .boundary-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 23px;
+      line-height: 1.35;
+      font-weight: 650;
+    }
+
+    .pipeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+      margin: 28px 0 34px;
+    }
+
+    .pipeline::before {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 72px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--line);
+      content: "";
+    }
+
+    .stage {
+      position: relative;
+      min-height: 164px;
+      padding: 22px 20px 20px;
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 12px 26px rgba(24, 51, 74, 0.12);
+    }
+
+    .stage-number {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      margin-bottom: 15px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .stage:nth-child(2) .stage-number {
+      background: var(--teal);
+    }
+
+    .stage:nth-child(3) .stage-number {
+      background: var(--yellow);
+      color: var(--ink);
+    }
+
+    .stage:nth-child(4) .stage-number {
+      background: var(--green);
+    }
+
+    .stage:nth-child(5) .stage-number {
+      background: var(--red);
+    }
+
+    .stage h2 {
+      margin: 0 0 8px;
+      font-size: 27px;
+      line-height: 1.16;
+      font-weight: 850;
+    }
+
+    .stage p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.32;
+      font-weight: 640;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .panel {
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 14px 30px rgba(24, 51, 74, 0.13);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: center;
+      padding: 25px 30px;
+      background: var(--ink);
+      color: #fff7dc;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .panel-header span {
+      color: #dbe8ef;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .steps {
+      display: grid;
+      gap: 18px;
+      padding: 28px 30px 30px;
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 18px;
+      align-items: start;
+      padding: 18px 20px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+    }
+
+    .task-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: var(--soft-blue);
+      color: var(--blue);
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .task h3 {
+      margin: 0 0 8px;
+      font-size: 25px;
+      line-height: 1.18;
+      font-weight: 880;
+    }
+
+    .task ul {
+      margin: 0;
+      padding-left: 22px;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.36;
+      font-weight: 640;
+    }
+
+    .code-card {
+      padding: 25px 28px;
+      border-radius: 8px;
+      background: #10293e;
+      color: #f2fbff;
+      box-shadow: 0 14px 30px rgba(16, 41, 62, 0.25);
+    }
+
+    .code-card h2 {
+      margin: 0 0 16px;
+      color: #fff7dc;
+      font-size: 32px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 20px;
+      line-height: 1.42;
+      font-weight: 650;
+    }
+
+    .blank {
+      color: #ffd166;
+      font-weight: 900;
+    }
+
+    .logic {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .logic-card {
+      padding: 24px 26px;
+      border-left: 10px solid var(--green);
+      border-radius: 8px;
+      background: var(--soft-green);
+    }
+
+    .logic-card.red {
+      border-left-color: var(--red);
+      background: var(--soft-red);
+    }
+
+    .logic-card.blue {
+      border-left-color: var(--blue);
+      background: var(--soft-blue);
+    }
+
+    .logic-card h3 {
+      margin: 0 0 10px;
+      font-size: 27px;
+      line-height: 1.16;
+      font-weight: 900;
+    }
+
+    .logic-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 21px;
+      line-height: 1.34;
+      font-weight: 650;
+    }
+
+    .formula-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 34px 0;
+    }
+
+    .formula {
+      min-height: 138px;
+      padding: 23px 24px;
+      border-radius: 8px;
+      background: var(--paper);
+      border: 3px solid var(--line);
+    }
+
+    .formula strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    .formula code {
+      color: var(--ink);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 30px;
+    }
+
+    .checklist,
+    .stop {
+      min-height: 360px;
+      padding: 30px 34px;
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 14px 30px rgba(24, 51, 74, 0.13);
+    }
+
+    .stop {
+      background: var(--soft-red);
+      border: 4px solid rgba(201, 77, 87, 0.28);
+    }
+
+    .checklist h2,
+    .stop h2 {
+      margin: 0 0 18px;
+      font-size: 34px;
+      line-height: 1.12;
+      font-weight: 900;
+    }
+
+    .checklist ul,
+    .stop ul {
+      margin: 0;
+      padding-left: 25px;
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1.42;
+      font-weight: 650;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding-top: 22px;
+      border-top: 4px solid var(--line);
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <section class="hero">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> QuantFish 教学任务图</div>
+        <h1>从原始数据到 longshort 权重</h1>
+        <p class="subtitle">这不是答案页，而是一张引导地图：学生需要自己补字段、补公式、检查方向，最终得到一张正负都有的 weighted_score 列表。</p>
+      </div>
+      <aside class="boundary-card">
+        <strong>边界很重要</strong>
+        <p>本任务停在 <b>score → centered_score → weighted_score</b>。还没有乘以今天 VWAP，也没有计算股数、成交、收益或交易成本。</p>
+      </aside>
+    </section>
+
+    <section class="pipeline" aria-label="任务流程">
+      <article class="stage">
+        <div class="stage-number">1</div>
+        <h2>读一天截面</h2>
+        <p>从 daily_returns 读出某个交易日的股票列表、价格、成交额和 markettype。</p>
+      </article>
+      <article class="stage">
+        <div class="stage-number">2</div>
+        <h2>问投资直觉</h2>
+        <p>先写清楚“什么股票应该高分”，再决定使用哪些字段。</p>
+      </article>
+      <article class="stage">
+        <div class="stage-number">3</div>
+        <h2>计算 score</h2>
+        <p>用 pandas / numpy 造中间列，标准化后合成原始因子分数。</p>
+      </article>
+      <article class="stage">
+        <div class="stage-number">4</div>
+        <h2>归一化权重</h2>
+        <p>去均值，再除以绝对值总和，得到正负都有的 weighted_score。</p>
+      </article>
+      <article class="stage">
+        <div class="stage-number">5</div>
+        <h2>检查 top/bottom</h2>
+        <p>打印 top 20 和 bottom 20，但完整组合是所有股票的权重表。</p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="panel-header">
+          <h2>学生要回答的问题</h2>
+          <span>每一步先想，再写代码</span>
+        </div>
+        <div class="steps">
+          <div class="task">
+            <div class="task-icon">?</div>
+            <div>
+              <h3>数据问题</h3>
+              <ul>
+                <li>我选的是哪一天？这一日有多少只股票？</li>
+                <li>哪些 markettype 应该被保留？为什么？</li>
+                <li>价格和成交额有没有 0、缺失或异常？</li>
+              </ul>
+            </div>
+          </div>
+          <div class="task">
+            <div class="task-icon">?</div>
+            <div>
+              <h3>因子问题</h3>
+              <ul>
+                <li>score 越高，代表我越看好什么特征？</li>
+                <li>如果方向反了，我应该改哪个符号？</li>
+                <li>不同量纲相加之前，有没有先标准化？</li>
+              </ul>
+            </div>
+          </div>
+          <div class="task">
+            <div class="task-icon">?</div>
+            <div>
+              <h3>权重问题</h3>
+              <ul>
+                <li>centered_score 为什么会有正有负？</li>
+                <li>weighted_score 的正数和负数分别代表什么？</li>
+                <li>gross 是否接近 1？long/short 是否都存在？</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <aside>
+        <div class="code-card">
+          <h2>只给片段，不给答案</h2>
+          <pre>rows["raw_vwap"] = rows[<span class="blank">"____"</span>] / rows[<span class="blank">"____"</span>]
+rows["intraday_return"] = rows[<span class="blank">"____"</span>] / rows[<span class="blank">"____"</span>] - 1
+
+signal_1 = zscore(rows[<span class="blank">"________"</span>])
+signal_2 = zscore(rows[<span class="blank">"________"</span>])
+
+rows["score"] = <span class="blank">___</span> * signal_1 + <span class="blank">___</span> * signal_2
+
+score_mean = rows["score"].<span class="blank">____</span>(skipna=True)
+rows["centered_score"] = rows["score"] - score_mean
+
+gross = rows["centered_score"].abs().sum()
+rows["weighted_score"] = rows["centered_score"] / gross</pre>
+        </div>
+        <div class="logic">
+          <div class="logic-card blue">
+            <h3>高分不是答案</h3>
+            <p>score 只是排序依据；它还不是仓位。学生要解释自己的高分股票为什么应该排前面。</p>
+          </div>
+          <div class="logic-card">
+            <h3>去均值才产生多空</h3>
+            <p>高于平均分变成正的 centered_score；低于平均分变成负的 centered_score。</p>
+          </div>
+          <div class="logic-card red">
+            <h3>不要跨进成交系统</h3>
+            <p>weighted_score 出来后先停住。VWAP、股数、成本和收益是下一节课。</p>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="formula-strip" aria-label="核心公式">
+      <div class="formula">
+        <strong>1. 原始分数</strong>
+        <code>score = 因子组合</code>
+      </div>
+      <div class="formula">
+        <strong>2. 去均值</strong>
+        <code>centered = score - mean(score)</code>
+      </div>
+      <div class="formula">
+        <strong>3. 归一化</strong>
+        <code>weighted = centered / sum(abs(centered))</code>
+      </div>
+    </section>
+
+    <section class="bottom">
+      <article class="checklist">
+        <h2>最终检查</h2>
+        <ul>
+          <li>完整表是否包含所有有效股票？</li>
+          <li>weighted_score 是否有正有负？</li>
+          <li>正权重合计是否约为 +0.5？</li>
+          <li>负权重合计是否约为 -0.5？</li>
+          <li>绝对值总和是否约为 1.0？</li>
+          <li>top 20 / bottom 20 是否符合因子直觉？</li>
+        </ul>
+      </article>
+      <article class="stop">
+        <h2>停止线</h2>
+        <ul>
+          <li>还不计算买卖多少股。</li>
+          <li>还不把权重乘以资金。</li>
+          <li>还不使用今天 VWAP 成交。</li>
+          <li>还不计算 VWAP 到收盘的收益。</li>
+          <li>先把排序和权重逻辑讲清楚，再进入回测引擎。</li>
+        </ul>
+      </article>
+    </section>
+
+    <p class="footer">课堂使用建议：先让学生完成引导版，再让他们对照完整实验版；如果 top/bottom 不符合直觉，问题在 score；如果正负权重不对，问题在 weighted_score；权重对但收益不对，才进入 VWAP 与回测引擎。</p>
+  </main>
+</body>
+</html>

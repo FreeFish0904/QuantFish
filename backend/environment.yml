@@ -1,0 +1,12 @@
+name: QuantFish
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+dependencies:
+  - python=3.12
+  - pandas
+  - pyarrow
+  - pyyaml
+  - matplotlib
+  - pytest
+  - pip

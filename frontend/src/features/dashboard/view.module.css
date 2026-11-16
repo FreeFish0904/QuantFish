@@ -1,0 +1,162 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-5);
+  padding: var(--sf-space-5);
+  color: var(--sf-text);
+  min-height: 0;
+}
+
+@media (max-width: 560px) {
+  .view {
+    padding: var(--sf-space-4);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sf-space-4);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--sf-text-muted);
+  margin: 0 0 var(--sf-space-1);
+  font-size: 0.875rem;
+}
+
+.subtitle {
+  color: var(--sf-text-muted);
+  margin: 0;
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sf-space-4);
+}
+
+.kpiValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--sf-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.toneNeutral {
+  color: var(--sf-cyan);
+}
+
+.tonePositive {
+  color: var(--sf-emerald);
+}
+
+.toneWarning {
+  color: var(--sf-amber);
+}
+
+.toneDanger {
+  color: var(--sf-red);
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--sf-space-4);
+  align-items: start;
+}
+
+.panel {
+  min-width: 0;
+}
+
+.panelSurface {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  padding: var(--sf-space-4);
+  min-width: 0;
+}
+
+.panelIntro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+  margin-bottom: var(--sf-space-3);
+}
+
+.panelIntro h3 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.panelDescription {
+  color: var(--sf-text-muted);
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.liveHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+  width: 100%;
+}
+
+.liveIcon {
+  color: var(--sf-emerald);
+  flex-shrink: 0;
+}
+
+.definitionList {
+  display: grid;
+  gap: var(--sf-space-3);
+  margin: 0;
+}
+
+.definitionList div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+}
+
+.definitionList dt {
+  color: var(--sf-text-muted);
+  font-size: 0.875rem;
+}
+
+.definitionList dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 920px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+}

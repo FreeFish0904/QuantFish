@@ -1,0 +1,144 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-5);
+  padding: var(--sf-space-4);
+}
+
+@media (min-width: 920px) {
+  .view {
+    padding: var(--sf-space-6);
+  }
+}
+
+.header {
+  max-width: 720px;
+}
+
+.header h1 {
+  font-size: var(--sf-text-2xl);
+  font-weight: 800;
+  margin: 0;
+}
+
+.header p {
+  color: var(--sf-text-muted);
+  margin: var(--sf-space-1) 0 0;
+}
+
+.muted {
+  color: var(--sf-text-muted);
+  font-size: var(--sf-text-sm);
+}
+
+.card {
+  max-width: 520px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+}
+
+.field label {
+  font-size: var(--sf-text-sm);
+  font-weight: 700;
+}
+
+.input {
+  background: var(--sf-bg-elevated);
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  color: var(--sf-text);
+  font: inherit;
+  min-height: 40px;
+  padding: var(--sf-space-2) var(--sf-space-3);
+  transition: border-color var(--sf-transition-fast), box-shadow var(--sf-transition-fast);
+}
+
+.input:hover {
+  border-color: var(--sf-border-strong);
+}
+
+.input:focus-visible {
+  border-color: var(--sf-cyan);
+  box-shadow: var(--sf-focus-ring);
+  outline: none;
+}
+
+.formHint {
+  color: var(--sf-text-muted);
+  font-size: var(--sf-text-xs);
+  margin: calc(var(--sf-space-2) * -1) 0 0;
+}
+
+.activeSession {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-4);
+}
+
+.activeSession strong,
+.submitLink {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--sf-space-2);
+}
+
+.submitLink {
+  background: var(--sf-cyan-soft);
+  border: 1px solid var(--sf-cyan-soft-strong);
+  border-radius: var(--sf-radius-md);
+  color: var(--sf-text);
+  font-weight: 800;
+  min-height: 36px;
+  padding: 0 var(--sf-space-3);
+  text-decoration: none;
+  transition: background-color var(--sf-transition-fast), border-color var(--sf-transition-fast);
+}
+
+.submitLink:hover {
+  background: var(--sf-cyan-soft-hover);
+}
+
+.submitLink:focus-visible {
+  box-shadow: var(--sf-focus-ring);
+  outline: none;
+}
+
+.submitLink:active {
+  transform: translateY(1px);
+}
+
+.error {
+  margin-top: var(--sf-space-4);
+}
+
+.error > div {
+  min-height: auto;
+  padding: var(--sf-space-3) var(--sf-space-4);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,51 @@
+.chart {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.chartTitle {
+  color: var(--sf-text);
+  font-size: var(--sf-text-lg);
+  font-weight: 700;
+  line-height: var(--sf-line-height-tight);
+  margin: 0;
+}
+
+.legend {
+  align-items: center;
+  color: var(--sf-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--sf-text-xs);
+  font-weight: 800;
+  gap: var(--sf-space-3);
+}
+
+.legendItem {
+  align-items: center;
+  border-radius: var(--sf-radius-sm);
+  display: inline-flex;
+  gap: 6px;
+  padding: 2px 6px;
+  transition: background-color var(--sf-transition-fast);
+}
+
+.legendItem:hover {
+  background-color: var(--sf-slate-soft);
+}
+
+.swatch {
+  border-radius: var(--sf-radius-full);
+  display: inline-block;
+  height: 8px;
+  width: 18px;
+}
+
+.frame {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  min-height: 260px;
+  overflow: hidden;
+  width: 100%;
+}

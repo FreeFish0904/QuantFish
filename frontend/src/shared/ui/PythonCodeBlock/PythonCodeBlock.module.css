@@ -1,0 +1,51 @@
+.codeBox {
+  background: var(--sf-bg);
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  margin: 0;
+  max-height: min(68vh, 720px);
+  overflow: auto;
+  padding: var(--sf-space-3);
+  tab-size: 4;
+  white-space: pre;
+}
+
+.pythonCode {
+  color: var(--sf-text);
+  display: block;
+  font-family: var(--sf-font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  min-width: max-content;
+}
+
+.pythonKeyword {
+  color: var(--sf-cyan);
+  font-weight: 800;
+}
+
+.pythonBuiltin {
+  color: var(--sf-violet);
+}
+
+.pythonString {
+  color: var(--sf-green);
+}
+
+.pythonNumber {
+  color: var(--sf-amber);
+}
+
+.pythonComment {
+  color: var(--sf-text-muted);
+  font-style: italic;
+}
+
+.pythonFunction {
+  color: var(--sf-blue);
+  font-weight: 800;
+}
+
+.pythonDecorator {
+  color: var(--sf-magenta);
+}

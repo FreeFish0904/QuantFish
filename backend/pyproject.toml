@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantfish"
+version = "0.1.0"
+description = "Classroom factor research platform data tools"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "matplotlib",
+  "pandas",
+  "pyarrow",
+  "python-multipart",
+  "PyYAML",
+  "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx",
+  "pytest",
+]
+
+[project.scripts]
+quantfish-web = "quantfish.web_app.app:main"
+quantfish-export-monitor = "quantfish.student_exports.monitor:main"
+quantfish-offline-runtime = "quantfish.student_exports.runtime_packages:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

@@ -1,0 +1,26 @@
+.state {
+  align-items: center;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  display: grid;
+  gap: var(--sf-space-2);
+  justify-items: center;
+  min-height: 190px;
+  padding: var(--sf-space-6);
+  text-align: center;
+  color: var(--sf-text);
+}
+
+.state svg {
+  color: var(--sf-red);
+}
+
+.state h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.state p {
+  margin: var(--sf-space-1) 0 0;
+  color: var(--sf-text-muted);
+}

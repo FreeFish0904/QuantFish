@@ -1,0 +1,107 @@
+.tableRegion {
+  display: grid;
+  gap: var(--sf-space-2);
+  min-width: 0;
+}
+
+.wrap {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  min-width: 0;
+  overscroll-behavior-x: contain;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.wrap:focus-visible {
+  box-shadow: var(--sf-focus-ring);
+  outline: none;
+}
+
+.table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  min-width: 100%;
+  width: 100%;
+}
+
+.table caption {
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid var(--sf-border);
+  padding: var(--sf-space-3) var(--sf-space-3);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table th {
+  background: var(--sf-slate-soft);
+  color: var(--sf-text-muted);
+  font-size: var(--sf-text-xs);
+  font-weight: 800;
+}
+
+.table td {
+  color: var(--sf-text);
+  font-size: var(--sf-text-sm);
+}
+
+.table tbody tr:hover td {
+  background: var(--sf-slate-soft-hover);
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.selectedRow td {
+  background: var(--sf-cyan-soft);
+}
+
+.table tbody tr.selectedRow:hover td {
+  background: var(--sf-cyan-soft-hover);
+}
+
+.sort {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  font: inherit;
+  font-weight: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.sort:hover {
+  color: var(--sf-text);
+  text-decoration: underline;
+}
+
+.sort:focus-visible {
+  box-shadow: var(--sf-focus-ring);
+  outline: none;
+  border-radius: var(--sf-radius-sm);
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.scrollHint {
+  align-items: center;
+  color: var(--sf-text-muted);
+  display: inline-flex;
+  font-size: var(--sf-text-xs);
+  gap: var(--sf-space-2);
+  justify-self: end;
+  margin: 0;
+}

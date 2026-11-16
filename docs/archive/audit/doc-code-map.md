@@ -1,0 +1,26 @@
+# Doc-Code Mapping for Audit
+
+This mapping ties each student-facing document to the source files and config keys that actually implement the behavior it describes. It is the basis for the agent-swarm audit.
+
+| Student doc | Audience | Related source files | Related config keys | Audit question |
+|---|---|---|---|---|
+| `docs/student/README.md` | entry point | `docs/student/*.md`, `docs/platform-feature-map.md` | — | Is the reading order still correct? Are estimated reading times sane? |
+| `docs/student/00-before-you-start.md` | beginner | `environment.yml`, `src/quantfish/data/releases.py` | `data_releases.*` | Do install and data-build steps match current scripts? |
+| `docs/student/00a-environment-kit.md` | beginner (offline) | `src/quantfish/student_exports/*`, `scripts/start-quantfish.sh` | — | Are offline-kit filenames and entry points consistent with the rest of the docs? |
+| `docs/student/01-first-strategy.md` | beginner | `src/quantfish/factor_execution/strategy_execution.py`, `docs/student/examples/hello_strategy.py` | — | Does the doc correctly describe what `generate_signals` receives and must return? |
+| `docs/student/02-data-bundle-api.md` | beginner/intermediate | `src/quantfish/data/bundle.py`, `src/quantfish/market_types.py`, `src/quantfish/factor_execution/strategy_execution.py` | `execution.allowed_market_types` | Are all four methods (`current`, `load`, `history`, `latest`) documented with their real restrictions? Is the default market-type filter documented? |
+| `docs/student/03-dataset-catalog.md` | intermediate | `src/quantfish/data/catalog.py`, `src/quantfish/data/scanner.py`, `src/quantfish/data/releases.py` | `data_releases.*` | Do dataset names, aliases, and fields match the current catalog? |
+| `docs/student/04-generate-signals-deep-dive.md` | intermediate | `src/quantfish/factor_execution/strategy_execution.py`, `src/quantfish/backtest/panel.py` | `execution.long_only`, `execution.long_only_weighting` | Are signature rules, NaN/0 semantics, and score→weight transformations accurate? |
+| `docs/student/05-example-strategies-walkthrough.md` | beginner | `examples/strategies/*.py`, `First Day Sample Strategies/*.py` | — | Do the walkthroughs match the actual example files? |
+| `docs/student/06-backtest-and-metrics.md` | intermediate | `src/quantfish/backtest/runner.py`, `src/quantfish/backtest/simulator.py`, `src/quantfish/backtest/metrics.py`, `src/quantfish/backtest/active_returns.py` | `backtest.*`, `execution.*` | Are config defaults, metrics formulas, and long-only/active-return behavior correct? |
+| `docs/student/07-running-locally.md` | beginner | `docs/student/examples/full_local_run.py`, `src/quantfish/backtest/report_writer.py` | — | Does the local output file list match `report_writer.py`? |
+| `docs/student/08-submitting-on-web.md` | beginner | `src/quantfish/submissions/routes.py`, `src/quantfish/submissions/service.py`, `src/quantfish/submissions/storage.py`, `src/quantfish/submissions/track_visibility.py`, `frontend/src/features/submissions/view.tsx`, `src/quantfish/leaderboard/ranking.py` | `execution.submissions_enabled`, `execution.hidden_test_enabled`, `execution.submission_timeout_seconds`, `execution.submission_cooldown_seconds`, `scoring.*` | Does the doc match upload validation, status semantics, cooldown, timeout, hidden-test gating, and composite-score formula? |
+| `docs/student/09-common-errors.md` | beginner | `src/quantfish/factor_execution/strategy_execution.py`, `src/quantfish/data/bundle.py`, `src/quantfish/submissions/service.py`, `src/quantfish/submissions/storage.py` | — | Do listed errors still occur with the same messages? Are new common errors missing? |
+| `docs/student/10-cookbook.md` | intermediate | `src/quantfish/data/bundle.py`, `src/quantfish/backtest/panel.py` | — | Are code snippets still runnable with current API? |
+| `docs/student/11-backtest-engine-explained.md` | advanced | `src/quantfish/backtest/runner.py`, `src/quantfish/backtest/simulator.py`, `src/quantfish/backtest/panel.py`, `src/quantfish/backtest/metrics.py`, `src/quantfish/backtest/graph.py`, `src/quantfish/backtest/industry_neutralization.py` | `backtest.*`, `execution.*` | Is the full pipeline description accurate, including warmup clipping, long-only active returns, and graph data sources? |
+| `docs/student/12-raw-factor-ranking-lab.md` | lab | `src/quantfish/backtest/panel.py`, `src/quantfish/backtest/runner.py` | — | Do lab instructions match the current panel construction? |
+| `docs/student/12b-raw-factor-ranking-guided-lab.md` | lab | `src/quantfish/backtest/panel.py`, `src/quantfish/backtest/runner.py` | — | Do guided-lab blanks match the current panel construction? |
+| `docs/student/13-datago-data-guide.md` | intermediate | `src/quantfish/data/bundle.py` | — | Is the DataGo table access pattern still correct? |
+| `docs/student/dataframe-field-guide.md` | reference | `src/quantfish/data/catalog.py`, actual `data_releases/learning` parquet files | — | Do field names and types match the current catalog? |
+| `docs/student/firm-data-api-guide.md` | intermediate | `src/quantfish/data/bundle.py` | — | Are the firm-data access warnings still accurate? |
+| `docs/student/glossary.md` | reference | all above | — | Are terms like `active return`, `information ratio`, `max_position_weight`, `min_listing_days` defined? |

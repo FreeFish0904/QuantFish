@@ -1,0 +1,52 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+.vite/
+
+# Local data, generated artifacts and runtime state
+data_releases/
+runs/
+backups/
+new_data/
+outputs/
+output/
+reports/
+artifacts/
+build/
+dist/
+.runtime-build/
+*.parquet
+*.pkl
+*.pickle
+*.zip
+
+# Generated demo dataset (scripts/gen_sample_dataset.py)
+data/sample/
+
+# Secrets and local env files
+.env
+.env.*
+!.env.example
+
+# Editor and OS noise
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.log

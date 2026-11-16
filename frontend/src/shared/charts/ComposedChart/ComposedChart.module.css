@@ -1,0 +1,231 @@
+.chart {
+  --sf-profit: var(--sf-emerald);
+  --sf-loss: var(--sf-red);
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.chartTitle {
+  color: var(--sf-text);
+  font-size: var(--sf-text-lg);
+  font-weight: 700;
+  line-height: var(--sf-line-height-tight);
+  margin: 0;
+}
+
+.legend {
+  align-items: center;
+  color: var(--sf-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--sf-text-xs);
+  font-weight: 800;
+  gap: var(--sf-space-3);
+}
+
+.legendItem {
+  align-items: center;
+  border-radius: var(--sf-radius-sm);
+  display: inline-flex;
+  gap: 6px;
+  padding: 2px 6px;
+  transition: background-color var(--sf-transition-fast);
+}
+
+.legendItem:hover {
+  background-color: var(--sf-slate-soft);
+}
+
+.legendUnavailable {
+  color: var(--sf-text-muted);
+  opacity: 0.62;
+  text-decoration: line-through;
+}
+
+.unitLabel {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-sm);
+  color: var(--sf-text);
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+.swatch {
+  border-radius: var(--sf-radius-full);
+  display: inline-block;
+  height: 8px;
+  width: 18px;
+}
+
+.dotSwatch {
+  border-radius: var(--sf-radius-full);
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+
+.chartBody {
+  align-items: start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 124px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.axisStack {
+  display: grid;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.axisRail {
+  color: var(--sf-text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  position: relative;
+}
+
+.axisRailTitle {
+  color: var(--sf-text);
+  font-size: 10px;
+  left: 0;
+  letter-spacing: 0.02em;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
+  white-space: nowrap;
+}
+
+.axisRailRight .axisRailTitle {
+  left: auto;
+  right: 0;
+}
+
+.axisTick {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  width: 100%;
+}
+
+.axisRailRight .axisTick {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  left: 0;
+  right: auto;
+}
+
+.axisRailRight .axisTickLabel {
+  text-align: left;
+}
+
+.axisTickLabel {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.axisTickRule {
+  background: color-mix(in srgb, var(--sf-text-muted) 52%, transparent);
+  flex: 0 0 12px;
+  height: 1px;
+}
+
+.tooltip {
+  background: var(--sf-overlay);
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  color: var(--sf-text);
+  display: grid;
+  font-size: var(--sf-text-xs);
+  gap: 6px;
+  min-width: 154px;
+  padding: 8px 10px;
+}
+
+.tooltipDate {
+  color: var(--sf-text);
+  font-weight: 900;
+}
+
+.tooltipRow {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.tooltipSeries {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tooltipSwatch {
+  border-radius: var(--sf-radius-full);
+  display: inline-block;
+  height: 7px;
+  width: 14px;
+}
+
+.tooltipValue {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.frame {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  min-height: 260px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.frameScrollable {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  min-height: 260px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  scrollbar-color: var(--sf-cyan) transparent;
+  width: 100%;
+}
+
+.scrollSpacer {
+  min-width: 100%;
+  position: relative;
+}
+
+.plotStack {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 2px 0;
+}
+
+.plotStackFloating {
+  left: 0;
+  min-width: 320px;
+  position: absolute;
+  top: 0;
+  will-change: transform;
+}
+
+@media (max-width: 560px) {
+  .chartBody {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+
+  .axisRail {
+    font-size: 9px;
+  }
+}

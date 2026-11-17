@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 from pathlib import Path
+import re
 import time
 import zipfile
 
@@ -522,9 +523,11 @@ def test_submission_upload_returns_429_inside_same_team_cooldown(
 
     assert first_response.status_code == 200
     assert second_response.status_code == 429
-    assert second_response.json()["detail"] == (
-        "Please wait 2 seconds before submitting another strategy."
-    )
+    # The cooldown is a wall-clock 2 s window, so a slow machine can report 1 s.
+    detail = second_response.json()["detail"]
+    assert re.fullmatch(
+        r"Please wait [12] seconds? before submitting another strategy\.", detail
+    ), detail
     assert len(app.state.services.submission_repository.list_all()) == 1
 
 

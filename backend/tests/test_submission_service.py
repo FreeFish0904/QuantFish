@@ -749,7 +749,8 @@ def test_submission_service_rejects_same_team_uploads_inside_cooldown(
 
     with pytest.raises(
         SubmissionCooldownError,
-        match="Please wait 2 seconds before submitting another strategy",
+        # A wall-clock 2 s window can report 1 s on a slow machine.
+        match=r"Please wait [12] seconds? before submitting another strategy",
     ):
         service.submit_strategy(
             team_name="Team A",

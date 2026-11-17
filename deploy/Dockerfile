@@ -35,7 +35,9 @@ RUN apt-get update \
 COPY backend/ ./backend/
 RUN pip install './backend[pdf]'
 
-COPY frontend/dist ./frontend/dist
+# Take the bundle from the build stage above; the host copy is git-ignored and
+# would not exist on a fresh clone.
+COPY --from=frontend /app/frontend/dist ./frontend/dist
 COPY config/ ./config/
 COPY docs/ ./docs/
 COPY examples/ ./examples/

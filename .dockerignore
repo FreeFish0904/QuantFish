@@ -1,0 +1,41 @@
+# Keep the Docker build context small: without this file the context ships
+# .venv, node_modules and the generated dataset (~500 MB) that the image never
+# reads — the frontend bundle is built in its own stage and the dataset is
+# generated inside the image.
+
+# Version control and local tooling
+.git
+.gitignore
+.vscode
+.venv
+venv
+
+# Dependency trees (rebuilt in the frontend stage / pip install)
+frontend/node_modules
+frontend/dist
+**/node_modules
+
+# Local runtime state and generated data
+data
+runs
+backups
+reports
+artifacts
+data_releases
+new_data
+outputs
+
+# Test and lint caches
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+.coverage
+htmlcov
+
+# Local noise
+.DS_Store
+*.log
+*.tar.gz
+*.tgz

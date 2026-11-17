@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>QuantFish 平台简介</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 16mm 14mm; }
+
+  @media screen {
+    body { padding: 15mm 14mm 16mm 14mm; max-width: 794px; background: #fff; }
+  }
+
+  :root {
+    --ink: #16212b;
+    --muted: #5b6b7b;
+    --line: #dbe3ea;
+    --brand: #0f766e;
+    --brand-soft: #ecfdf5;
+    --accent: #b45309;
+    --accent-soft: #fffbeb;
+    --code-bg: #f4f7f9;
+  }
+
+  * { box-sizing: border-box; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    font-size: 10.2pt;
+    line-height: 1.62;
+  }
+
+  h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: .01em; }
+  h2 { font-size: 15pt; color: var(--brand); margin: 0 0 3mm; }
+  h3 { font-size: 11pt; margin: 5mm 0 1.5mm; }
+  p { margin: 0 0 2.6mm; }
+  ul, ol { margin: 0 0 2.6mm; padding-left: 5.2mm; }
+  li { margin-bottom: 1.2mm; }
+  code {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 8.8pt;
+    background: var(--code-bg);
+    border-radius: 3px;
+    padding: .5mm 1.2mm;
+    color: #0b4f4a;
+  }
+  .muted { color: var(--muted); }
+  .small { font-size: 9pt; }
+  .tiny { font-size: 8.2pt; }
+
+  section { break-inside: avoid; }
+  .page-break { break-before: page; }
+
+  /* ---------- cover ---------- */
+  .cover { padding-top: 0; }
+  .brand-row { display: flex; align-items: center; gap: 4mm; }
+  .mark {
+    width: 13mm; height: 13mm; border-radius: 3.5mm;
+    background: var(--brand); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13pt; font-weight: 700; letter-spacing: -.02em;
+  }
+  .brand-name { font-size: 23pt; line-height: 1.1; color: var(--ink); }
+  .brand-sub { font-size: 9.2pt; color: var(--muted); margin-top: .6mm; }
+
+  .cover h1 {
+    font-size: 17.5pt; line-height: 1.32; margin: 6mm 0 2.2mm; color: var(--ink);
+  }
+  .cover .lede { font-size: 10pt; color: var(--muted); margin-bottom: 4mm; }
+
+  .meta {
+    border: .4pt solid var(--line); border-radius: 2.5mm; overflow: hidden;
+    margin-bottom: 4mm;
+  }
+  .meta table { width: 100%; border-collapse: collapse; font-size: 8.7pt; }
+  .meta th, .meta td { text-align: left; padding: 1.6mm 3mm; border-bottom: .4pt solid var(--line); vertical-align: top; }
+  .meta tr:last-child th, .meta tr:last-child td { border-bottom: 0; }
+  .meta th { width: 22mm; color: var(--muted); font-weight: 600; background: #fafcfd; }
+
+  .shot { border: .4pt solid var(--line); border-radius: 2.5mm; overflow: hidden; }
+  .shot img { display: block; width: 100%; height: 62mm; object-fit: cover; object-position: top center; }
+  .caption { font-size: 8.2pt; color: var(--muted); margin-top: 1.2mm; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 1.8mm; margin-top: 3.4mm; }
+  .chip {
+    font-size: 8.6pt; padding: 1mm 2.6mm; border-radius: 99px;
+    background: var(--brand-soft); color: var(--brand); border: .4pt solid #b8e6dc;
+  }
+  .chip.accent { background: var(--accent-soft); color: var(--accent); border-color: #f0d9a8; }
+
+  /* ---------- tables ---------- */
+  table.grid { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 2mm 0 3mm; }
+  table.grid th, table.grid td {
+    border-bottom: .4pt solid var(--line);
+    padding: 1.9mm 2.4mm;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.grid thead th { background: var(--brand-soft); color: #0b4f4a; font-weight: 700; border-bottom: .6pt solid #b8e6dc; }
+  table.grid tbody tr:nth-child(even) td { background: #fbfcfd; }
+  table.grid td.num, table.grid th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.grid code { background: transparent; padding: 0; }
+
+  section.tight table.grid { font-size: 8.5pt; }
+  section.tight table.grid th, section.tight table.grid td { padding: 1.3mm 2.2mm; }
+  section.tight h3 { margin: 3.2mm 0 1.2mm; }
+  section.tight p { margin-bottom: 2mm; }
+
+  .callout {
+    border-left: 2.2pt solid var(--brand);
+    background: var(--brand-soft);
+    padding: 2.6mm 3.2mm;
+    border-radius: 0 2mm 2mm 0;
+    margin: 3mm 0;
+    font-size: 9.4pt;
+  }
+  .callout.warn { border-left-color: var(--accent); background: var(--accent-soft); }
+
+  .footnote {
+    margin-top: 6mm; padding-top: 2.5mm; border-top: .4pt solid var(--line);
+    font-size: 8.2pt; color: var(--muted);
+  }
+  .steps { counter-reset: s; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: s; position: relative; padding-left: 8mm; margin-bottom: 2.2mm; }
+  .steps > li::before {
+    content: counter(s); position: absolute; left: 0; top: .2mm;
+    width: 5.4mm; height: 5.4mm; border-radius: 99px;
+    background: var(--brand); color: #fff; font-size: 8.4pt; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kbd { font-family: "SF Mono", Menlo, monospace; font-size: 8.6pt; }
+  pre {
+    background: #0f1a1f; color: #d7e6ea; border-radius: 2mm;
+    padding: 2.6mm 3.2mm; font-size: 8.4pt; line-height: 1.5; margin: 2mm 0 3mm;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; }
+</style>
+</head>
+<body>
+
+<!-- ============================ 封面 ============================ -->
+<section class="cover">
+  <div class="brand-row">
+    <div class="mark">QF</div>
+    <div>
+      <div class="brand-name">QuantFish</div>
+      <div class="brand-sub">A-share factor research &amp; backtesting platform</div>
+    </div>
+  </div>
+
+  <h1>A 股因子研究与回测教学平台<br />从「交一份脚本」到「拿到可复现的成绩单」</h1>
+  <div class="lede">
+    学生只写一个 <code>generate_signals.py</code>；平台用隐藏数据、真实撮合规则跑一次完整回测，
+    给出排行榜、多次提交对比与 PDF 报告。引擎是真的，流水线也是真的。
+  </div>
+
+  <div class="meta">
+    <table>
+      <tr><th>线上演示</th><td>https://FreeFish0904.github.io/QuantFish/ <span class="muted tiny">（静态构建 + 浏览器内 mock API，无需服务器）</span></td></tr>
+      <tr><th>源码仓库</th><td>https://github.com/FreeFish0904/QuantFish <span class="muted tiny">（MIT License）</span></td></tr>
+      <tr><th>版本</th><td><span class="kbd">main @ <!--commit-sha--></span> · <!--build-date--></td></tr>
+      <tr><th>技术栈</th><td>FastAPI · React 19 + Vite · SQLite/JSON 仓储 · parquet 面板缓存 · Docker</td></tr>
+      <tr><th>质量</th><td>387 个后端测试（pytest）· 224 个前端测试（vitest + MSW）· CI 矩阵 Python 3.12 / 3.13</td></tr>
+    </table>
+  </div>
+
+  <div class="shot">
+    <img src="../screenshots/landing.jpg" alt="QuantFish 首页" />
+  </div>
+  <div class="caption">首页：课程状态、评分队列状态、关键指标与最新提交。</div>
+
+  <div class="chip-row">
+    <span class="chip">真实撮合引擎</span>
+    <span class="chip">评分队列</span>
+    <span class="chip">结果过期检测</span>
+    <span class="chip">双计量口径</span>
+    <span class="chip">中英双语</span>
+    <span class="chip accent">离线教学包</span>
+  </div>
+
+  <div class="footnote">
+    本文档为平台简介，技术细节见仓库内 <span class="kbd">docs/architecture.md</span>、
+    <span class="kbd">docs/metrics-definitions.md</span> 与 <span class="kbd">docs/student/</span> 学生手册。
+  </div>
+</section>

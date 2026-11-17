@@ -1,0 +1,62 @@
+<!-- ==================== 4. 指标口径 ==================== -->
+<section class="page-break tight">
+  <h2>4　指标：两套口径并列，永不混用</h2>
+
+  <p>
+    同一个回测同时给出两种收益基准。它们都来自<strong>同一条日收益序列</strong>，
+    因此不会对「哪天交易了」有分歧，只对「怎么聚合」有分歧。
+  </p>
+
+  <table class="grid">
+    <thead><tr><th style="width:18%">口径</th><th style="width:44%">字段</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>算术</strong><br /><span class="tiny muted">简单收益相加</span></td>
+        <td><code>all_return</code> / <code>total_return</code>、<code>annual_return</code>、
+          <code>max_drawdown</code>、<code>calmar</code>、<code>fitness</code> 等
+          <br /><span class="tiny muted">即 \(R=\sum_{i=1}^{n} r_i\)，\(A=R\cdot 252/n\)</span></td>
+        <td><strong>评分、排名、过期检测。</strong>评分权重就是在这些数值上调出来的。</td>
+      </tr>
+      <tr>
+        <td><strong>几何</strong><br /><span class="tiny muted">复利净值</span></td>
+        <td><code>compounded_total_return</code>、<code>cagr</code>、
+          <code>compounded_max_drawdown</code>、<code>compounded_calmar</code>、
+          <code>volatility</code>、<code>sortino</code>、<code>t_stat</code>、<code>t_stat_p_value</code></td>
+        <td><strong>报告与对外解释。</strong>这是外部平台或审阅者会用的定义。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>八个几何口径字段</h3>
+  <table class="grid">
+    <thead><tr><th style="width:34%">字段</th><th>定义</th></tr></thead>
+    <tbody>
+      <tr><td><code>compounded_total_return</code></td><td>\(\prod_{i=1}^{n}(1+r_i)-1\)，账户真正会持有的累计收益</td></tr>
+      <tr><td><code>cagr</code></td><td>\(\left(\prod_{i=1}^{n}(1+r_i)\right)^{252/n}-1\)，复合年增长率</td></tr>
+      <tr><td><code>compounded_max_drawdown</code></td><td>复利净值 \(V_i=\prod_{j\le i}(1+r_j)\) 的峰谷回撤 \(\max_i\left(1-\dfrac{V_i}{\max_{j\le i}V_j}\right)\)（把初始 1.0 计为峰），以正数报告</td></tr>
+      <tr><td><code>compounded_calmar</code></td><td>\(\text{cagr} / d^{\text{cmpd}}_{\max}\)，即复合年增长率 ÷ 复合最大回撤</td></tr>
+      <tr><td><code>volatility</code></td><td>\(\sqrt{252}\,\operatorname{std}(r,\ \text{ddof}=1)\)，年化波动率</td></tr>
+      <tr><td><code>sortino</code></td><td>\(\dfrac{\sqrt{252}\,\operatorname{mean}(r_i-r_f^{d})}{\sqrt{\operatorname{mean}\left(\min(r_i-r_f^{d},\,0)^2\right)}}\)，MAR = <code>long_only_risk_free_rate</code>（默认 1.75%/年）</td></tr>
+      <tr><td><code>t_stat</code></td><td>\(t=\sqrt{n}\,\dfrac{\overline{r}}{\operatorname{std}(r,\ \text{ddof}=1)}\)，均值日收益的 t 统计量</td></tr>
+      <tr><td><code>t_stat_p_value</code></td><td>\(p=\operatorname{erfc}\!\left(\dfrac{|t|}{\sqrt{2}}\right)\)，正态近似下的双侧 p 值（不引入 SciPy）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>算不出来就报 null，不报 0 也不报 inf</h3>
+  <table class="grid">
+    <thead><tr><th style="width:38%">情形</th><th>结果</th></tr></thead>
+    <tbody>
+      <tr><td>观测数 n &lt; 2</td><td><code>volatility</code> / <code>sortino</code> / <code>t_stat</code> / <code>t_stat_p_value</code> 为 null；收益与 CAGR 照常</td></tr>
+      <tr><td>任一天 ≤ −100%（本金归零）</td><td>整个复利块为 null，算术字段不受影响</td></tr>
+      <tr><td>全样本收益恰好为 0</td><td><code>cagr</code> = 0、<code>volatility</code> = 0；<code>sortino</code> / <code>t_stat</code> 为 null（分母为 0）</td></tr>
+      <tr><td>没有任何一天低于 MAR</td><td><code>sortino</code> 为 null（无穷大不是测量结果）</td></tr>
+      <tr><td>历史报告早于这些字段</td><td>API 返回 null，界面回落到 <code>annual_return</code>，无需重跑</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">
+    细节与可复现代码见 <code>docs/metrics-definitions.md</code>；
+    每个公式都在 <code>backend/tests/test_backtest_metrics_graph.py</code> 里用 pandas / math
+    独立重算并固定下来。
+  </p>
+</section>

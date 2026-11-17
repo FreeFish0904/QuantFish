@@ -1,0 +1,52 @@
+<!-- ==================== 2. 三端功能 ==================== -->
+<section class="page-break">
+  <h2>2　三类使用者看到的功能</h2>
+
+  <table class="grid">
+    <thead><tr><th style="width:15%">角色</th><th>主要界面与能力</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>学生</strong></td>
+        <td>
+          团队登录 · 下载学习数据与学习材料 · 上传策略（learning / hidden_test 赛道）·
+          轮询运行状态（<code>queued → running → completed</code>）· 查看指标、评分拆解、净值/回撤/分组收益图 ·
+          分年表现表 · 多次提交对比 · 下载离线环境包
+        </td>
+      </tr>
+      <tr>
+        <td><strong>教师 / 管理</strong></td>
+        <td>
+          管理团队与提交 · 编辑平台设置（单一配置树 + 交叉校验）· 评分权重与超时 ·
+          查看学生源码与报错原文 · 导出学生数据 · 重跑与清理
+        </td>
+      </tr>
+      <tr>
+        <td><strong>维护者</strong></td>
+        <td>
+          维护数据发布（<code>learning</code> / <code>learning_1..3</code> / <code>hidden_test</code>）·
+          引擎与队列 · 运行时仓储 · 离线运行时包 · 由运行中应用自动生成的 API 契约（<code>api-types.ts</code>）
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>页面组成（前端按路由分特性，一个目录一块屏）</h3>
+  <table class="grid">
+    <thead><tr><th style="width:24%">页面</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td>Dashboard</td><td>课程状态、评分器状态、KPI、最新提交</td></tr>
+      <tr><td>Submit Strategy</td><td>团队凭据、赛道选择、上传、状态轮询、数据与环境下载</td></tr>
+      <tr><td>Leaderboard</td><td>每队最佳成绩排名</td></tr>
+      <tr><td>History</td><td>全部提交、筛选、过期状态、勾选对比</td></tr>
+      <tr><td>Submission Detail</td><td>指标卡与指标表、评分拆解、图形数据、执行参数、分年表现</td></tr>
+      <tr><td>Compare</td><td>多份提交的净值、回撤、分组收益与执行参数对照</td></tr>
+      <tr><td>Admin Console</td><td>设置、团队、提交与相关管理面板</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">
+    图表不依赖任何图表库：净值、回撤、PnL、成交量与分组曲线都由
+    <code>frontend/src/shared/charts</code> 手写 SVG 渲染，几何计算有单元测试。
+    界面中英双语，全部走 <code>t("namespace.key")</code> 单份字典。
+  </p>
+</section>

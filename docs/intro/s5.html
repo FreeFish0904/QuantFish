@@ -1,0 +1,50 @@
+<!-- ==================== 5. 真实数字 ==================== -->
+<section class="page-break">
+  <h2>5　两套口径差多少：演示环境的真实输出</h2>
+
+  <p class="small muted">
+    下表的数字直接来自 Docker 演示环境的两份真实回测（合成数据，<code>hidden_test</code> 赛道）。
+    同一个策略、同一条日收益序列，只是聚合方式不同。
+  </p>
+
+  <table class="grid">
+    <thead>
+      <tr>
+        <th style="width:34%">指标</th>
+        <th class="num">Alpha Desk<span class="tiny muted"><br />n = 522 日</span></th>
+        <th class="num">Beta Desk<span class="tiny muted"><br />n = 1305 日</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>累计收益（算术 <code>total_return</code>）</td><td class="num">35.99%</td><td class="num">113.03%</td></tr>
+      <tr><td>累计收益（复利 <code>compounded_total_return</code>）</td><td class="num">41.83%</td><td class="num">201.00%</td></tr>
+      <tr><td>年化（算术 <code>annual_return</code>，用于打分）</td><td class="num">17.37%</td><td class="num">21.83%</td></tr>
+      <tr><td>年化（复利 <code>cagr</code>，用于展示）</td><td class="num">18.38%</td><td class="num">23.71%</td></tr>
+      <tr><td>最大回撤 <code>max_drawdown</code></td><td class="num">6.59%</td><td class="num">7.10%</td></tr>
+      <tr><td>最大回撤 <code>compounded_max_drawdown</code></td><td class="num">7.91%</td><td class="num">11.67%</td></tr>
+      <tr><td>Calmar <code>calmar</code> / <code>compounded_calmar</code></td><td class="num">2.64 / 2.32</td><td class="num">3.08 / 2.03</td></tr>
+      <tr><td>Sharpe / Sortino</td><td class="num">1.74 / 2.37</td><td class="num">2.10 / 2.96</td></tr>
+      <tr><td>年化波动率 <code>volatility</code></td><td class="num">9.97%</td><td class="num">10.39%</td></tr>
+      <tr><td>t 统计量 / p 值</td><td class="num">2.51 / 0.012</td><td class="num">4.78 / 1.8e−6</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>看 Beta Desk 那一列：</strong>算术累计 113%，复利累计却是 201%。
+    算术口径把每天的收益直接相加，忽略了「波动拖累」；回撤同理——复利回撤 11.67%
+    比算术回撤 7.10% 深得多，因为亏损发生在更大的账户上。
+    一个只报 <em>annual_return</em> 的榜单，会让读者严重低估这两件事。
+  </div>
+
+  <h3>那为什么评分不改成几何口径？</h3>
+  <ul>
+    <li><strong>历史可比。</strong>换口径会改变每一份历史得分，<code>engine_version</code> 必须变，
+      榜单就不能再跨学期比较。</li>
+    <li><strong>权重是调出来的。</strong><code>config/platform.yaml</code> 里的评分权重本来就针对算术字段调参，
+      换底数等于让权重失去意义。</li>
+    <li><strong>排名和数据之间要解耦。</strong>现在的分工是：算术口径决定「你排第几」，
+      几何口径回答「这套策略如果真跑，会变成什么样」。两者都写在界面上，谁也不会被藏起来。</li>
+    <li><strong>复利口径在极端样本上不稳定。</strong>单日大跌会让复利块整体变成 null，
+      不适合做每周都在变的排名依据；作为报告字段则完全合适。</li>
+  </ul>
+</section>

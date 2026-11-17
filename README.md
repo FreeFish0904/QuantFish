@@ -12,6 +12,7 @@ leaderboard, a run comparison and a PDF report.
 [Docker demo](#-quickstart) ·
 [Architecture](docs/architecture.md) ·
 [Metric definitions](docs/metrics-definitions.md) ·
+[Platform intro (中文 PDF)](docs/intro/QuantFish-简介.pdf) ·
 [Contributing](CONTRIBUTING.md)
 
 [![CI](https://github.com/FreeFish0904/QuantFish/actions/workflows/ci.yml/badge.svg)](https://github.com/FreeFish0904/QuantFish/actions/workflows/ci.yml)
@@ -154,7 +155,7 @@ frontend/                React 19 + Vite SPA (features/* = one folder per screen
 frontend/src/mocks/      MSW handlers powering the tests and the static demo
 config/                  platform.yaml (classroom) and platform.demo.yaml (demo)
 deploy/                  Dockerfile, compose file, entrypoint, demo seeding
-docs/                    architecture, student handbook, guides, screenshots
+docs/                    architecture, student handbook, guides, screenshots, intro deck
 examples/                runnable example strategies
 scripts/                 dataset generator, launchers, backups, runtime builders
 data/                    generated dataset location (git-ignored, see data/README.md)

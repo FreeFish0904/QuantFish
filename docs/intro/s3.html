@@ -1,0 +1,50 @@
+<!-- ==================== 3. 一次提交的链路 ==================== -->
+<section class="page-break">
+  <h2>3　一次提交走过什么路径</h2>
+
+  <ol class="steps">
+    <li><strong>上传与入队。</strong><code>POST /api/submissions</code> 校验脚本（接口约定、语法、导入），
+      写入运行时仓储并把任务置为 <code>queued</code>；同队冷却时间与评分超时都来自同一份配置。</li>
+    <li><strong>独立进程评分。</strong><code>SubmissionScoringDispatcher</code> 在
+      <code>max_concurrent_scoring</code> 上限内起一个 <code>score_worker</code> 子进程，
+      Web 进程不被计算阻塞；进度可轮询、可中止。</li>
+    <li><strong>构建面板。</strong>CSMAR 风格原始表按 as-of 语义 join，用
+      <code>cumulatefwardfactor</code> 做前复权，再按市场类型、上市天数与交易状态过滤；
+      结果缓存进 <code>panel_cache</code>，同一份数据的重复运行不必重算。</li>
+    <li><strong>撮合与评估。</strong>t 日的信号在 <strong>t+1 的 VWAP</strong> 成交，
+      叠加涨跌停、停牌、参与率上限与交易成本；行业中性化后分五组，
+      long-only 模式按排名加权，并给出相对 HS300 的 beta 调整主动收益。</li>
+    <li><strong>算指标。</strong>指标只在一个地方算：<code>quantfish.backtest.metrics</code>。
+      同一份日收益序列同时导出算术口径（用于打分）与几何口径（用于报告），两者永不混用。</li>
+    <li><strong>交付产物。</strong><code>summary.csv</code>、<code>graph_data.json</code>、
+      分年 <code>performance_by_year.csv</code>、parquet 序列与可选 PDF 报告；
+      UI 直接渲染这些产物，并在配置或数据发布变化后把旧运行标成 <em>stale</em>。</li>
+  </ol>
+
+  <h3>两条关键的设计约束</h3>
+  <table class="grid">
+    <thead><tr><th style="width:26%">约束</th><th>为什么必须这样</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>算子进程隔离</td>
+        <td>学生代码质量不可控（死循环、内存暴涨、<code>sys.exit</code>）；子进程 + 超时是唯一
+          能保证 Web 一直可用的做法，错误原文也正好可以回传给详情页。</td>
+      </tr>
+      <tr>
+        <td>时点正确（不偷看未来）</td>
+        <td>面板按 as-of 语义构建、信号次日成交、复权因子只使用当日及之前的信息，
+          否则回测会系统性高估。</td>
+      </tr>
+      <tr>
+        <td>口径唯一</td>
+        <td>指标一处计算、多处展示：<code>summary.csv</code> → <code>SubmissionMetrics</code>
+          → 详情页 / PDF。任何界面都不会自己再算一遍年化。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>可复现性：</strong>每次运行都会留下配置指纹与数据发布指纹。
+    参数一改、数据一换，历史运行立刻变成 <em>stale</em>，而不是被当成可比结果继续排名。
+  </div>
+</section>

@@ -1,0 +1,39 @@
+<!-- ==================== 1. 平台是什么 ==================== -->
+<section class="page-break">
+  <h2>1　平台是什么，解决什么问题</h2>
+
+  <p>
+    QuantFish 最初是一个课堂作业平台：学生上传 <code>generate_signals.py</code>，平台在隐藏行情上评分，
+    榜单排出全班的相对水平。它后来长成了一条完整的研究闭环 —— 数据发布、时点正确的撮合引擎、
+    队列化评分 worker、结果过期检测，以及一个跑<strong>真实引擎</strong>的演示环境。
+  </p>
+
+  <h3>它替换掉的手工流程</h3>
+  <table class="grid">
+    <thead><tr><th style="width:32%">传统做法</th><th>QuantFish 的做法</th></tr></thead>
+    <tbody>
+      <tr><td>助教本地跑脚本，结果散落在各自电脑</td><td>提交即入队，独立进程评分，产物统一落在 <code>reports/&lt;submission-id&gt;/</code></td></tr>
+      <tr><td>「年化收益」各处口径不一，无法横向比较</td><td>指标只在 <code>metrics.py</code> 算一次，写入 <code>summary.csv</code> 并镜像到 API</td></tr>
+      <tr><td>学生只看到最终分数，不知道错在哪</td><td>详情页给出指标、分组收益、分年表现、执行参数与错误原文</td></tr>
+      <tr><td>改了数据或参数后旧成绩仍被当作可比</td><td>每次运行记录配置与数据指纹，变化后自动标记 <em>stale</em></td></tr>
+      <tr><td>课堂断网就没法做作业</td><td>可导出学习数据包与 conda 离线运行时（含依赖签名清单）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>四个「不是玩具」的地方</h3>
+  <ul>
+    <li><strong>引擎是真的。</strong>前复权价格、T+1 VWAP 成交、涨跌停与停牌规则、参与率上限、
+      佣金／滑点／印花税；long-only 路径按排名加权并计算 beta 调整后的主动收益。</li>
+    <li><strong>平台是真的。</strong>FastAPI + SQLite + 线程／进程评分队列、parquet 面板缓存、
+      作业进度流式输出、过期结果检测、管理后台、班级分组、学生数据导出、离线运行时打包。</li>
+    <li><strong>测试是真的。</strong>387 个后端测试与 224 个前端测试，前后端各有 CI 门槛。</li>
+    <li><strong>演示是诚实的。</strong>公开演示是静态构建 + 浏览器内 mock；Docker 演示会生成一份合成
+      CSMAR 风格数据，并真的跑引擎、队列和报告生成器。</li>
+  </ul>
+
+  <div class="callout">
+    <strong>数据说明：</strong>仓库不分发行情数据。演示与 CI 使用 <code>scripts/gen_sample_dataset.py</code>
+    生成的<strong>合成数据集</strong>（模拟价格、成交量、行业，以及一个故意偏弱的嵌入信号），
+    不含任何真实市场信息；真实部署把 <code>data_releases.raw_data_root</code> 指向授权的 CSMAR 风格导出。
+  </div>
+</section>

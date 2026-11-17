@@ -1,0 +1,51 @@
+<!-- ==================== 6. 技术栈与结构 ==================== -->
+<section class="page-break">
+  <h2>6　技术组成与仓库结构</h2>
+
+  <table class="grid">
+    <thead><tr><th style="width:18%">层</th><th>组成</th></tr></thead>
+    <tbody>
+      <tr><td>前端</td><td>React 19 + TypeScript + Vite；按路由划分 feature 目录；手写 SVG 图表；中英双语字典；测试用 vitest + Testing Library + MSW</td></tr>
+      <tr><td>后端</td><td>FastAPI + Pydantic；特性内聚的路由（submissions / leaderboard / compare / admin / downloads）；SQLite 与 JSON 仓储</td></tr>
+      <tr><td>引擎</td><td>pandas + pyarrow；面板构建与缓存、撮合、行业中性化、指标与图形数据</td></tr>
+      <tr><td>评分</td><td>线程／进程队列，<code>score_worker</code> 子进程，超时与并发上限来自配置</td></tr>
+      <tr><td>报告</td><td><code>summary.csv</code> / <code>graph_data.json</code> / 分年 CSV / parquet；可选 PDF（weasyprint + Noto CJK）</td></tr>
+      <tr><td>交付</td><td>Docker 多阶段构建；GitHub Actions（CI 矩阵 + Pages 静态演示）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>目录一览</h3>
+  <pre><code>backend/src/quantfish/   FastAPI 应用、回测引擎、评分队列、数据发布、导出
+backend/tests/           pytest 测试集
+frontend/                React 19 + Vite 单页应用（features/* = 一个目录一块屏）
+frontend/src/mocks/      MSW 处理器，同时驱动测试与静态演示
+config/                  platform.yaml（课堂）与 platform.demo.yaml（演示）
+deploy/                  Dockerfile、compose、entrypoint、演示数据播种
+docs/                    架构、指标定义、学生手册、截图
+examples/                可直接运行的示例策略
+scripts/                 数据集生成、启动器、备份、离线运行时打包
+data/                    生成的数据集目录（git 忽略）</code></pre>
+
+  <h3>三种运行方式</h3>
+  <table class="grid">
+    <thead><tr><th style="width:20%">方式</th><th>命令</th><th style="width:30%">你会得到</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Docker</strong><br /><span class="tiny muted">推荐</span></td>
+        <td><code>docker compose -f deploy/docker-compose.yml up --build</code></td>
+        <td>生成合成数据、构建数据发布、跑两份真实回测，打开 http://localhost:8010</td>
+      </tr>
+      <tr>
+        <td><strong>本地开发</strong></td>
+        <td><code>pip install -e './backend[dev,pdf]'</code> · <code>npm --prefix frontend install</code> ·
+          <code>scripts/start-quantfish.sh --mode dev</code></td>
+        <td>API + Vite 热更新；<code>--mode prod --port 8010</code> 跑生产构建</td>
+      </tr>
+      <tr>
+        <td><strong>纯静态演示</strong></td>
+        <td><code>VITE_DEMO_MODE=true npm --prefix frontend run build</code></td>
+        <td>MSW 接管全部 REST 接口、hash 路由、无需后端即可托管（线上演示就是这样部署的）</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

@@ -254,16 +254,6 @@
   font-weight: var(--qf-font-weight-semibold);
 }
 
-.footer {
-  width: 100%;
-  max-width: 1080px;
-  margin: var(--qf-space-12) auto 0;
-  padding-top: var(--qf-space-4);
-  border-top: 1px solid var(--qf-border);
-  color: var(--qf-text-muted);
-  font-size: 0.78rem;
-}
-
 @media (max-width: 900px) {
   .featureGrid {
     grid-template-columns: 1fr;

@@ -41,8 +41,7 @@ export const translations = {
         step2: "Submit the script",
         step3: "Queued backtest",
         step4: "Compare and export"
-      },
-      stack: "React 19 · FastAPI · Parquet panels · pure SVG charts · one-command Docker demo"
+      }
     },
     demo: {
       badge: "Demo",
@@ -963,8 +962,7 @@ export const translations = {
         step2: "上传脚本",
         step3: "队列回测",
         step4: "对比与导出"
-      },
-      stack: "React 19 · FastAPI · Parquet 面板 · 纯 SVG 图表 · Docker 一键演示"
+      }
     },
     demo: {
       badge: "演示",

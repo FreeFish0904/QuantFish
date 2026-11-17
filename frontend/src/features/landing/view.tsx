@@ -99,8 +99,6 @@ export function LandingView() {
           </ol>
         </section>
       </main>
-
-      <footer className={styles.footer}>{t("landing.stack")}</footer>
     </div>
   );
 }

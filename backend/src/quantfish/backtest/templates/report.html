@@ -2,272 +2,459 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Backtest Report {{ submission_label }}</title>
 <style>
   @page {
     size: A4;
-    margin: 20mm 18mm;
-    @bottom-center {
-      content: "Page " counter(page) " of " counter(pages);
-      font-size: 9px;
-      color: #666;
-      font-family: sans-serif;
+    margin: 17mm 15mm 14mm;
+    background: #12121f;
+    @top-left {
+      content: "QuantFish · Backtest Report";
+      font-size: 7.5pt;
+      color: #5f6675;
+    }
+    @top-right {
+      content: counter(page) " / " counter(pages);
+      font-size: 7.5pt;
+      color: #5f6675;
     }
   }
+  @page :first {
+    margin: 0;
+    @top-left { content: none; }
+    @top-right { content: none; }
+  }
+
+  html, body { background: #12121f; }
   body {
     font-family: "DejaVu Sans", sans-serif;
-    background: #1a1a2e;
-    color: #ccc;
+    color: #cfd3dc;
+    font-size: 9.5pt;
+    line-height: 1.45;
     margin: 0;
     padding: 0;
-    font-size: 11px;
-    line-height: 1.5;
   }
-  .page-break { page-break-before: always; }
+  h1, h2 { margin: 0; color: #4fc3f7; }
+  h2 {
+    font-size: 15pt;
+    letter-spacing: 0.2px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #2a2a4a;
+    margin: 0 0 9px;
+  }
+  h2 span { color: #6b7280; font-size: 9pt; font-weight: normal; }
+  p { margin: 4px 0; }
+  .page { page-break-before: always; }
+  .note {
+    color: #8a8f9c;
+    font-size: 8pt;
+    line-height: 1.5;
+    border-left: 2px solid #2a2a4a;
+    padding-left: 8px;
+    margin-top: 10px;
+  }
 
-  /* Cover */
-  .cover {
-    text-align: center;
-    padding: 60px 20px 40px;
+  /* ---------- cover ---------- */
+  .cover { padding: 24mm 16mm 0; }
+  .brand {
+    color: #4fc3f7;
+    font-size: 8pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
   }
   .cover h1 {
-    font-size: 32px;
-    color: #4fc3f7;
-    margin: 0 0 8px;
+    font-size: 30pt;
+    margin: 6px 0 10px;
   }
-  .cover .subtitle {
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 30px;
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .meta-table td {
+    color: #8a8f9c;
+    font-size: 8.5pt;
+    padding: 3px 10px 3px 0;
+    vertical-align: top;
   }
-  .cover .meta {
-    font-size: 11px;
-    color: #888;
-    margin: 4px 0;
+  .meta-table td b {
+    display: block;
+    color: #5f6675;
+    font-size: 7pt;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: normal;
   }
 
-  /* Cards */
-  .cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin: 30px 0;
+  .verdict {
+    border-left: 4px solid #5a6070;
+    background: #1b1f2e;
+    padding: 9px 12px;
+    margin-bottom: 16px;
   }
-  .card {
-    background: #16213e;
-    border: 1px solid #2a2a4a;
-    border-radius: 6px;
-    padding: 12px 18px;
-    min-width: 120px;
-    text-align: center;
-  }
-  .card .label {
-    font-size: 9px;
-    color: #888;
+  .verdict.positive { border-left-color: #81c784; background: #142b1f; }
+  .verdict.negative { border-left-color: #e57373; background: #2c1a1c; }
+  .verdict-label { font-size: 13pt; font-weight: bold; color: #e6e9ef; }
+  .verdict.positive .verdict-label { color: #a5d6a7; }
+  .verdict.negative .verdict-label { color: #ef9a9a; }
+  .verdict-detail { font-size: 8.5pt; color: #9aa1ae; margin-top: 2px; }
+
+  .group-head {
+    font-size: 8pt;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    letter-spacing: 1px;
+    color: #7b8390;
+    margin: 14px 0 5px;
+  }
+  .group-head span.group-note {
+    text-transform: none;
+    letter-spacing: 0;
+    color: #5f6675;
+  }
+
+  table.cards { width: 100%; border-collapse: separate; border-spacing: 5px; }
+  table.cards td.card {
+    width: 25%;
+    background: #171b2b;
+    border: 1px solid #232840;
+    border-radius: 4px;
+    padding: 7px 9px;
+    vertical-align: top;
+  }
+  table.cards td.card-empty { border: none; background: transparent; }
+  .card .label {
+    font-size: 7pt;
+    color: #7b8390;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
   }
   .card .value {
-    font-size: 16px;
+    font-size: 13pt;
     font-weight: bold;
-    color: #4fc3f7;
+    color: #e6e9ef;
+    line-height: 1.25;
   }
 
-  /* Section titles */
-  h2 {
-    font-size: 18px;
-    color: #4fc3f7;
-    border-bottom: 2px solid #2a2a4a;
-    padding-bottom: 6px;
-    margin: 30px 0 15px;
+  .highlights ul { margin: 4px 0 0; padding-left: 16px; }
+  .highlights li { font-size: 8.5pt; color: #b6bcc8; margin-bottom: 3px; }
+  .cover-foot {
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px solid #232840;
+    color: #5f6675;
+    font-size: 7.5pt;
   }
 
-  /* Tables */
-  table {
+  /* ---------- plots ---------- */
+  .plot { margin: 0 0 9px; page-break-inside: avoid; text-align: center; }
+  .plot img {
+    width: 100%;
+    border: 1px solid #232840;
+    border-radius: 3px;
+  }
+  .plot caption, .plot .caption {
+    display: block;
+    color: #6b7280;
+    font-size: 7.5pt;
+    margin-top: 3px;
+    text-align: left;
+  }
+  table.plot-pair { width: 100%; border-collapse: collapse; }
+  table.plot-pair td {
+    width: 50%;
+    padding: 0 4px 0 0;
+    vertical-align: top;
+  }
+  table.plot-pair td + td { padding: 0 0 0 4px; }
+
+  /* ---------- tables ---------- */
+  table.metric {
     width: 100%;
     border-collapse: collapse;
-    margin: 10px 0;
-    font-size: 10px;
+    font-size: 8.5pt;
+    margin: 0 0 12px;
+    page-break-inside: avoid;
   }
-  th {
-    background: #16213e;
-    color: #4fc3f7;
+  table.metric thead th {
+    background: #171b2b;
+    color: #7b8390;
     text-align: left;
-    padding: 6px 8px;
-    border-bottom: 2px solid #2a2a4a;
-    font-size: 10px;
+    font-weight: normal;
+    font-size: 7pt;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  td {
     padding: 5px 8px;
-    border-bottom: 1px solid #222;
-    color: #ccc;
-  }
-  tr:nth-child(even) td { background: #16213e33; }
-
-  /* Plots */
-  .plot-container {
-    margin: 15px 0;
-    text-align: center;
-  }
-  .plot-container img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    border: 1px solid #2a2a4a;
-  }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    color: #555;
-    font-size: 9px;
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #2a2a4a;
-  }
-  .footer p { margin: 2px 0; }
-
-  /* Params */
-  .param-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0;
-    border: 1px solid #2a2a4a;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .param-row {
-    display: flex;
-    width: 50%;
     border-bottom: 1px solid #2a2a4a;
   }
-  .param-row:nth-last-child(-n+2) { border-bottom: none; }
-  .param-key {
-    background: #16213e;
-    padding: 6px 10px;
-    width: 50%;
-    color: #888;
-    font-size: 9px;
-    text-transform: uppercase;
-    border-right: 1px solid #2a2a4a;
+  table.metric thead th.num { text-align: right; }
+  table.metric td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #1d2131;
+    color: #cfd3dc;
   }
-  .param-value {
-    padding: 6px 10px;
-    width: 50%;
-    color: #ccc;
-    font-size: 10px;
-    font-weight: bold;
+  table.metric td.num { text-align: right; }
+  table.metric tr:nth-child(even) td { background: #161a29; }
+  table.metric tr.section td {
+    background: #1b2338;
+    color: #8fa7bd;
+    font-size: 7pt;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 8px;
+  }
+  .up { color: #81c784; }
+  .down { color: #e57373; }
+
+  table.params { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+  table.params td {
+    border-bottom: 1px solid #1d2131;
+    padding: 5px 8px;
+    width: 25%;
+  }
+  table.params td.key {
+    background: #171b2b;
+    color: #7b8390;
+    font-size: 7pt;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  table.params td.value { color: #e6e9ef; font-weight: bold; }
+
+  .footer {
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 1px solid #232840;
+    color: #5f6675;
+    font-size: 7.5pt;
+    text-align: center;
   }
 </style>
 </head>
 <body>
-
-<!-- Page 1: Cover + Summary -->
+<!-- ===================== Cover ===================== -->
 <div class="cover">
+  <div class="brand">QuantFish · Classroom Quant Platform</div>
   <h1>Backtest Report</h1>
-  <p class="subtitle">QuantFish Classroom Quant Platform</p>
-  <p class="meta"><strong>Submission:</strong> {{ submission_label }}</p>
-  <p class="meta"><strong>Team:</strong> {{ team_name }}</p>
-  <p class="meta"><strong>Data Track:</strong> {{ data_track }}</p>
-  <p class="meta"><strong>Generated:</strong> {{ generated_at }}</p>
-</div>
-
-<div class="cards">
-  {% for c in cover_cards %}
-  <div class="card">
-    <div class="label">{{ c.label }}</div>
-    <div class="value">{{ c.value }}</div>
-  </div>
-  {% endfor %}
-</div>
-
-<!-- Page 2: Performance Charts -->
-<div class="page-break"></div>
-<h2>Performance</h2>
-{% if plots.equity_curve %}
-<div class="plot-container">
-  <img src="{{ plots.equity_curve }}" alt="Equity Curve">
-</div>
-{% endif %}
-
-{% if plots.drawdown %}
-<div class="plot-container">
-  <img src="{{ plots.drawdown }}" alt="Drawdown">
-</div>
-{% endif %}
-
-{% if plots.rolling_sharpe %}
-<div class="plot-container">
-  <img src="{{ plots.rolling_sharpe }}" alt="Rolling Sharpe">
-</div>
-{% endif %}
-
-{% if plots.monthly_heatmap %}
-<div class="plot-container">
-  <img src="{{ plots.monthly_heatmap }}" alt="Monthly Returns Heatmap">
-</div>
-{% endif %}
-
-{% if plots.yearly_bar %}
-<div class="plot-container">
-  <img src="{{ plots.yearly_bar }}" alt="Yearly Returns">
-</div>
-{% endif %}
-
-<!-- Page 3: Risk Analysis -->
-<div class="page-break"></div>
-<h2>Risk Analysis</h2>
-<table>
-  <thead>
-    <tr><th>Metric</th><th>Value</th></tr>
-  </thead>
-  <tbody>
-    {% for label, value in risk_table %}
-    <tr><td>{{ label }}</td><td>{{ value }}</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<!-- Yearly Performance Table -->
-{% if yearly_table %}
-<h2>Yearly Performance</h2>
-<table>
-  <thead>
-    <tr><th>Year</th><th>Return</th><th>Sharpe</th><th>Max Drawdown</th></tr>
-  </thead>
-  <tbody>
-    {% for row in yearly_table %}
+  <table class="meta-table">
     <tr>
-      <td>{{ row.year }}</td>
-      <td>{{ row.return }}</td>
-      <td>{{ row.sharpe }}</td>
-      <td>{{ row.drawdown }}</td>
+      <td><b>Submission</b>{{ submission_label }}</td>
+      <td><b>Team</b>{{ team_name }}</td>
+      <td><b>Data track</b>{{ data_track }}</td>
+      <td><b>Window</b>{{ period.start }} → {{ period.end }}</td>
+      <td><b>Generated</b>{{ generated_at }}</td>
+    </tr>
+  </table>
+
+  <div class="verdict {{ verdict.tone }}">
+    <div class="verdict-label">{{ verdict.label }}</div>
+    <div class="verdict-detail">{{ verdict.detail }}</div>
+  </div>
+
+  {% for group in card_groups %}
+  <div class="group-head">{{ group.title }} <span class="group-note">— {{ group.note }}</span></div>
+  <table class="cards">
+    {% for row in group.cards|batch(4) %}
+    <tr>
+      {% for card in row %}
+      <td class="card">
+        <div class="label">{{ card.label }}</div>
+        <div class="value">{{ card.value }}</div>
+      </td>
+      {% endfor %}
+      {% if row|length < 4 %}
+      <td class="card card-empty" colspan="{{ 4 - row|length }}"></td>
+      {% endif %}
     </tr>
     {% endfor %}
-  </tbody>
-</table>
-{% endif %}
-
-<!-- Page 4: Parameters -->
-<div class="page-break"></div>
-<h2>Execution Parameters</h2>
-<div class="param-grid">
-  {% for key, value in params %}
-  <div class="param-row">
-    <div class="param-key">{{ key }}</div>
-    <div class="param-value">{{ value }}</div>
-  </div>
+  </table>
   {% endfor %}
+
+  {% if highlights %}
+  <div class="group-head">Highlights</div>
+  <div class="highlights">
+    <ul>
+      {% for line in highlights %}<li>{{ line }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="cover-foot">
+    {{ version }} · scoring figures cover every day of the run; benchmark figures only count days where the CSI 300 series exists.
+  </div>
 </div>
 
-<!-- Footer -->
-<div class="footer">
-  <p>Generated by QuantFish AI Quant Platform</p>
-  <p>Report Time: {{ generated_at }} &nbsp;|&nbsp; Submission: {{ submission_id }}</p>
-  <p>Version: {{ version }}</p>
+<!-- ===================== Performance ===================== -->
+<div class="page">
+  <h2>Performance <span>raw portfolio equity, excess curve and drawdown</span></h2>
+
+  {% if plots.equity_curve %}
+  <div class="plot"><img src="{{ plots.equity_curve }}" alt="Equity curve"></div>
+  {% endif %}
+
+  {% if plots.excess_curve %}
+  <div class="plot"><img src="{{ plots.excess_curve }}" alt="Cumulative excess return"></div>
+  {% endif %}
+
+  {% if plots.drawdown %}
+  <div class="plot"><img src="{{ plots.drawdown }}" alt="Drawdown"></div>
+  {% endif %}
+
+  {% if plots.rolling_sharpe %}
+  <div class="plot"><img src="{{ plots.rolling_sharpe }}" alt="Rolling Sharpe"></div>
+  {% endif %}
+
+  {% if not plots.equity_curve and not plots.excess_curve and not plots.drawdown %}
+  <p class="note">No chart series were found for this run, so only the metric tables below are populated.</p>
+  {% endif %}
+
+  <p class="note">
+    Equity, excess and drawdown are all built from the arithmetic daily return convention used for scoring,
+    so they can be compared with the numbers in the tables. The excess curve is the simple daily difference
+    between the raw portfolio and the CSI 300, compounded day by day.
+  </p>
+</div>
+<!-- ===================== Activity & attribution ===================== -->
+{% if plots.monthly_excess or plots.turnover or plots.exposure or plots.group_cumulative %}
+<div class="page">
+  <h2>Activity &amp; attribution <span>monthly excess, traded capital, exposure and factor groups</span></h2>
+
+  {% if plots.monthly_excess %}
+  <div class="plot"><img src="{{ plots.monthly_excess }}" alt="Monthly excess return"></div>
+  {% endif %}
+
+  {% if plots.turnover or plots.exposure %}
+  <table class="plot-pair">
+    <tr>
+      <td>
+        {% if plots.turnover %}
+        <div class="plot"><img src="{{ plots.turnover }}" alt="Turnover"></div>
+        {% endif %}
+      </td>
+      <td>
+        {% if plots.exposure %}
+        <div class="plot"><img src="{{ plots.exposure }}" alt="Exposure"></div>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+  {% endif %}
+
+  {% if plots.group_cumulative %}
+  <div class="plot"><img src="{{ plots.group_cumulative }}" alt="Factor groups"></div>
+  <p class="note">
+    Group lines are the cumulative arithmetic return of each score bucket over the scored window.
+    A clean downward slope from the top group to the bottom group is the factor working as designed.
+  </p>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- ===================== Return calendar ===================== -->
+{% if plots.monthly_heatmap or plots.yearly_bar %}
+<div class="page">
+  <h2>Return calendar <span>monthly and yearly performance of the scored book</span></h2>
+
+  {% if plots.monthly_heatmap %}
+  <div class="plot"><img src="{{ plots.monthly_heatmap }}" alt="Monthly returns heatmap"></div>
+  {% endif %}
+
+  {% if plots.yearly_bar %}
+  <div class="plot"><img src="{{ plots.yearly_bar }}" alt="Yearly returns"></div>
+  {% endif %}
+</div>
+{% endif %}
+<!-- ===================== Metrics ===================== -->
+<div class="page">
+  <h2>Performance summary <span>scoring basis, every day of the run</span></h2>
+  <table class="metric">
+    <thead>
+      <tr><th>Metric</th><th class="num">Value</th></tr>
+    </thead>
+    <tbody>
+      {% for label, value in risk_table %}
+      <tr><td>{{ label }}</td><td class="num">{{ value }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if benchmark_sections %}
+  <h2>Benchmark &amp; Excess Return <span>strategy versus CSI 300, aligned days only</span></h2>
+  <table class="metric">
+    <thead>
+      <tr><th>Metric</th><th class="num">Value</th></tr>
+    </thead>
+    <tbody>
+      {% for section in benchmark_sections %}
+      <tr class="section"><td colspan="2">{{ section.title }}</td></tr>
+      {% for row in section["rows"] %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td class="num{% if row|length > 2 %} {{ row[2] }}{% endif %}">{{ row[1] }}</td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="note">
+    Excess return is the simple arithmetic difference between the raw portfolio and the CSI 300 on days
+    where both exist; the compounded relative return and the excess CAGR are the geometric view of the
+    same comparison. Beta-adjusted excess (scoring basis) stays in the block above because it is the
+    number the platform scores on.
+  </p>
+  {% endif %}
+
+  {% if yearly_table %}
+  <h2>Yearly Performance <span>one row per calendar year of the scored window</span></h2>
+  <table class="metric">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th class="num">Return</th>
+        <th class="num">Annualized</th>
+        <th class="num">Sharpe</th>
+        <th class="num">Turnover</th>
+        <th class="num">Max Drawdown</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in yearly_table %}
+      <tr>
+        <td>{{ row.year }}</td>
+        <td class="num {{ row.tone }}">{{ row.return }}</td>
+        <td class="num">{{ row.annualized }}</td>
+        <td class="num">{{ row.sharpe }}</td>
+        <td class="num">{{ row.turnover }}</td>
+        <td class="num">{{ row.drawdown }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+<!-- ===================== Parameters ===================== -->
+<div class="page">
+  <h2>Execution Parameters <span>configuration snapshot of this submission</span></h2>
+  <table class="params">
+    {% for row in params|batch(2) %}
+    <tr>
+      {% for key, value in row %}
+      <td class="key">{{ key }}</td>
+      <td class="value">{{ value }}</td>
+      {% endfor %}
+      {% if row|length < 2 %}
+      <td class="key"></td>
+      <td class="value"></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p class="note">
+    Scoring figures follow the platform convention: arithmetic daily returns, annualized with 252 trading
+    days, with the benchmark block reused from the same aligned window so the comparison stays honest.
+  </p>
+
+  <div class="footer">
+    <p>Generated by QuantFish Classroom Quant Platform</p>
+    <p>Report time {{ generated_at }} · Submission {{ submission_id }} · {{ version }}</p>
+  </div>
 </div>
 
 </body>

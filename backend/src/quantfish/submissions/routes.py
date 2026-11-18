@@ -8,6 +8,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 
+from quantfish.backtest.pdf_report_version import pdf_report_is_current, pdf_report_path
 from quantfish.leaderboard.ranking import (
     ScoringWeights,
     calculate_leaderboard_score,
@@ -278,11 +279,10 @@ def download_pdf_report(request: Request, submission_id: str):
         raise HTTPException(status_code=404, detail="report is not available: submission not completed")
 
     report_dir = Path(submission.report_dir)
-    pdf_path = report_dir / "report.pdf"
 
-    if pdf_path.exists():
+    if pdf_report_is_current(report_dir):
         return FileResponse(
-            pdf_path,
+            pdf_report_path(report_dir),
             media_type="application/pdf",
             filename=f"report_{submission.submission_number or submission_id[:8]}.pdf",
         )
@@ -298,6 +298,15 @@ def download_pdf_report(request: Request, submission_id: str):
             filename=f"report_{submission.submission_number or submission_id[:8]}.pdf",
         )
     except ModuleNotFoundError as exc:
+        # Report support is optional: keep serving a cached build rather than fail
+        # the download when the host has no weasyprint/jinja2 to refresh it.
+        cached = pdf_report_path(report_dir)
+        if cached.is_file():
+            return FileResponse(
+                cached,
+                media_type="application/pdf",
+                filename=f"report_{submission.submission_number or submission_id[:8]}.pdf",
+            )
         raise HTTPException(
             status_code=503,
             detail=(
@@ -313,9 +322,9 @@ def download_pdf_report(request: Request, submission_id: str):
 
 
 def _pdf_report_available(report_dir: Path) -> bool:
-    """True when a PDF exists or the optional PDF dependencies are installed."""
+    """True when a current PDF exists or the optional PDF dependencies are installed."""
 
-    if (report_dir / "report.pdf").exists():
+    if pdf_report_path(report_dir).is_file():
         return True
     return (
         importlib.util.find_spec("weasyprint") is not None

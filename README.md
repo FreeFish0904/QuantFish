@@ -39,7 +39,7 @@ generated dataset.
 - **The platform is real.** FastAPI + SQLite + a thread/process scoring queue, cached
   parquet panels, job progress streaming, stale-result detection, admin console, team
   cohorts, student data exports and offline runtime bundles.
-- **Everything is tested.** 387 backend tests (pytest) and 224 frontend tests
+- **Everything is tested.** 419 backend tests (pytest) and 229 frontend tests
   (vitest + Testing Library + MSW), plus a CI matrix on Python 3.12/3.13.
 - **The demo is honest.** The public demo is a static build with an in-browser mock API;
   the Docker demo generates a synthetic CSMAR-style dataset and runs the actual engine,
@@ -164,8 +164,8 @@ data/                    generated dataset location (git-ignored, see data/READM
 ## Testing
 
 ```bash
-python -m pytest backend/tests -q              # 387 passed
-npm --prefix frontend test -- --run            # 224 passed
+python -m pytest backend/tests -q              # 419 passed
+npm --prefix frontend test -- --run            # 229 passed
 npm --prefix frontend run build                # tsc -b && vite build
 ```
 

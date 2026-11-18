@@ -19,10 +19,8 @@
       color: #5f6675;
     }
   }
-  @page :first {
+  @page cover {
     margin: 0;
-    @top-left { content: none; }
-    @top-right { content: none; }
   }
 
   html, body { background: #12121f; }
@@ -55,7 +53,7 @@
   }
 
   /* ---------- cover ---------- */
-  .cover { padding: 24mm 16mm 0; }
+  .cover { page: cover; padding: 24mm 16mm 0; }
   .brand {
     color: #4fc3f7;
     font-size: 8pt;

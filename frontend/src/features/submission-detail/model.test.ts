@@ -512,4 +512,93 @@ describe("toSubmissionDetailModel", () => {
       }
     ]);
   });
+
+  it("builds benchmark-relative rows in reporting order", () => {
+    const summary = backendDetail.artifacts.summary as Record<string, unknown>;
+    const model = toSubmissionDetailModel({
+      ...backendDetail,
+      artifacts: {
+        ...(backendDetail.artifacts ?? {}),
+        summary: {
+          ...summary,
+          strategy_total_return: 0.184,
+          strategy_annual_return: 0.42,
+          benchmark_total_return: 0.061,
+          benchmark_annual_return: 0.12,
+          benchmark_cagr: 0.108,
+          excess_total_return: 0.123,
+          excess_annual_return: 0.3,
+          excess_compounded_return: 0.114,
+          excess_cagr: 0.281,
+          excess_max_drawdown: 0.021,
+          excess_win_rate: 0.541,
+          excess_volatility: 0.083,
+          excess_information_ratio: 3.614,
+          excess_beta: 0.842,
+          excess_observations: 120
+        }
+      }
+    } as BackendSubmissionDetail);
+
+    expect(model.benchmarkRelativeRows.map((row) => row.field)).toEqual([
+      "strategy_total_return",
+      "benchmark_total_return",
+      "excess_total_return",
+      "strategy_annual_return",
+      "benchmark_annual_return",
+      "excess_annual_return",
+      "benchmark_cagr",
+      "excess_compounded_return",
+      "excess_cagr",
+      "excess_volatility",
+      "excess_information_ratio",
+      "excess_beta",
+      "excess_max_drawdown",
+      "excess_win_rate",
+      "excess_observations"
+    ]);
+
+    const row = (field: string) => model.benchmarkRelativeRows.find((item) => item.field === field);
+    expect(row("benchmark_total_return")).toEqual({
+      field: "benchmark_total_return",
+      labelKey: "submissionDetail.benchmarkTotalReturn",
+      note: "Arithmetic",
+      value: "6.10%"
+    });
+    expect(row("excess_total_return")?.value).toBe("12.30%");
+    expect(row("excess_total_return")?.note).toBe("Strategy − CSI 300");
+    expect(row("excess_information_ratio")?.value).toBe("3.61");
+    expect(row("excess_beta")?.value).toBe("0.842");
+    expect(row("excess_max_drawdown")?.value).toBe("2.10%");
+    expect(row("excess_observations")?.value).toBe("120");
+  });
+
+  it("keeps benchmark-relative fields out of the generic metric table", () => {
+    const summary = backendDetail.artifacts.summary as Record<string, unknown>;
+    const model = toSubmissionDetailModel({
+      ...backendDetail,
+      artifacts: {
+        ...(backendDetail.artifacts ?? {}),
+        summary: {
+          ...summary,
+          strategy_total_return: 0.184,
+          benchmark_total_return: 0.061,
+          excess_total_return: 0.123,
+          excess_information_ratio: Number.NaN
+        }
+      }
+    } as BackendSubmissionDetail);
+
+    expect(model.metricRows.some((row) => row.metric.startsWith("Excess"))).toBe(false);
+    expect(model.metricRows.some((row) => row.metric.startsWith("Benchmark"))).toBe(false);
+    expect(model.metricRows.some((row) => row.metric.startsWith("Strategy"))).toBe(false);
+    expect(model.metricRows.some((row) => row.value === "NaN")).toBe(false);
+  });
+
+  it("leaves benchmark-relative rows empty when the run has no excess metrics", () => {
+    const model = toSubmissionDetailModel(backendDetail);
+
+    expect(model.benchmarkRelativeRows).toEqual([]);
+    expect(toSubmissionDetailDisplay(model).benchmarkRelativeRows).toEqual([]);
+  });
 });

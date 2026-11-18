@@ -96,6 +96,22 @@ class SubmissionMetrics(_FrozenModel):
     sortino: float | None = None
     t_stat: float | None = None
     t_stat_p_value: float | None = None
+    # Benchmark-relative reporting block; excess_* = strategy_* - benchmark_*.
+    strategy_total_return: float | None = None
+    strategy_annual_return: float | None = None
+    benchmark_total_return: float | None = None
+    benchmark_annual_return: float | None = None
+    benchmark_cagr: float | None = None
+    excess_total_return: float | None = None
+    excess_annual_return: float | None = None
+    excess_compounded_return: float | None = None
+    excess_cagr: float | None = None
+    excess_max_drawdown: float | None = None
+    excess_win_rate: float | None = None
+    excess_volatility: float | None = None
+    excess_information_ratio: float | None = None
+    excess_beta: float | None = None
+    excess_observations: int | None = None
 
 
 _DATA_TRACK_LITERAL = Literal[

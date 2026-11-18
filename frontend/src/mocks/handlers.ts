@@ -43,6 +43,7 @@ type DemoGraphData = {
   drawdown: Array<{ date: string; drawdown: number }>;
   benchmark: Array<{ date: string; benchmark_cny: number }>;
   alpha: Array<{ date: string; alpha_cny: number }>;
+  excess: Array<{ date: string; excess_return: number; excess_equity: number; excess_cny: number }>;
   daily_pnl: Array<{ date: string; pnl_cny: number }>;
   trade_volume: Array<{ date: string; buy_cny: number; sell_cny: number }>;
   group_cumulative: Array<{ date: string; group: string; cumulative_return: number }>;
@@ -57,6 +58,7 @@ function buildDemoGraphData(seed = 7): DemoGraphData {
     drawdown: [],
     benchmark: [],
     alpha: [],
+    excess: [],
     daily_pnl: [],
     trade_volume: [],
     group_cumulative: []
@@ -65,6 +67,7 @@ function buildDemoGraphData(seed = 7): DemoGraphData {
   let strategy = 1;
   let benchmark = 1;
   let peak = 1;
+  let excessCumulative = 0;
 
   dated.forEach((date) => {
     const marketReturn = (random() - 0.5) * 0.018;
@@ -80,6 +83,13 @@ function buildDemoGraphData(seed = 7): DemoGraphData {
     data.alpha.push({
       date,
       alpha_cny: Math.round((nextStrategy - benchmark) * DEMO_CAPITAL)
+    });
+    excessCumulative += excess;
+    data.excess.push({
+      date,
+      excess_return: Number(excess.toFixed(6)),
+      excess_equity: Number((1 + excessCumulative).toFixed(6)),
+      excess_cny: Math.round(excessCumulative * DEMO_CAPITAL)
     });
     data.daily_pnl.push({
       date,
@@ -184,6 +194,21 @@ const submissionDetailSample: SubmissionDetail = {
     sortino: 2.1,
     t_stat: 1.5,
     t_stat_p_value: 0.1336,
+    strategy_total_return: 0.168,
+    strategy_annual_return: 0.134,
+    benchmark_total_return: 0.062,
+    benchmark_annual_return: 0.049,
+    benchmark_cagr: 0.047,
+    excess_total_return: 0.106,
+    excess_annual_return: 0.085,
+    excess_compounded_return: 0.091,
+    excess_cagr: 0.073,
+    excess_max_drawdown: 0.041,
+    excess_win_rate: 0.557,
+    excess_volatility: 0.062,
+    excess_information_ratio: 1.371,
+    excess_beta: 0.78,
+    excess_observations: 242,
   },
   score: 23.333333333333332,
   error_message: null,

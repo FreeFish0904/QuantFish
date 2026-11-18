@@ -28,6 +28,13 @@ export type MetricRow = {
   note: string;
 };
 
+export type BenchmarkRelativeRow = {
+  field: string;
+  labelKey: string;
+  value: string;
+  note: string;
+};
+
 export type TradeSummaryRow = {
   label: string;
   value: string;
@@ -68,6 +75,7 @@ export type SubmissionDetailModel = {
   groupSeries: PerformanceGroupSeries[];
   bestGroupId: string | null;
   metricRows: MetricRow[];
+  benchmarkRelativeRows: BenchmarkRelativeRow[];
   performanceRows: PerformanceRow[];
   tradeSummaryRows: TradeSummaryRow[];
   pdfReportAvailable: boolean;
@@ -76,6 +84,7 @@ export type SubmissionDetailModel = {
 export type SubmissionDetailDisplay = {
   kpis: KpiCard[];
   metricRows: MetricRow[];
+  benchmarkRelativeRows: BenchmarkRelativeRow[];
   tradeSummaryRows: TradeSummaryRow[];
 };
 
@@ -234,12 +243,163 @@ function buildMetricRows(metrics: Record<string, number>, summary: Record<string
     t_stat_p_value: "Normal approx."
   };
 
-  return Object.entries(source).map(([metric, value]) => ({
-    helpKey: metricHelpKey(metric),
-    metric: formatMetricRowName(metric),
-    value: formatMetricRowValue(metric, value),
-    note: noteMap[metric] ?? ""
-  }));
+  return Object.entries(source)
+    .filter(([metric, value]) => !isBenchmarkRelativeField(metric) && isReportableMetric(value))
+    .map(([metric, value]) => ({
+      helpKey: metricHelpKey(metric),
+      metric: formatMetricRowName(metric),
+      value: formatMetricRowValue(metric, value),
+      note: noteMap[metric] ?? ""
+    }));
+}
+
+const BENCHMARK_RELATIVE_PREFIXES = ["benchmark_", "excess_", "strategy_"] as const;
+
+function isBenchmarkRelativeField(field: string): boolean {
+  return BENCHMARK_RELATIVE_PREFIXES.some((prefix) => field.startsWith(prefix));
+}
+
+function isReportableMetric(value: number | null | undefined): boolean {
+  return typeof value !== "number" || Number.isFinite(value);
+}
+
+type BenchmarkRelativeRowDefinition = {
+  field: string;
+  labelKey: string;
+  note: string;
+  format: (value: number) => string;
+  order: number;
+};
+
+/**
+ * Reporting-only "strategy vs CSI 300" block. Order follows cumulative ->
+ * annualized -> geometric -> risk -> sample size so the table reads top-down.
+ */
+const BENCHMARK_RELATIVE_ROW_DEFINITIONS: BenchmarkRelativeRowDefinition[] = [
+  {
+    field: "strategy_total_return",
+    labelKey: "submissionDetail.strategyTotalReturnRaw",
+    note: "Raw portfolio",
+    format: formatPercent,
+    order: 10
+  },
+  {
+    field: "benchmark_total_return",
+    labelKey: "submissionDetail.benchmarkTotalReturn",
+    note: "Arithmetic",
+    format: formatPercent,
+    order: 20
+  },
+  {
+    field: "excess_total_return",
+    labelKey: "submissionDetail.excessTotalReturn",
+    note: "Strategy − CSI 300",
+    format: formatPercent,
+    order: 30
+  },
+  {
+    field: "strategy_annual_return",
+    labelKey: "submissionDetail.strategyAnnualReturnRaw",
+    note: "Raw portfolio",
+    format: formatPercent,
+    order: 40
+  },
+  {
+    field: "benchmark_annual_return",
+    labelKey: "submissionDetail.benchmarkAnnualReturn",
+    note: "Arithmetic",
+    format: formatPercent,
+    order: 50
+  },
+  {
+    field: "excess_annual_return",
+    labelKey: "submissionDetail.excessAnnualReturn",
+    note: "Annualized",
+    format: formatPercent,
+    order: 60
+  },
+  {
+    field: "benchmark_cagr",
+    labelKey: "submissionDetail.benchmarkCagr",
+    note: "Geometric",
+    format: formatPercent,
+    order: 70
+  },
+  {
+    field: "excess_compounded_return",
+    labelKey: "submissionDetail.excessCompoundedReturn",
+    note: "Geometric",
+    format: formatPercent,
+    order: 80
+  },
+  {
+    field: "excess_cagr",
+    labelKey: "submissionDetail.excessCagr",
+    note: "Annualized",
+    format: formatPercent,
+    order: 90
+  },
+  {
+    field: "excess_volatility",
+    labelKey: "submissionDetail.excessTrackingError",
+    note: "Annualized excess stdev",
+    format: formatPercent,
+    order: 100
+  },
+  {
+    field: "excess_information_ratio",
+    labelKey: "submissionDetail.excessInformationRatio",
+    note: "Excess / tracking error",
+    format: (value) => formatNumber(value, 2),
+    order: 110
+  },
+  {
+    field: "excess_beta",
+    labelKey: "submissionDetail.excessBeta",
+    note: "Regression slope",
+    format: (value) => formatNumber(value, 3),
+    order: 120
+  },
+  {
+    field: "excess_max_drawdown",
+    labelKey: "submissionDetail.excessMaxDrawdown",
+    note: "Excess equity",
+    format: formatDrawdownPercent,
+    order: 130
+  },
+  {
+    field: "excess_win_rate",
+    labelKey: "submissionDetail.excessWinRate",
+    note: "Days beating CSI 300",
+    format: formatPercent,
+    order: 140
+  },
+  {
+    field: "excess_observations",
+    labelKey: "submissionDetail.excessObservations",
+    note: "Aligned observations",
+    format: formatCount,
+    order: 150
+  }
+];
+
+function buildBenchmarkRelativeRows(
+  metrics: Record<string, number>,
+  summary: Record<string, number>
+): BenchmarkRelativeRow[] {
+  const source = Object.keys(summary).length > 0 ? summary : metrics;
+
+  return BENCHMARK_RELATIVE_ROW_DEFINITIONS.filter((definition) => {
+    const value = source[definition.field];
+    return typeof value === "number" && Number.isFinite(value);
+  })
+    .sort((left, right) => left.order - right.order)
+    .map((definition) => ({
+      field: definition.field,
+      labelKey: definition.labelKey,
+      value: definition.format(source[definition.field]),
+      note: definition.note
+    }));
 }
 
 function buildTradeSummaryRows(summary: Record<string, number>): TradeSummaryRow[] {
@@ -312,6 +472,7 @@ export function toSubmissionDetailModel(backendDetail: BackendSubmissionDetail):
     groupSeries,
     bestGroupId,
     metricRows: buildMetricRows(metrics, summary),
+    benchmarkRelativeRows: buildBenchmarkRelativeRows(metrics, summary),
     performanceRows: buildPerformanceRows(backendDetail.performance_table),
     tradeSummaryRows: buildTradeSummaryRows(summary),
     pdfReportAvailable: backendDetail.pdf_report_available ?? false
@@ -322,6 +483,7 @@ export function toSubmissionDetailDisplay(model: SubmissionDetailModel): Submiss
   return {
     kpis: model.kpis,
     metricRows: model.metricRows,
+    benchmarkRelativeRows: model.benchmarkRelativeRows,
     tradeSummaryRows: model.tradeSummaryRows
   };
 }

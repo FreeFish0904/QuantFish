@@ -37,6 +37,7 @@ def build_backtest_graph_data(
         capital,
         active_returns=active_returns,
     )
+    excess_records = _excess_records(returns, benchmark_returns, capital)
 
     return {
         "equity": [
@@ -55,6 +56,7 @@ def build_backtest_graph_data(
         "trade_volume": _trade_volume_records(daily, capital),
         "benchmark": benchmark_records,
         "alpha": alpha_records,
+        "excess": excess_records,
         "daily_returns": _series_records(
             daily,
             graph_return_column,
@@ -170,6 +172,37 @@ def _alpha_records(
             "alpha_return": _json_float(daily_return),
             "alpha_equity": _json_float(value),
             "alpha_cny": _json_float(value * capital),
+        }
+        for date, daily_return, value in zip(benchmark_returns["date"], excess, equity)
+    ]
+
+
+def _excess_records(
+    strategy_returns: pd.Series,
+    benchmark_returns: pd.DataFrame,
+    capital: float,
+) -> list[dict]:
+    """Plain ``strategy - benchmark`` curve; never beta-adjusted.
+
+    ``alpha`` keeps its historical beta-adjusted meaning for the equity chart,
+    while ``excess`` is the simple difference used by the excess-return table.
+    """
+
+    if benchmark_returns.empty:
+        return []
+    aligned_strategy = strategy_returns.reset_index(drop=True).iloc[
+        benchmark_returns["strategy_index"].to_numpy()
+    ].reset_index(drop=True)
+    excess = aligned_strategy.fillna(0.0) - benchmark_returns["return"].reset_index(
+        drop=True
+    )
+    equity = arithmetic_equity(excess)
+    return [
+        {
+            "date": _date(date),
+            "excess_return": _json_float(daily_return),
+            "excess_equity": _json_float(value),
+            "excess_cny": _json_float(value * capital),
         }
         for date, daily_return, value in zip(benchmark_returns["date"], excess, equity)
     ]

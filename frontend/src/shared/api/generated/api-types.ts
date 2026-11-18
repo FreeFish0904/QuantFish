@@ -1636,6 +1636,36 @@ export interface components {
             t_stat?: number | null;
             /** T Stat P Value */
             t_stat_p_value?: number | null;
+            /** Strategy Total Return */
+            strategy_total_return?: number | null;
+            /** Strategy Annual Return */
+            strategy_annual_return?: number | null;
+            /** Benchmark Total Return */
+            benchmark_total_return?: number | null;
+            /** Benchmark Annual Return */
+            benchmark_annual_return?: number | null;
+            /** Benchmark Cagr */
+            benchmark_cagr?: number | null;
+            /** Excess Total Return */
+            excess_total_return?: number | null;
+            /** Excess Annual Return */
+            excess_annual_return?: number | null;
+            /** Excess Compounded Return */
+            excess_compounded_return?: number | null;
+            /** Excess Cagr */
+            excess_cagr?: number | null;
+            /** Excess Max Drawdown */
+            excess_max_drawdown?: number | null;
+            /** Excess Win Rate */
+            excess_win_rate?: number | null;
+            /** Excess Volatility */
+            excess_volatility?: number | null;
+            /** Excess Information Ratio */
+            excess_information_ratio?: number | null;
+            /** Excess Beta */
+            excess_beta?: number | null;
+            /** Excess Observations */
+            excess_observations?: number | null;
         };
         /** SubmissionOptionsResponse */
         SubmissionOptionsResponse: {

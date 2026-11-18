@@ -161,6 +161,24 @@ class SubmissionMetrics:
     sortino: float | None = None
     t_stat: float | None = None
     t_stat_p_value: float | None = None
+    # Benchmark-relative reporting block (see docs/metrics-definitions.md).
+    # strategy_* is the raw portfolio on the days that have a CSI 300 return, so
+    # excess_* = strategy_* - benchmark_*; scoring keeps using the rows above.
+    strategy_total_return: float | None = None
+    strategy_annual_return: float | None = None
+    benchmark_total_return: float | None = None
+    benchmark_annual_return: float | None = None
+    benchmark_cagr: float | None = None
+    excess_total_return: float | None = None
+    excess_annual_return: float | None = None
+    excess_compounded_return: float | None = None
+    excess_cagr: float | None = None
+    excess_max_drawdown: float | None = None
+    excess_win_rate: float | None = None
+    excess_volatility: float | None = None
+    excess_information_ratio: float | None = None
+    excess_beta: float | None = None
+    excess_observations: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -204,6 +222,21 @@ class SubmissionMetrics:
             "sortino": self.sortino,
             "t_stat": self.t_stat,
             "t_stat_p_value": self.t_stat_p_value,
+            "strategy_total_return": self.strategy_total_return,
+            "strategy_annual_return": self.strategy_annual_return,
+            "benchmark_total_return": self.benchmark_total_return,
+            "benchmark_annual_return": self.benchmark_annual_return,
+            "benchmark_cagr": self.benchmark_cagr,
+            "excess_total_return": self.excess_total_return,
+            "excess_annual_return": self.excess_annual_return,
+            "excess_compounded_return": self.excess_compounded_return,
+            "excess_cagr": self.excess_cagr,
+            "excess_max_drawdown": self.excess_max_drawdown,
+            "excess_win_rate": self.excess_win_rate,
+            "excess_volatility": self.excess_volatility,
+            "excess_information_ratio": self.excess_information_ratio,
+            "excess_beta": self.excess_beta,
+            "excess_observations": self.excess_observations,
         }
 
     @classmethod
@@ -269,6 +302,27 @@ class SubmissionMetrics:
             sortino=_optional_float(summary.get("sortino")),
             t_stat=_optional_float(summary.get("t_stat")),
             t_stat_p_value=_optional_float(summary.get("t_stat_p_value")),
+            strategy_total_return=_optional_float(summary.get("strategy_total_return")),
+            strategy_annual_return=_optional_float(summary.get("strategy_annual_return")),
+            benchmark_total_return=_optional_float(summary.get("benchmark_total_return")),
+            benchmark_annual_return=_optional_float(
+                summary.get("benchmark_annual_return")
+            ),
+            benchmark_cagr=_optional_float(summary.get("benchmark_cagr")),
+            excess_total_return=_optional_float(summary.get("excess_total_return")),
+            excess_annual_return=_optional_float(summary.get("excess_annual_return")),
+            excess_compounded_return=_optional_float(
+                summary.get("excess_compounded_return")
+            ),
+            excess_cagr=_optional_float(summary.get("excess_cagr")),
+            excess_max_drawdown=_optional_float(summary.get("excess_max_drawdown")),
+            excess_win_rate=_optional_float(summary.get("excess_win_rate")),
+            excess_volatility=_optional_float(summary.get("excess_volatility")),
+            excess_information_ratio=_optional_float(
+                summary.get("excess_information_ratio")
+            ),
+            excess_beta=_optional_float(summary.get("excess_beta")),
+            excess_observations=_optional_int(summary.get("excess_observations")),
         )
 
 

@@ -105,7 +105,16 @@ const metricNoteKeys: Record<string, string> = {
   "Annualized stdev": "submissionDetail.annualizedStdev",
   "Downside risk-adjusted": "submissionDetail.downsideRiskAdjusted",
   "Mean / standard error": "submissionDetail.meanOverStandardError",
-  "Normal approx.": "submissionDetail.normalApproximation"
+  "Normal approx.": "submissionDetail.normalApproximation",
+  Arithmetic: "submissionDetail.arithmeticBasis",
+  Geometric: "submissionDetail.geometricBasis",
+  "Strategy − CSI 300": "submissionDetail.strategyMinusBenchmark",
+  "Excess equity": "submissionDetail.excessEquity",
+  "Days beating CSI 300": "submissionDetail.daysBeatingBenchmark",
+  "Annualized excess stdev": "submissionDetail.excessStdev",
+  "Excess / tracking error": "submissionDetail.excessOverTrackingError",
+  "Regression slope": "submissionDetail.regressionSlope",
+  "Aligned observations": "submissionDetail.alignedObservations"
 };
 
 type Translator = (key: string, values?: Record<string, string | number>) => string;
@@ -274,6 +283,9 @@ export function SubmissionDetailView() {
       scored_at: data.scoredAt ?? null,
       kpis: Object.fromEntries(display.kpis.map((kpi) => [kpi.id, kpi.value])),
       metrics: Object.fromEntries(display.metricRows.map((row) => [row.metric, row.value])),
+      benchmark_relative: Object.fromEntries(
+        display.benchmarkRelativeRows.map((row) => [row.field, row.value])
+      ),
       trade_summary: Object.fromEntries(
         display.tradeSummaryRows.map((row) => [row.label, row.value])
       )
@@ -431,6 +443,32 @@ export function SubmissionDetailView() {
           </div>
         </Card>
       </section>
+
+      {display.benchmarkRelativeRows.length > 0 ? (
+        <section className={styles.panel} aria-labelledby="benchmark-relative-title">
+          <Card
+            header={
+              <div>
+                <h3 className={styles.panelTitle} id="benchmark-relative-title">
+                  {t("submissionDetail.benchmarkRelativeTitle")}
+                </h3>
+                <p className={styles.panelMeta}>{t("submissionDetail.benchmarkRelativeDescription")}</p>
+              </div>
+            }
+          >
+            <DataTable
+              caption={t("submissionDetail.benchmarkRelativeTitle")}
+              columns={[
+                { key: "label", header: t("submissionDetail.metric"), render: (row) => t(row.labelKey) },
+                { key: "value", header: t("submissionDetail.value"), render: (row) => row.value, align: "right" },
+                { key: "note", header: t("submissionDetail.note"), render: (row) => renderMetricNote(row.note, t) }
+              ]}
+              getRowId={(row) => row.field}
+              rows={display.benchmarkRelativeRows}
+            />
+          </Card>
+        </section>
+      ) : null}
 
       <section className={styles.panel} aria-labelledby="execution-parameters-title">
         <Card

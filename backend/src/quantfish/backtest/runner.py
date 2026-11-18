@@ -7,6 +7,10 @@ import pandas as pd
 
 from quantfish.backtest.active_returns import calculate_long_only_active_returns
 from quantfish.backtest.benchmark import HS300_DATASET, load_hs300_benchmark
+from quantfish.backtest.excess import (
+    MIN_EXCESS_OBSERVATIONS,
+    calculate_benchmark_relative_metrics,
+)
 from quantfish.backtest.graph import build_backtest_graph_data
 from quantfish.backtest.metrics import (
     TRADING_DAYS_PER_YEAR,
@@ -240,6 +244,13 @@ def run_student_backtest(
     summary = _summary_frame(metrics, daily_returns)
     for key, value in active_scoring_summary.items():
         summary.loc[0, key] = value
+    benchmark_relative_summary, benchmark_relative_status = _benchmark_relative_summary(
+        scoring_result.daily,
+        benchmark,
+        min_observations=MIN_EXCESS_OBSERVATIONS,
+    )
+    for key, value in benchmark_relative_summary.items():
+        summary.loc[0, key] = value
     graph_data = build_backtest_graph_data(
         scoring_result,
         capital=capital,
@@ -291,6 +302,7 @@ def run_student_backtest(
         "industry_neutralization": industry_summary.to_dict(),
         "investable_universe": universe_summary,
         "long_only_universe": universe_summary if mode == "longonly" else None,
+        "benchmark_relative": benchmark_relative_status,
         "long_only_scoring": (
             {
                 "benchmark": long_only_benchmark_name,
@@ -776,6 +788,31 @@ def _summary_frame(metrics: Any, daily_returns: pd.DataFrame) -> pd.DataFrame:
     summary["total_return"] = summary.get("all_return", 0.0)
     summary["trading_days"] = int(len(daily_returns))
     return pd.DataFrame([summary])
+
+
+def _benchmark_relative_summary(
+    daily: pd.DataFrame,
+    benchmark: pd.DataFrame,
+    *,
+    min_observations: int = MIN_EXCESS_OBSERVATIONS,
+) -> tuple[dict[str, float | int], dict[str, Any]]:
+    """Best-effort strategy-vs-benchmark block; it never fails the backtest."""
+
+    try:
+        relative = calculate_benchmark_relative_metrics(
+            daily, benchmark, min_observations=min_observations
+        )
+    except ValueError as error:
+        return {}, {"status": "unavailable", "reason": str(error)}
+    status = {
+        "status": "available",
+        "benchmark": relative.benchmark,
+        "observations": relative.observations,
+        "start": relative.start,
+        "end": relative.end,
+        "min_observations": min_observations,
+    }
+    return relative.summary_fields(), status
 
 
 def _public_daily_returns(daily: pd.DataFrame, *, return_column: str) -> pd.DataFrame:

@@ -515,4 +515,55 @@ describe("SubmissionDetailView", () => {
     expect(screen.getByRole("heading", { name: /yearly performance/i })).toBeInTheDocument();
     expect(screen.getByText(/yearly performance is available after a submission is newly scored or rescored/i)).toBeInTheDocument();
   });
+
+  it("renders the benchmark-relative panel with translated labels and notes", async () => {
+    const summary = backendDetail.artifacts.summary as Record<string, unknown>;
+    vi.spyOn(api, "fetchSubmissionDetail").mockResolvedValue({
+      ...backendDetail,
+      artifacts: {
+        ...backendDetail.artifacts,
+        summary: {
+          ...summary,
+          strategy_total_return: 0.184,
+          benchmark_total_return: 0.061,
+          excess_total_return: 0.123,
+          excess_annual_return: 0.3,
+          excess_information_ratio: 3.614,
+          excess_observations: 120
+        }
+      }
+    });
+
+    render(<SubmissionDetailView />, { wrapper: Wrapper });
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Relative to benchmark" })).toBeInTheDocument();
+    });
+
+    const table = screen.getByRole("table", { name: "Relative to benchmark" });
+    expect(table).toHaveTextContent("Strategy total return");
+    expect(table).toHaveTextContent("18.40%");
+    expect(table).toHaveTextContent("CSI 300 total return");
+    expect(table).toHaveTextContent("6.10%");
+    expect(table).toHaveTextContent("Excess total return");
+    expect(table).toHaveTextContent("12.30%");
+    expect(table).toHaveTextContent("Strategy − CSI 300");
+    expect(table).toHaveTextContent("Information ratio");
+    expect(table).toHaveTextContent("3.61");
+    expect(table).toHaveTextContent("Aligned days");
+    expect(table).toHaveTextContent("120");
+    expect(screen.queryByText("Excess Total Return")).not.toBeInTheDocument();
+  });
+
+  it("hides the benchmark-relative panel for runs without excess metrics", async () => {
+    vi.spyOn(api, "fetchSubmissionDetail").mockResolvedValue(backendDetail);
+
+    render(<SubmissionDetailView />, { wrapper: Wrapper });
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "#1" })).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole("heading", { name: "Relative to benchmark" })).not.toBeInTheDocument();
+  });
 });

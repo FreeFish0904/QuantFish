@@ -5,8 +5,14 @@ import pandas as pd
 import pytest
 
 from quantfish.backtest import BacktestPanel, run_student_backtest
+from quantfish.backtest import runner
+from quantfish.backtest.excess import MIN_EXCESS_OBSERVATIONS
 from quantfish.backtest.report_writer import write_backtest_report
-from quantfish.backtest.runner import BacktestResult, _calculate_group_returns
+from quantfish.backtest.runner import (
+    BacktestResult,
+    _benchmark_relative_summary,
+    _calculate_group_returns,
+)
 from quantfish.data.catalog import DataCatalog, DatasetSpec
 
 
@@ -472,6 +478,13 @@ def test_run_student_backtest_returns_public_result_contract(tmp_path: Path) -> 
         },
     ]
     assert result.graph_data["alpha"][0]["alpha_cny"] == pytest.approx(1_080_000)
+    assert result.graph_data["excess"][0] == {
+        "date": "2023-01-03",
+        "excess_return": pytest.approx(0.09 - 0.01),
+        "excess_equity": pytest.approx(1.08),
+        "excess_cny": pytest.approx(1_080_000),
+    }
+    assert result.diagnostics["benchmark_relative"]["status"] == "unavailable"
     assert result.diagnostics["strategy_path"].endswith("student_strategy.py")
     assert result.diagnostics["execution_mode"] == "longshort"
     assert "alpha_type" not in result.diagnostics
@@ -577,6 +590,20 @@ def test_run_student_backtest_longonly_scores_active_returns_and_keeps_raw_colum
     assert result.graph_data["alpha"][0]["alpha_return"] == pytest.approx(
         result.daily_returns.loc[0, "active_return"]
     )
+    assert [
+        point["excess_return"] for point in result.graph_data["excess"]
+    ] == pytest.approx(
+        [
+            strategy - benchmark
+            for strategy, benchmark in zip(
+                result.daily_returns["portfolio_return"],
+                [point["benchmark_return"] for point in result.graph_data["benchmark"]],
+                strict=True,
+            )
+        ]
+    )
+    assert "excess_total_return" not in summary
+    assert result.diagnostics["benchmark_relative"]["status"] == "unavailable"
     assert result.diagnostics["execution_mode"] == "longonly"
     assert "alpha_type" not in result.diagnostics
     assert result.diagnostics["long_only_scoring"]["benchmark"] == "hs300"
@@ -631,11 +658,96 @@ def test_run_student_backtest_unbenchmarked_longonly_tolerates_missing_index(
     assert summary["sharpe"] == pytest.approx(summary["raw_sharpe"])
     assert result.graph_data["benchmark"] == []
     assert result.graph_data["alpha"] == []
+    assert result.graph_data["excess"] == []
     assert result.diagnostics["long_only_scoring"] == {
         "benchmark": "none",
         "benchmark_available": False,
         "scoring_basis": "portfolio_return",
     }
+
+
+def test_benchmark_relative_summary_reports_available_block() -> None:
+    dates = pd.bdate_range("2023-01-03", periods=25)
+    strategy = [0.004 if index % 2 == 0 else 0.006 for index in range(25)]
+    benchmark = [0.003 if index % 2 == 0 else 0.005 for index in range(25)]
+
+    fields, status = _benchmark_relative_summary(
+        pd.DataFrame({"date": dates, "portfolio_return": strategy}),
+        pd.DataFrame({"date": dates, "return": benchmark}),
+    )
+
+    assert status == {
+        "status": "available",
+        "benchmark": "hs300",
+        "observations": 25,
+        "start": "2023-01-03",
+        "end": "2023-02-06",
+        "min_observations": MIN_EXCESS_OBSERVATIONS,
+    }
+    assert fields["excess_observations"] == 25
+    assert fields["strategy_total_return"] == pytest.approx(13 * 0.004 + 12 * 0.006)
+    assert fields["benchmark_total_return"] == pytest.approx(13 * 0.003 + 12 * 0.005)
+    assert fields["excess_total_return"] == pytest.approx(25 * 0.001)
+    assert fields["excess_win_rate"] == pytest.approx(1.0)
+    assert fields["excess_beta"] == pytest.approx(1.0)
+    assert fields["excess_information_ratio"] is None
+
+
+def test_run_student_backtest_merges_benchmark_relative_summary_columns(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    data_root = tmp_path / "release"
+    _write_release(data_root)
+    # The fixture only carries two scoring days; lower the reporting threshold so the
+    # real merge path (summary columns + diagnostics) runs end to end.
+    monkeypatch.setattr(runner, "MIN_EXCESS_OBSERVATIONS", 2)
+
+    result = run_student_backtest(
+        _write_strategy(tmp_path / "student_strategy.py"),
+        data_root,
+        {
+            "backtest": {
+                "data_start": "2023-01-02",
+                "scoring_start": "2023-01-03",
+                "scoring_end": "2023-01-04",
+                "capital": 1_000_000,
+                "group_count": 2,
+            },
+            "execution": {
+                "max_participation_rate": 1.0,
+                "min_listing_days": 0,
+            },
+        },
+    )
+
+    summary = result.summary.iloc[0].to_dict()
+    benchmark = [point["benchmark_return"] for point in result.graph_data["benchmark"]]
+    strategy = [point["daily_return"] for point in result.graph_data["daily_pnl"]]
+
+    assert result.diagnostics["benchmark_relative"] == {
+        "status": "available",
+        "benchmark": "hs300",
+        "observations": 2,
+        "start": "2023-01-03",
+        "end": "2023-01-04",
+        "min_observations": 2,
+    }
+    assert summary["excess_observations"] == 2
+    assert summary["strategy_total_return"] == pytest.approx(sum(strategy))
+    assert summary["benchmark_total_return"] == pytest.approx(sum(benchmark))
+    assert summary["excess_total_return"] == pytest.approx(
+        sum(s - b for s, b in zip(strategy, benchmark, strict=True))
+    )
+    assert summary["excess_total_return"] == pytest.approx(
+        summary["strategy_total_return"] - summary["benchmark_total_return"]
+    )
+    assert summary["excess_annual_return"] == pytest.approx(
+        summary["excess_total_return"] * 252 / 2
+    )
+    assert result.graph_data["excess"][0]["excess_return"] == pytest.approx(
+        strategy[0] - benchmark[0]
+    )
 
 
 def test_run_student_backtest_ignores_legacy_alpha_type_for_mode(tmp_path: Path) -> None:

@@ -5,6 +5,7 @@ import {
   fetchSubmissionOptions,
   fetchSubmissionStatus,
   submitStrategy,
+  validateStrategy,
   type SubmitStrategyInput
 } from "./api";
 
@@ -17,6 +18,12 @@ const ACTIVE_POLL_STATUSES = new Set(["queued", "running"]);
 export function useSubmitStrategy() {
   return useMutation({
     mutationFn: submitStrategy
+  });
+}
+
+export function useValidateStrategy() {
+  return useMutation({
+    mutationFn: validateStrategy
   });
 }
 

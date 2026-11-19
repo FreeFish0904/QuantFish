@@ -603,6 +603,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/submissions/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate Strategy
+         * @description Dry-run an upload without storing a submission or producing a score.
+         */
+        post: operations["validate_strategy_api_submissions_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/submissions/options": {
         parameters: {
             query?: never;
@@ -1235,6 +1255,17 @@ export interface components {
             /** File */
             file: string;
         };
+        /** Body_validate_strategy_api_submissions_validate_post */
+        Body_validate_strategy_api_submissions_validate_post: {
+            /** Team Name */
+            team_name?: string | null;
+            /** Password */
+            password?: string | null;
+            /** Data Track */
+            data_track?: string | null;
+            /** File */
+            file: string;
+        };
         /** CompareResponse */
         CompareResponse: {
             /** Submissions */
@@ -1442,6 +1473,39 @@ export interface components {
             engine_version: string;
             /** Checks */
             checks: components["schemas"]["ReadinessCheckResponse"][];
+        };
+        /** StrategyValidationResponse */
+        StrategyValidationResponse: {
+            /** Ok */
+            ok: boolean;
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /**
+             * Data Track
+             * @enum {string}
+             */
+            data_track: "hidden_test" | "learning" | "learning_1" | "learning_2" | "learning_3";
+            /** Trading Dates Checked */
+            trading_dates_checked?: number | null;
+            /** Signal Rows */
+            signal_rows?: number | null;
+            /** Signal Dates */
+            signal_dates?: number | null;
+            /** First Signal Date */
+            first_signal_date?: string | null;
+            /** Last Signal Date */
+            last_signal_date?: string | null;
+            /** Sample Codes */
+            sample_codes?: string[];
+            /** Warnings */
+            warnings?: string[];
+            /**
+             * Elapsed Ms
+             * @default 0
+             */
+            elapsed_ms: number;
         };
         /**
          * SubmissionDataTrack
@@ -2960,6 +3024,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubmissionSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_strategy_api_submissions_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_validate_strategy_api_submissions_validate_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategyValidationResponse"];
                 };
             };
             /** @description Validation Error */

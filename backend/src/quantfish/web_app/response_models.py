@@ -218,6 +218,21 @@ class SubmissionOptionsResponse(_FrozenModel):
     available_data_tracks: list[_DATA_TRACK_LITERAL]
 
 
+class StrategyValidationResponse(_FrozenModel):
+    ok: bool
+    code: str
+    message: str
+    data_track: _DATA_TRACK_LITERAL
+    trading_dates_checked: int | None = None
+    signal_rows: int | None = None
+    signal_dates: int | None = None
+    first_signal_date: str | None = None
+    last_signal_date: str | None = None
+    sample_codes: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    elapsed_ms: float = 0.0
+
+
 class CompareSubmission(_FrozenModel):
     submission_id: str
     submission_number: int

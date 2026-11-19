@@ -28,6 +28,9 @@ class StrategyExecutionConfig:
     scoring_end: str | pd.Timestamp
     canonical_panel: str = CANONICAL_PANEL_DATASET
     allowed_market_types: tuple[int, ...] | None = DEFAULT_ALLOWED_MARKET_TYPES
+    # When set, only the last N trading dates inside the window are visited.
+    # The upload pre-check uses this to keep a validation run to seconds.
+    max_trading_dates: int | None = None
 
 
 @dataclass(frozen=True)
@@ -284,6 +287,8 @@ def execute_student_strategy(
             "canonical_panel": config.canonical_panel,
             "allowed_market_types": _allowed_market_type_list(config.allowed_market_types),
             "trading_dates": [date.date().isoformat() for date in trading_dates],
+            "trading_dates_checked": len(trading_dates),
+            "max_trading_dates": config.max_trading_dates,
             "signal_rows": len(scores),
         },
     )
@@ -346,7 +351,15 @@ def _trading_dates(
     if data_start > scoring_end:
         raise StrategySignalError("data_start cannot be after scoring_end")
     mask = (dates >= data_start) & (dates <= scoring_end)
-    return sorted(pd.Series(dates[mask].unique()).dropna().tolist())
+    resolved = sorted(pd.Series(dates[mask].unique()).dropna().tolist())
+    if config.max_trading_dates is not None:
+        limit = int(config.max_trading_dates)
+        if limit <= 0:
+            raise StrategySignalError("max_trading_dates must be positive")
+        # Take the most recent dates: that is where the scoring window ends and
+        # where a strategy is most likely to break after a config change.
+        resolved = resolved[-limit:]
+    return resolved
 
 
 def _normalize_signals(raw_signals: Any, trading_date: pd.Timestamp) -> pd.DataFrame:

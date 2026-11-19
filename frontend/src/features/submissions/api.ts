@@ -7,6 +7,8 @@ type SubmissionOptionsResponse =
   paths["/api/submissions/options"]["get"]["responses"][200]["content"]["application/json"];
 type SubmitStrategyResponse =
   paths["/api/submissions"]["post"]["responses"][200]["content"]["application/json"];
+export type ValidateStrategyResponse =
+  paths["/api/submissions/validate"]["post"]["responses"][200]["content"]["application/json"];
 
 export type SubmitStrategyInput = {
   teamName?: string;
@@ -54,6 +56,31 @@ export async function submitStrategy(input: SubmitStrategyInput): Promise<Submit
   }
 
   return (await response.json()) as SubmitStrategyResponse;
+}
+
+export async function validateStrategy(
+  input: SubmitStrategyInput
+): Promise<ValidateStrategyResponse> {
+  const formData = new FormData();
+  if (input.teamName) {
+    formData.append("team_name", input.teamName);
+  }
+  if (input.password) {
+    formData.append("password", input.password);
+  }
+  formData.append("file", input.file);
+  formData.append("data_track", input.dataTrack);
+
+  const response = await fetch(`${window.location.origin}/api/submissions/validate`, {
+    method: "POST",
+    body: formData
+  });
+
+  if (!response.ok) {
+    throw new StudentApiError(response.status, await extractErrorMessage(response));
+  }
+
+  return (await response.json()) as ValidateStrategyResponse;
 }
 
 export async function fetchSubmissionStatus(submissionId: string) {

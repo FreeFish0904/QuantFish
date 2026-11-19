@@ -28,6 +28,8 @@ FastAPI wires feature-owned routers in `backend/src/quantfish/web_app/app.py`:
 
 - `/api/session` handles participant session login/logout.
 - `/api/submissions` handles strategy upload, history, options, and detail payloads.
+- `/api/submissions/validate` dry-runs an upload (last ~20 trading dates, no persistence,
+  6 requests/minute per team) so a student can fix errors before submitting.
 - `/api/leaderboard` and `/api/dashboard` expose ranked and overview views.
 - `/api/compare` combines artifacts for selected submissions.
 - `/api/admin/*` handles admin auth, settings, teams, submissions, source/error viewing, and downloads.

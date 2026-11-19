@@ -428,3 +428,59 @@ def test_execute_student_strategy_rejects_invalid_scores(
             data_root,
             StrategyExecutionConfig(data_start="2023-01-03", scoring_end="2023-01-03"),
         )
+
+
+def test_max_trading_dates_visits_only_the_most_recent_dates(
+    tmp_path: Path,
+) -> None:
+    data_root = tmp_path / "release"
+    _write_release(data_root)
+    strategy_path = _write_strategy(
+        tmp_path / "student_strategy.py",
+        """
+def generate_signals(data):
+    current = data.current("stock.daily_returns")
+    return pd.DataFrame({"code": current["Symbol"], "score": range(len(current))})
+""",
+    )
+
+    result = execute_student_strategy(
+        strategy_path,
+        data_root,
+        StrategyExecutionConfig(
+            data_start="2023-01-03",
+            scoring_end="2023-01-05",
+            max_trading_dates=2,
+        ),
+    )
+
+    assert result.diagnostics["trading_dates"] == ["2023-01-04", "2023-01-05"]
+    assert result.diagnostics["trading_dates_checked"] == 2
+    assert result.diagnostics["max_trading_dates"] == 2
+    assert sorted(result.scores["date"].unique().tolist()) == [
+        pd.Timestamp("2023-01-04"),
+        pd.Timestamp("2023-01-05"),
+    ]
+
+
+def test_max_trading_dates_must_be_positive(tmp_path: Path) -> None:
+    data_root = tmp_path / "release"
+    _write_release(data_root)
+    strategy_path = _write_strategy(
+        tmp_path / "student_strategy.py",
+        """
+def generate_signals(data):
+    return pd.DataFrame({"code": ["1"], "score": [1.0]})
+""",
+    )
+
+    with pytest.raises(StrategySignalError, match="max_trading_dates must be positive"):
+        execute_student_strategy(
+            strategy_path,
+            data_root,
+            StrategyExecutionConfig(
+                data_start="2023-01-03",
+                scoring_end="2023-01-05",
+                max_trading_dates=0,
+            ),
+        )

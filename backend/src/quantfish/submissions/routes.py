@@ -36,12 +36,14 @@ from quantfish.submissions.participant_session import require_participant_sessio
 from quantfish.submissions.result_staleness import is_zero_result_stale
 from quantfish.submissions.score_summary import score_summary_for_submission
 from quantfish.submissions.service import SubmissionCohortDisabledError, SubmissionCooldownError
+from quantfish.submissions.strategy_validation import ValidationRateLimitError
 from quantfish.submissions.track_visibility import (
     default_public_data_track,
     ensure_public_data_track_enabled,
     public_data_tracks,
 )
 from quantfish.web_app.response_models import (
+    StrategyValidationResponse,
     SubmissionDetail,
     SubmissionListResponse,
     SubmissionOptionsResponse,
@@ -112,6 +114,64 @@ async def submit_strategy(
 
 def _has_supplied_credentials(team_name: str | None, password: str | None) -> bool:
     return team_name is not None or password is not None
+
+
+@router.post("/validate", response_model=StrategyValidationResponse)
+async def validate_strategy(
+    request: Request,
+    team_name: str | None = Form(None),
+    password: str | None = Form(None),
+    data_track: str | None = Form(None),
+    file: UploadFile = File(...),
+) -> dict[str, Any]:
+    """Dry-run an upload without storing a submission or producing a score."""
+    services = request.app.state.services
+    content = await file.read()
+    try:
+        team_id = _validation_team_id(services, request, team_name, password)
+        track = ensure_public_data_track_enabled(
+            services,
+            data_track or default_public_data_track(services),
+        )
+        result = services.strategy_validation_service.validate(
+            team_id=team_id,
+            filename=file.filename or "strategy.py",
+            content=content,
+            data_track=track,
+        )
+    except ValidationRateLimitError as exc:
+        raise HTTPException(
+            status_code=429,
+            detail=str(exc),
+            headers={"Retry-After": str(exc.retry_after_seconds)},
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return result.to_payload()
+
+
+def _validation_team_id(
+    services: Any,
+    request: Request,
+    team_name: str | None,
+    password: str | None,
+) -> str:
+    if _has_supplied_credentials(team_name, password):
+        if not team_name or not password or not team_name.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="team name and password are required together",
+            )
+        team = services.team_repository.resolve_login(team_name)
+        if (
+            team is None
+            or team.archived_at is not None
+            or not services.team_repository.verify_password(team_name, password)
+        ):
+            raise HTTPException(status_code=401, detail="invalid team credentials")
+        return team.team_id
+    session = require_participant_session(request)
+    return session.team_id
 
 
 @router.get("", response_model=SubmissionListResponse, response_model_exclude_unset=True)

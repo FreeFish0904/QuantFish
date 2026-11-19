@@ -8,6 +8,7 @@ import {
   FileUp,
   LoaderCircle,
   PackageOpen,
+  ShieldCheck,
   UploadCloud,
   UserRound,
   XCircle
@@ -27,12 +28,14 @@ import { Button } from "../../shared/ui/Button/Button";
 import { Card } from "../../shared/ui/Card/Card";
 import { ErrorState } from "../../shared/ui/ErrorState/ErrorState";
 import { PasswordInput } from "../../shared/ui/PasswordInput/PasswordInput";
+import type { ValidateStrategyResponse } from "./api";
 import {
   deriveSubmitState,
   useEnvironmentOptions,
   useSubmissionOptions,
   useSubmitStrategy,
-  useSubmissionStatus
+  useSubmissionStatus,
+  useValidateStrategy
 } from "./model";
 import styles from "./view.module.css";
 
@@ -53,6 +56,7 @@ export function SubmissionView() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const submit = useSubmitStrategy();
+  const validation = useValidateStrategy();
   const statusQuery = useSubmissionStatus(submittedId ?? undefined);
   const submissionOptions = useSubmissionOptions();
   const environmentOptions = useEnvironmentOptions();
@@ -86,6 +90,7 @@ export function SubmissionView() {
     ? file !== null
     : teamName.trim().length > 0 && password.length > 0 && file !== null;
   const canSubmit = hasRequiredSubmitFields && !submit.isPending && !isCooldownActive;
+  const canValidate = hasRequiredSubmitFields && !validation.isPending && !submit.isPending;
   const submitGuidance = isCooldownActive
     ? t("submissions.cooldownHint")
     : !activeTeamName && (teamName.trim().length === 0 || password.length === 0)
@@ -132,6 +137,17 @@ export function SubmissionView() {
           startSubmissionCooldown();
         }
       }
+    );
+  }
+
+  function handleValidate() {
+    if (!canValidate || !file) {
+      return;
+    }
+    validation.mutate(
+      activeTeamName
+        ? { file, dataTrack: selectedDataTrack }
+        : { teamName: teamName.trim(), password, file, dataTrack: selectedDataTrack }
     );
   }
 
@@ -243,6 +259,22 @@ export function SubmissionView() {
                 <UploadCloud aria-hidden="true" size={17} />
                 {t("submissions.submitButton")}
               </Button>
+              <Button
+                aria-describedby="submission-validate-hint"
+                disabled={!canValidate}
+                onClick={handleValidate}
+                type="button"
+                variant="ghost"
+              >
+                {validation.isPending ? (
+                  <LoaderCircle aria-hidden="true" className={styles.spinIcon} size={17} />
+                ) : (
+                  <ShieldCheck aria-hidden="true" size={17} />
+                )}
+                {validation.isPending
+                  ? t("submissions.validating")
+                  : t("submissions.validateButton")}
+              </Button>
               <a
                 className={styles.linkButton}
                 download
@@ -278,6 +310,20 @@ export function SubmissionView() {
                 ) : null}
               </div>
             </div>
+
+            <div className={styles.validateRow}>
+              <p className={styles.formHint} id="submission-validate-hint">
+                {t("submissions.validateHint")}
+              </p>
+              {!file ? (
+                <p className={styles.muted}>{t("submissions.validateRequiresFile")}</p>
+              ) : null}
+            </div>
+            <ValidationResultPanel
+              error={validation.error}
+              isPending={validation.isPending}
+              result={validation.data}
+            />
           </form>
         </Card>
 
@@ -301,6 +347,83 @@ export function SubmissionView() {
         />
       ) : null}
     </section>
+  );
+}
+
+function ValidationResultPanel({
+  error,
+  isPending,
+  result
+}: {
+  error: Error | null;
+  isPending: boolean;
+  result?: ValidateStrategyResponse;
+}) {
+  const { t } = useI18n();
+
+  if (isPending || (!result && !error)) {
+    return null;
+  }
+
+  if (error || !result) {
+    return (
+      <div className={styles.validatePanel} data-status="error" role="status">
+        <ErrorState
+          message={error?.message ?? t("submissions.validateFailedTitle")}
+          title={t("submissions.validateFailedTitle")}
+        />
+      </div>
+    );
+  }
+
+  const checked = result.trading_dates_checked ?? 0;
+  const dates = result.signal_dates ?? 0;
+  const rows = result.signal_rows ?? 0;
+
+  return (
+    <div
+      className={styles.validatePanel}
+      data-status={result.ok ? "ok" : "error"}
+      role="status"
+    >
+      <p className={styles.stateTitle}>
+        {result.ok ? (
+          <CheckCircle2 aria-hidden="true" size={18} />
+        ) : (
+          <XCircle aria-hidden="true" size={18} />
+        )}
+        {t(result.ok ? "submissions.validatePassedTitle" : "submissions.validateFailedTitle")}
+      </p>
+      <p className={styles.muted}>
+        {result.ok
+          ? t("submissions.validatePassedBody", { checked, dates, rows })
+          : result.message}
+      </p>
+      {checked > 0 ? (
+        <p className={styles.muted}>
+          {t("submissions.validateStats", {
+            checked,
+            first: result.first_signal_date ?? "—",
+            last: result.last_signal_date ?? "—"
+          })}
+        </p>
+      ) : null}
+      {result.ok && (result.sample_codes?.length ?? 0) > 0 ? (
+        <p className={styles.muted}>
+          {t("submissions.validateSampleCodes", { codes: (result.sample_codes ?? []).join(", ") })}
+        </p>
+      ) : null}
+      {(result.warnings?.length ?? 0) > 0 ? (
+        <div>
+          <p className={styles.muted}>{t("submissions.validateWarnings")}</p>
+          <ul className={styles.validateList}>
+            {(result.warnings ?? []).map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

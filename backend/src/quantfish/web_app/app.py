@@ -31,6 +31,7 @@ from quantfish.submissions.runners import BacktestSubmissionRunner
 from quantfish.submissions.service import SubmissionRunner, SubmissionService
 from quantfish.submissions.session_routes import router as participant_session_router
 from quantfish.submissions.storage import SubmissionStorage
+from quantfish.submissions.strategy_validation import StrategyValidationService
 from quantfish.team_cohorts import TeamCohortRepository, TeamCohortService
 from quantfish.web_app.readiness import build_readiness_report
 from quantfish.web_app.request_logging import install_request_logging
@@ -64,6 +65,7 @@ class AppServices:
     submission_runner: SubmissionRunner
     scoring_dispatcher: SubmissionScoringDispatcher
     submission_service: SubmissionService
+    strategy_validation_service: StrategyValidationService
     comparison_service: ComparisonService
     admin_service: AdminConsoleService
     student_export_service: StudentExportService
@@ -181,6 +183,10 @@ def _build_services(
         release_lock_manager=release_lock_manager,
     )
     submission_service.set_scoring_dispatcher(scoring_dispatcher)
+    strategy_validation_service = StrategyValidationService(
+        storage,
+        settings.config_path,
+    )
     comparison_service = ComparisonService(
         submission_repository,
         team_repository,
@@ -214,6 +220,7 @@ def _build_services(
         submission_runner=runner,
         scoring_dispatcher=scoring_dispatcher,
         submission_service=submission_service,
+        strategy_validation_service=strategy_validation_service,
         comparison_service=comparison_service,
         admin_service=admin_service,
         student_export_service=student_export_service,

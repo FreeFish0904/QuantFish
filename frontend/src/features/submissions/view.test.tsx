@@ -549,4 +549,117 @@ describe("SubmissionView", () => {
     expect(screen.getByText(/Windows 64 位/)).toBeInTheDocument();
     expect(screen.getByText(/缺失/)).toBeInTheDocument();
   });
+
+  it("pre-checks a strategy without submitting it", async () => {
+    let validatedTrack: FormDataEntryValue | null = null;
+    let submissionsCreated = 0;
+    server.use(
+      http.post("/api/submissions/validate", async ({ request }) => {
+        const formData = await request.clone().formData();
+        validatedTrack = formData.get("data_track");
+        return HttpResponse.json({
+          ok: true,
+          code: "ok",
+          message: "strategy produced usable signals",
+          data_track: "learning",
+          trading_dates_checked: 20,
+          signal_rows: 300,
+          signal_dates: 18,
+          first_signal_date: "2022-12-01",
+          last_signal_date: "2022-12-30",
+          sample_codes: ["000001", "000002"],
+          warnings: ["signals were produced on 18 of 20 checked trading dates"],
+          elapsed_ms: 421.5
+        });
+      }),
+      http.post("/api/submissions", () => {
+        submissionsCreated += 1;
+        return HttpResponse.json({ detail: "unexpected" }, { status: 500 });
+      })
+    );
+
+    render(<SubmissionView />, { wrapper: createWrapper() });
+
+    const preCheckButton = screen.getByRole("button", { name: /pre-check strategy/i });
+    expect(preCheckButton).toBeDisabled();
+    expect(screen.getByText(/choose a strategy file to run the pre-check/i)).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText(/team name/i), "alpha-desk");
+    await userEvent.type(screen.getByLabelText(/team password/i), "secret");
+    await userEvent.upload(
+      screen.getByLabelText(/strategy file/i),
+      new File(["print('alpha')"], "alpha.py", { type: "text/x-python" })
+    );
+    expect(preCheckButton).toBeEnabled();
+
+    await userEvent.click(preCheckButton);
+
+    await waitFor(() => expect(screen.getByText(/pre-check passed/i)).toBeInTheDocument());
+    expect(validatedTrack).toBe("learning");
+    expect(screen.getByText(/signals were produced on 18 of 20 checked trading days/i)).toBeInTheDocument();
+    expect(screen.getByText(/sample codes: 000001, 000002/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/signals were produced on 18 of 20 checked trading dates/i)
+    ).toBeInTheDocument();
+    expect(submissionsCreated).toBe(0);
+  });
+
+  it("reports a failing pre-check with the backend message", async () => {
+    server.use(
+      http.post("/api/submissions/validate", () =>
+        HttpResponse.json({
+          ok: false,
+          code: "strategy_error",
+          message: "RuntimeError: boom",
+          data_track: "learning",
+          trading_dates_checked: null,
+          signal_rows: null,
+          signal_dates: null,
+          first_signal_date: null,
+          last_signal_date: null,
+          sample_codes: [],
+          warnings: [],
+          elapsed_ms: 87.2
+        })
+      )
+    );
+
+    render(<SubmissionView />, { wrapper: createWrapper() });
+
+    await userEvent.type(screen.getByLabelText(/team name/i), "alpha-desk");
+    await userEvent.type(screen.getByLabelText(/team password/i), "secret");
+    await userEvent.upload(
+      screen.getByLabelText(/strategy file/i),
+      new File(["print('alpha')"], "alpha.py", { type: "text/x-python" })
+    );
+    await userEvent.click(screen.getByRole("button", { name: /pre-check strategy/i }));
+
+    await waitFor(() => expect(screen.getByText(/pre-check failed/i)).toBeInTheDocument());
+    expect(screen.getByText(/RuntimeError: boom/)).toBeInTheDocument();
+  });
+
+  it("surfaces pre-check transport errors", async () => {
+    server.use(
+      http.post("/api/submissions/validate", () =>
+        HttpResponse.json(
+          { detail: "Too many pre-checks; try again in 42 seconds." },
+          { status: 429 }
+        )
+      )
+    );
+
+    render(<SubmissionView />, { wrapper: createWrapper() });
+
+    await userEvent.type(screen.getByLabelText(/team name/i), "alpha-desk");
+    await userEvent.type(screen.getByLabelText(/team password/i), "secret");
+    await userEvent.upload(
+      screen.getByLabelText(/strategy file/i),
+      new File(["print('alpha')"], "alpha.py", { type: "text/x-python" })
+    );
+    await userEvent.click(screen.getByRole("button", { name: /pre-check strategy/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText(/too many pre-checks; try again in 42 seconds/i)).toBeInTheDocument()
+    );
+  });
 });

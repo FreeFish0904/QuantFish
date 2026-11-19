@@ -4,11 +4,13 @@ import { useMemo, useState } from "react";
 import { useI18n } from "../../../shared/i18n";
 import {
   dataTrackLabelKey,
-  dataTrackSearchText
+  dataTrackSearchText,
+  normalizeDataTrack
 } from "../../../shared/submissions/dataTrack";
 import { Button } from "../../../shared/ui/Button/Button";
 import { SubmissionSourceDialog } from "../../../shared/ui/SubmissionSourceDialog";
 import {
+  useAdminFailures,
   useAdminSubmissionRawError,
   useAdminSubmissionSource,
   useDeleteAdminSubmissions,
@@ -71,6 +73,74 @@ type SubmissionsPanelProps = {
 };
 
 const activeStatuses = new Set(["queued", "running"]);
+
+function FailuresTriage({ onSelect }: { onSelect?: (submissionId: string) => void }) {
+  const { t } = useI18n();
+  const failures = useAdminFailures();
+  const summary = failures.data;
+
+  if (failures.isLoading && !summary) {
+    return null;
+  }
+  if (failures.isError) {
+    return (
+      <p className={styles.muted} role="status">
+        {t("admin.triageUnavailable")}
+      </p>
+    );
+  }
+  if (!summary) {
+    return null;
+  }
+
+  return (
+    <section className={styles.triage} aria-labelledby="admin-triage-title">
+      <div className={styles.triageHeader}>
+        <h3 id="admin-triage-title">{t("admin.triageTitle")}</h3>
+        <span className={styles.muted}>
+          {t("admin.triageWindow", {
+            days: summary.window_days,
+            failed: summary.failed_submissions,
+            total: summary.total_submissions
+          })}
+        </span>
+      </div>
+      {summary.failed_submissions === 0 ? (
+        <p className={styles.muted}>{t("admin.triageEmpty", { days: summary.window_days })}</p>
+      ) : (
+        <>
+          <ul className={styles.triageChips}>
+            {(summary.categories ?? []).map((category) => (
+              <li className={styles.triageChip} key={category.category}>
+                <strong>{category.count}</strong>
+                <span>
+                  {t(`admin.triageCategory.${category.category}`)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <ul className={styles.triageList}>
+            {(summary.recent_failures ?? []).slice(0, 5).map((failure) => (
+              <li key={failure.submission_id}>
+                <button
+                  className={styles.triageRow}
+                  onClick={() => onSelect?.(failure.submission_id)}
+                  type="button"
+                >
+                  <span className={styles.triageRowMeta}>
+                    {failure.team_name} ·{" "}
+                    {t(dataTrackLabelKey(normalizeDataTrack(failure.data_track)))}
+                  </span>
+                  <span className={styles.nowrap}>{failure.error_message ?? "—"}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
 
 function statusLabel(status: string): string {
   return status.replaceAll("_", " ");
@@ -268,6 +338,7 @@ export function SubmissionsPanel({
 
   return (
     <div className={styles.stack}>
+      <FailuresTriage onSelect={updateSearch} />
       <div className={styles.submissionToolbar}>
         <label className={styles.inlineField} htmlFor="admin-submission-search">
           <span>{t("admin.searchSubmissions")}</span>

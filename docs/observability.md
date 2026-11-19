@@ -87,6 +87,25 @@ header. A student report ("my upload failed around 14:03") can therefore be
 matched to the request line, the `score_started` line and the eventual
 `score_failed` traceback.
 
+## Failure triage
+
+`GET /api/admin/failures?days=7&limit=20` (admin session) answers the question
+after a class upload: *why did these runs fail?*
+
+- `status_counts` — how many submissions in the window are queued / running /
+  completed / failed;
+- `categories` — failures grouped into `timeout`, `stale_positions`,
+  `invalid_signals`, `worker_crash`, `data_release` or `other`, each with a
+  count and up to five submission ids;
+- `recent_failures` — the newest failures with team, track, a 200-character
+  error snippet, whether a raw log exists, and the `worker_failure.json` code.
+
+Classification lives in `quantfish/submissions/failure_summary.py`: a machine
+readable `worker_failure.json` code wins, otherwise the stored `error_message`
+is matched against a small rule table. The admin console renders the same data
+at the top of its submissions tab; clicking a row filters the table by that
+submission id.
+
 ## Running things
 
 ```bash

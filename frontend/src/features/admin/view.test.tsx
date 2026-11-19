@@ -50,6 +50,7 @@ vi.mock("./model", () => ({
   useUpdateTeamCohort: vi.fn(),
   useDeleteTeamCohort: vi.fn(),
   useAdminSubmissions: vi.fn(),
+  useAdminFailures: vi.fn(),
   useAdminSubmissionSource: vi.fn(),
   useAdminSubmissionRawError: vi.fn(),
   useDeleteAdminSubmissions: vi.fn(),
@@ -62,6 +63,7 @@ import {
   useAdminSession,
   useAdminSettings,
   useAdminDataReleases,
+  useAdminFailures,
   useAdminSubmissions,
   useAdminSubmissionRawError,
   useAdminSubmissionSource,
@@ -455,6 +457,13 @@ function setupMocks(authenticated = true) {
     mutate: viewRawErrorMock,
     isPending: false,
     error: null
+  });
+  (useAdminFailures as Mock).mockReturnValue({
+    data: undefined,
+    isLoading: true,
+    isError: false,
+    error: null,
+    refetch: vi.fn()
   });
 }
 
@@ -1099,6 +1108,79 @@ describe("AdminConsoleView", () => {
     expect(highlightedCode).toHaveAttribute("data-language", "python");
     expect(within(highlightedCode).getByText("def")).toHaveAttribute("data-token", "keyword");
     expect(within(highlightedCode).getByText("alpha_strategy")).toHaveAttribute("data-token", "function");
+  });
+
+  it("shows a failure triage block and drills into a submission", async () => {
+    setupMocks(true);
+    (useAdminFailures as Mock).mockReturnValue({
+      data: {
+        since: "2026-06-11T00:00:00+00:00",
+        window_days: 7,
+        total_submissions: 12,
+        failed_submissions: 3,
+        status_counts: { completed: 9, failed: 3 },
+        categories: [
+          { category: "timeout", count: 2, sample_submission_ids: ["sub-1"] },
+          { category: "invalid_signals", count: 1, sample_submission_ids: ["sub-9"] }
+        ],
+        recent_failures: [
+          {
+            submission_id: "sub-9",
+            submission_number: 9,
+            team_id: "team-alpha",
+            team_name: "Team Alpha",
+            data_track: "learning",
+            submitted_at: "2026-06-18T12:00:00Z",
+            category: "invalid_signals",
+            error_message: "signals must include code and score columns",
+            has_raw_log: true,
+            worker_code: null
+          }
+        ]
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn()
+    });
+
+    render(<AdminConsoleView />, { wrapper: Wrapper });
+    await userEvent.click(screen.getByRole("tab", { name: /^submissions$/i }));
+
+    expect(screen.getByRole("heading", { name: /recent failures/i })).toBeInTheDocument();
+    expect(screen.getByText(/last 7 days · 3 of 12 submissions failed/i)).toBeInTheDocument();
+    expect(screen.getByText("Timeouts")).toBeInTheDocument();
+    expect(screen.getByText("Invalid signals")).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /signals must include code and score columns/i })
+    );
+
+    expect(screen.getByRole("searchbox", { name: /search submissions/i })).toHaveValue("sub-9");
+  });
+
+  it("shows the empty triage state when nothing failed", async () => {
+    setupMocks(true);
+    (useAdminFailures as Mock).mockReturnValue({
+      data: {
+        since: "2026-06-11T00:00:00+00:00",
+        window_days: 7,
+        total_submissions: 4,
+        failed_submissions: 0,
+        status_counts: { completed: 4 },
+        categories: [],
+        recent_failures: []
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn()
+    });
+
+    render(<AdminConsoleView />, { wrapper: Wrapper });
+    await userEvent.click(screen.getByRole("tab", { name: /^submissions$/i }));
+
+    expect(screen.getByText(/no failures in the last 7 days/i)).toBeInTheDocument();
   });
 
   it("renders the admin submissions tab in Chinese", async () => {

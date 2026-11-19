@@ -13,6 +13,13 @@ vi.mock("react-router-dom", () => ({
 
 vi.mock("./model", () => ({
   useAdminSession: vi.fn(),
+  useAdminFailures: vi.fn(() => ({
+    data: undefined,
+    isLoading: true,
+    isError: false,
+    error: null,
+    refetch: vi.fn()
+  })),
   useAdminTeams: vi.fn(),
   useAdminCohortSubmissions: vi.fn(),
   useAdminCohortSubmissionSource: vi.fn(),

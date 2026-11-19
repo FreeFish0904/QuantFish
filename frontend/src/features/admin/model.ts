@@ -12,6 +12,7 @@ import {
   fetchAdminCohortSubmissions,
   fetchAdminCohortSubmissionSource,
   fetchAdminDataReleases,
+  fetchAdminFailures,
   fetchAdminSubmissionRawError,
   fetchAdminSubmissionSource,
   fetchAdminSession,
@@ -677,6 +678,15 @@ export function useAdminSubmissions(
     queryFn: () => fetchAdminSubmissions(params),
     select: toAdminSubmissionPage,
     placeholderData: keepPreviousData
+  });
+}
+
+export function useAdminFailures(enabled = true, days = 7) {
+  return useQuery({
+    enabled,
+    queryKey: ["admin", "failures", days],
+    queryFn: () => fetchAdminFailures({ days }),
+    staleTime: 30_000
   });
 }
 

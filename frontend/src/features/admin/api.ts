@@ -48,6 +48,8 @@ type TeamCohortDeleteResponse =
   paths["/api/admin/team-cohorts/{cohort_id}"]["delete"]["responses"][200]["content"]["application/json"];
 type AdminSubmissionsResponse =
   paths["/api/admin/submissions"]["get"]["responses"][200]["content"]["application/json"];
+export type AdminFailureSummaryResponse =
+  paths["/api/admin/failures"]["get"]["responses"][200]["content"]["application/json"];
 type AdminCohortSubmissionsResponse =
   paths["/api/admin/team-cohorts/{cohort_id}/submissions"]["get"]["responses"][200]["content"]["application/json"];
 type DeleteSubmissionsBody =
@@ -274,6 +276,23 @@ export async function fetchAdminSubmissions(
         status: params.status === "all" ? undefined : params.status,
         sort_by: params.sortBy,
         sort_dir: params.sortDir
+      }
+    }
+  });
+  if (error || !data) {
+    return throwApiError(response);
+  }
+  return data;
+}
+
+export async function fetchAdminFailures(
+  params: { days?: number; limit?: number } = {}
+): Promise<AdminFailureSummaryResponse> {
+  const { data, error, response } = await apiClient.GET("/api/admin/failures", {
+    params: {
+      query: {
+        days: params.days ?? 7,
+        limit: params.limit ?? 20
       }
     }
   });

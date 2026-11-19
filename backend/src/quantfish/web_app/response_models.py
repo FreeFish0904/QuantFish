@@ -485,6 +485,35 @@ class AdminSubmissionsResponse(_FrozenModel):
     has_next: bool | None = None
 
 
+class AdminFailureSample(_FrozenModel):
+    submission_id: str
+    submission_number: int | None = None
+    team_id: str
+    team_name: str
+    data_track: str
+    submitted_at: str
+    category: str
+    error_message: str | None = None
+    has_raw_log: bool = False
+    worker_code: str | None = None
+
+
+class AdminFailureCategory(_FrozenModel):
+    category: str
+    count: int
+    sample_submission_ids: list[str] = Field(default_factory=list)
+
+
+class AdminFailureSummary(_FrozenModel):
+    since: str
+    window_days: int
+    total_submissions: int
+    failed_submissions: int
+    status_counts: dict[str, int]
+    categories: list[AdminFailureCategory] = Field(default_factory=list)
+    recent_failures: list[AdminFailureSample] = Field(default_factory=list)
+
+
 class AdminBackfillResponse(_FrozenModel):
     queued: int
     submission_ids: list[str]

@@ -23,6 +23,7 @@ from quantfish.web_app.response_models import (
     AdminDataReleaseBuildJob,
     AdminDataReleaseBuildState,
     AdminDeletionResponse,
+    AdminFailureSummary,
     AdminRerunResponse,
     AdminSessionResponse,
     AdminSettingsResponse,
@@ -452,6 +453,20 @@ def admin_submissions(
         team_id=None if team_id in (None, "", "all") else team_id,
     )
     return request.app.state.services.admin_service.list_admin_submission_page(params)
+
+
+@router.get("/api/admin/failures", response_model=AdminFailureSummary)
+def admin_failure_summary(
+    request: Request,
+    days: Annotated[int, Query(ge=1, le=90)] = 7,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+) -> dict[str, Any]:
+    """Failures grouped by likely cause, for triage right after a class upload."""
+    require_admin_session(request)
+    return request.app.state.services.admin_service.failure_summary(
+        days=days,
+        limit=limit,
+    )
 
 
 @router.post(

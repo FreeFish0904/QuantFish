@@ -592,6 +592,36 @@ export const handlers = [
     return HttpResponse.json({ updated: 1 });
   }),
 
+  http.get("/api/admin/failures", ({ request }) => {
+    const url = new URL(request.url);
+    const days = Number(url.searchParams.get("days") ?? 7);
+    return HttpResponse.json({
+      since: "2026-06-11T00:00:00+00:00",
+      window_days: days,
+      total_submissions: 12,
+      failed_submissions: 2,
+      status_counts: { completed: 9, failed: 2, queued: 1 },
+      categories: [
+        { category: "timeout", count: 1, sample_submission_ids: ["sub-2"] },
+        { category: "invalid_signals", count: 1, sample_submission_ids: ["sub-9"] },
+      ],
+      recent_failures: [
+        {
+          submission_id: "sub-9",
+          submission_number: 9,
+          team_id: "team-alpha",
+          team_name: "Alpha Desk",
+          data_track: "learning",
+          submitted_at: "2026-06-18T12:00:00Z",
+          category: "invalid_signals",
+          error_message: "signals must include code and score columns",
+          has_raw_log: true,
+          worker_code: null,
+        },
+      ],
+    });
+  }),
+
   http.get("/api/admin/submissions", ({ request }) => {
     const url = new URL(request.url);
     const submissions = [

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import replace
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from quantfish.admin_console.settings_history import AdminSettingsHistoryRepository
@@ -9,6 +10,7 @@ from quantfish.leaderboard.ranking import ScoringWeights, calculate_leaderboard_
 from quantfish.leaderboard.sql_scoring import score_sort_expression
 from quantfish.platform_config import ConfigRepository, ConfigService
 from quantfish.submissions.error_details import raw_submission_error, submission_has_raw_error
+from quantfish.submissions.failure_summary import build_failure_summary
 from quantfish.submissions.listing import (
     SubmissionListParams,
     team_name_map,
@@ -375,6 +377,21 @@ class AdminConsoleService:
             )
             for submission in self.submission_repository.list_all()
         ]
+
+    def failure_summary(self, *, days: int = 7, limit: int = 20) -> dict[str, Any]:
+        """Group the failures of the last `days` days by likely cause."""
+        window_days = max(1, int(days))
+        since = datetime.now(UTC) - timedelta(days=window_days)
+        submissions = (
+            [] if self.submission_repository is None else self.submission_repository.list_all()
+        )
+        return build_failure_summary(
+            submissions,
+            team_names=team_name_map(self.team_repository.list_all()),
+            since=since,
+            window_days=window_days,
+            limit=max(1, int(limit)),
+        ).to_payload()
 
     def list_admin_submission_page(self, params: SubmissionListParams) -> dict[str, Any]:
         if self.submission_repository is None:

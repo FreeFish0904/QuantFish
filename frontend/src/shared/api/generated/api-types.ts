@@ -364,6 +364,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/failures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Admin Failure Summary
+         * @description Failures grouped by likely cause, for triage right after a class upload.
+         */
+        get: operations["admin_failure_summary_api_admin_failures_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/submissions/backfill-short-profit": {
         parameters: {
             query?: never;
@@ -993,6 +1013,60 @@ export interface components {
             scoring_timeout_seconds?: number | null;
             /** Engine Version */
             engine_version?: string | null;
+        };
+        /** AdminFailureCategory */
+        AdminFailureCategory: {
+            /** Category */
+            category: string;
+            /** Count */
+            count: number;
+            /** Sample Submission Ids */
+            sample_submission_ids?: string[];
+        };
+        /** AdminFailureSample */
+        AdminFailureSample: {
+            /** Submission Id */
+            submission_id: string;
+            /** Submission Number */
+            submission_number?: number | null;
+            /** Team Id */
+            team_id: string;
+            /** Team Name */
+            team_name: string;
+            /** Data Track */
+            data_track: string;
+            /** Submitted At */
+            submitted_at: string;
+            /** Category */
+            category: string;
+            /** Error Message */
+            error_message?: string | null;
+            /**
+             * Has Raw Log
+             * @default false
+             */
+            has_raw_log: boolean;
+            /** Worker Code */
+            worker_code?: string | null;
+        };
+        /** AdminFailureSummary */
+        AdminFailureSummary: {
+            /** Since */
+            since: string;
+            /** Window Days */
+            window_days: number;
+            /** Total Submissions */
+            total_submissions: number;
+            /** Failed Submissions */
+            failed_submissions: number;
+            /** Status Counts */
+            status_counts: {
+                [key: string]: number;
+            };
+            /** Categories */
+            categories?: components["schemas"]["AdminFailureCategory"][];
+            /** Recent Failures */
+            recent_failures?: components["schemas"]["AdminFailureSample"][];
         };
         /** AdminLoginRequest */
         AdminLoginRequest: {
@@ -2625,6 +2699,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminSubmissionsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_failure_summary_api_admin_failures_get: {
+        parameters: {
+            query?: {
+                days?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminFailureSummary"];
                 };
             };
             /** @description Validation Error */

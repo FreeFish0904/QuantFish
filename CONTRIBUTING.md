@@ -35,6 +35,7 @@ you if they are missing.
 | Task | Command |
 | --- | --- |
 | Backend tests | `python -m pytest backend/tests -q` |
+| Backend coverage | `python -m pytest backend/tests -q --cov=quantfish --cov-report=term-missing` |
 | Backend lint | `python -m ruff check backend` |
 | Frontend tests | `npm --prefix frontend test -- --run` |
 | Type-check + build | `npm --prefix frontend run build` |

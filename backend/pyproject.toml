@@ -71,6 +71,9 @@ extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Query"]
 branch = true
 source = ["quantfish"]
 
+# Report only for now: the first measured baseline is 88% (8350 statements,
+# 991 missed). Once the number is stable in CI, add
+# `fail_under = <baseline - 3>` so new untested code cannot slip in.
 [tool.coverage.report]
 exclude_also = [
   "if TYPE_CHECKING:",

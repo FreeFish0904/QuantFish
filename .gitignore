@@ -22,6 +22,7 @@ node_modules/
 
 # Local data, generated artifacts and runtime state
 data_releases/
+openapi.json
 runs/
 backups/
 new_data/

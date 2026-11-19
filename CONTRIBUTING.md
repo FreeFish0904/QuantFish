@@ -38,6 +38,8 @@ you if they are missing.
 | Backend coverage | `python -m pytest backend/tests -q --cov=quantfish --cov-report=term-missing` |
 | Backend lint | `python -m ruff check backend` |
 | Frontend tests | `npm --prefix frontend test -- --run` |
+| Frontend lint | `npm --prefix frontend run lint` |
+| Regenerate API types | `npm --prefix frontend run api-types` |
 | Type-check + build | `npm --prefix frontend run build` |
 | Dev servers (API + Vite) | `scripts/start-quantfish.sh --mode dev` |
 | Production-style single port | `scripts/start-quantfish.sh --mode prod --port 8010` |
@@ -67,11 +69,12 @@ data/                    placeholder for generated datasets (git-ignored)
 - **Tests first.** Every behavioural change should come with a pytest or
   vitest case. `backend/tests/test_project_naming.py` guards the branding and
   package layout, so keep module paths consistent with `quantfish`.
-- **Lint before pushing.** `python -m ruff check backend` must be clean; CI runs
-  it and fails the build otherwise. Rules live in `backend/pyproject.toml`
-  (`[tool.ruff]`). `E501` is deliberately off for now so the gate stays about
-  behaviour rather than reflowing files; `ruff format` is a separate, opt-in
-  change.
+- **Lint before pushing.** `python -m ruff check backend` and
+  `npm --prefix frontend run lint` must both be clean; CI runs them and fails
+  the build otherwise. Rules live in `backend/pyproject.toml` (`[tool.ruff]`)
+  and `frontend/eslint.config.js`. `E501` and the two noisy React rules are
+  deliberately off for now so the gate stays about behaviour rather than
+  reflowing files; `ruff format` is a separate, opt-in change.
 - **Config over constants.** Tunables belong in `config/platform.yaml` and are
   validated by `quantfish.platform_config`. Avoid duplicate defaults in code.
 - **Types at the boundary.** API contracts come from the FastAPI models. After
@@ -88,7 +91,8 @@ data/                    placeholder for generated datasets (git-ignored)
 1. Create a topic branch (`feat/…`, `fix/…`, `docs/…`).
 2. Keep commits focused; the history is meant to be readable.
 3. Make sure `python -m ruff check backend`,
-   `python -m pytest backend/tests -q` and
+   `python -m pytest backend/tests -q`,
+   `npm --prefix frontend run lint` and
    `npm --prefix frontend test -- --run && npm --prefix frontend run build`
    pass locally.
 4. Describe the user-visible change and any trade-offs in the PR body.

@@ -82,7 +82,7 @@ export function SubmissionView() {
     }
   }, []);
 
-  const hasRequiredSubmitFields = Boolean(activeTeamName)
+  const hasRequiredSubmitFields = activeTeamName
     ? file !== null
     : teamName.trim().length > 0 && password.length > 0 && file !== null;
   const canSubmit = hasRequiredSubmitFields && !submit.isPending && !isCooldownActive;

@@ -82,7 +82,10 @@ export function LeaderboardView() {
     [activeMetric, activeTrack, page, search, sort]
   );
   const { data, error, isLoading, refetch } = useLeaderboard(leaderboardQueryParams);
-  const entries = data ? toLeaderboardEntries(data.rows, activeMetric) : [];
+  const entries = useMemo(
+    () => (data ? toLeaderboardEntries(data.rows, activeMetric) : []),
+    [activeMetric, data]
+  );
   const totalCountFromServer = (data as { total_count?: number } | undefined)?.total_count;
   const serverPaged = typeof totalCountFromServer === "number";
   const filteredRows = useMemo(() => {

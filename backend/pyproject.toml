@@ -21,6 +21,8 @@ dependencies = [
 dev = [
   "httpx",
   "pytest",
+  "pytest-cov",
+  "ruff",
 ]
 # Optional PDF report rendering (matplotlib plots + weasyprint layout).
 pdf = [
@@ -42,3 +44,37 @@ quantfish = ["**/*.html", "**/*.css", "**/*.svg", "**/*.j2"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+# Lint gate for `backend/`. Run from the repository root: `ruff check backend`.
+# E501 (line length) stays disabled for now so the first pass is behavioural
+# only; formatting lives in `[tool.ruff.format]` and is applied separately.
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = [
+  "E501",
+  # The code base intentionally uses typographic characters in user-facing
+  # strings (the U+2212 minus sign, Chinese punctuation, en dashes).
+  "RUF001",
+  "RUF002",
+  "RUF003",
+]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Query"]
+
+[tool.coverage.run]
+branch = true
+source = ["quantfish"]
+
+[tool.coverage.report]
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "\\.\\.\\.",
+]
+

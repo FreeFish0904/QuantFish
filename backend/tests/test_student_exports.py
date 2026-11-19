@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import replace
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
 import zipfile
+from dataclasses import replace
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -395,7 +395,7 @@ def test_refresh_preserves_previous_releases_when_rebuild_fails(tmp_path: Path) 
         execution=config.execution,
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(FileNotFoundError):
         service.refresh(bad_config)
 
     assert (

@@ -6,7 +6,6 @@ from fastapi import APIRouter, Query, Request
 
 from quantfish.web_app.response_models import CompareResponse
 
-
 router = APIRouter(prefix="/api/compare", tags=["comparison"])
 
 

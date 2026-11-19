@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
 import hashlib
 import json
-from pathlib import Path
 import shutil
 import subprocess
-from typing import Callable, Sequence
 import zipfile
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
+from pathlib import Path
 
 from quantfish.student_exports.platforms import ENVIRONMENT_PLATFORMS
-
 
 DEFAULT_PIP_INDEX_URL = "https://pypi.tuna.tsinghua.edu.cn/simple"
 DEFAULT_CONDA_CHANNELS = (

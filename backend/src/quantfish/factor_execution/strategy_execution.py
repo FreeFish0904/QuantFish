@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from collections import OrderedDict
-from dataclasses import dataclass
-import inspect
 import importlib.util
+import inspect
+from collections import OrderedDict
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable, Optional, Sequence
+from typing import Any
 
 import pandas as pd
 
 from quantfish.data import DataBundle
 from quantfish.market_types import DEFAULT_ALLOWED_MARKET_TYPES
 from quantfish.stock_codes import StockCodeError, normalize_stock_code
-
 
 CANONICAL_PANEL_DATASET = "stock.daily_returns"
 
@@ -48,22 +48,22 @@ class CachedDataBundle(DataBundle):
         super().__init__(root, allowed_market_types=allowed_market_types)
         self._max_cache_entries = max(1, int(max_cache_entries))
         self._raw_cache: OrderedDict[
-            tuple[str, Optional[tuple[str, ...]]], pd.DataFrame
+            tuple[str, tuple[str, ...] | None], pd.DataFrame
         ] = OrderedDict()
         self._date_cache: OrderedDict[
-            tuple[str, Optional[tuple[str, ...]], str], pd.Series
+            tuple[str, tuple[str, ...] | None, str], pd.Series
         ] = OrderedDict()
         self._date_index_cache: OrderedDict[
-            tuple[str, Optional[tuple[str, ...]], str], dict[pd.Timestamp, pd.Index]
+            tuple[str, tuple[str, ...] | None, str], dict[pd.Timestamp, pd.Index]
         ] = OrderedDict()
 
     def load_raw(
-        self, dataset_id_or_alias: str, columns: Optional[list[str]] = None
+        self, dataset_id_or_alias: str, columns: list[str] | None = None
     ) -> pd.DataFrame:
         return self._load_raw_for_dated_access(dataset_id_or_alias, columns).copy()
 
     def _load_raw_for_dated_access(
-        self, dataset_id_or_alias: str, columns: Optional[list[str]] = None
+        self, dataset_id_or_alias: str, columns: list[str] | None = None
     ) -> pd.DataFrame:
         column_key = _column_key(columns)
         cache_key = (dataset_id_or_alias, column_key)
@@ -88,7 +88,7 @@ class CachedDataBundle(DataBundle):
     def date_series_for(
         self,
         dataset_id_or_alias: str,
-        columns: Optional[list[str]],
+        columns: list[str] | None,
         frame: pd.DataFrame,
         date_column: str,
     ) -> pd.Series:
@@ -113,7 +113,7 @@ class CachedDataBundle(DataBundle):
     def rows_for_date(
         self,
         dataset_id_or_alias: str,
-        columns: Optional[list[str]],
+        columns: list[str] | None,
         frame: pd.DataFrame,
         date_column: str,
         date: pd.Timestamp,
@@ -145,7 +145,7 @@ class CachedDataBundle(DataBundle):
         return frame.loc[indexes].copy()
 
 
-def _column_key(columns: Optional[list[str]]) -> Optional[tuple[str, ...]]:
+def _column_key(columns: list[str] | None) -> tuple[str, ...] | None:
     if columns is None:
         return None
     return tuple(dict.fromkeys(str(column) for column in columns))
@@ -192,11 +192,11 @@ class StudentDataView:
     def load(
         self,
         dataset_id_or_alias: str,
-        start: Optional[str | pd.Timestamp] = None,
-        end: Optional[str | pd.Timestamp] = None,
-        columns: Optional[list[str]] = None,
+        start: str | pd.Timestamp | None = None,
+        end: str | pd.Timestamp | None = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         return self.__dated_bundle.load(
             dataset_id_or_alias,
@@ -209,9 +209,9 @@ class StudentDataView:
     def current(
         self,
         dataset_id_or_alias: str,
-        columns: Optional[list[str]] = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         return self.__dated_bundle.current(
             dataset_id_or_alias,
@@ -222,11 +222,11 @@ class StudentDataView:
     def history(
         self,
         dataset_id_or_alias: str,
-        start: Optional[str | pd.Timestamp] = None,
-        lookback_days: Optional[int] = None,
-        columns: Optional[list[str]] = None,
+        start: str | pd.Timestamp | None = None,
+        lookback_days: int | None = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         return self.__dated_bundle.history(
             dataset_id_or_alias,
@@ -239,10 +239,10 @@ class StudentDataView:
     def latest(
         self,
         dataset_id_or_alias: str,
-        by: Optional[str] = None,
-        columns: Optional[list[str]] = None,
+        by: str | None = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         return self.__dated_bundle.latest(
             dataset_id_or_alias,
@@ -284,7 +284,7 @@ def execute_student_strategy(
             "canonical_panel": config.canonical_panel,
             "allowed_market_types": _allowed_market_type_list(config.allowed_market_types),
             "trading_dates": [date.date().isoformat() for date in trading_dates],
-            "signal_rows": int(len(scores)),
+            "signal_rows": len(scores),
         },
     )
 

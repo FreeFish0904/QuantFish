@@ -42,15 +42,15 @@ def build_backtest_graph_data(
     return {
         "equity": [
             {"date": _date(date), "equity": _json_float(value)}
-            for date, value in zip(daily["date"], equity)
+            for date, value in zip(daily["date"], equity, strict=True)
         ],
         "equity_cny": [
             {"date": _date(date), "equity_cny": _json_float(value * capital)}
-            for date, value in zip(daily["date"], equity)
+            for date, value in zip(daily["date"], equity, strict=True)
         ],
         "drawdown": [
             {"date": _date(date), "drawdown": _json_float(value)}
-            for date, value in zip(daily["date"], drawdown)
+            for date, value in zip(daily["date"], drawdown, strict=True)
         ],
         "daily_pnl": _daily_pnl_records(daily, capital, graph_return_column),
         "trade_volume": _trade_volume_records(daily, capital),
@@ -105,7 +105,7 @@ def _daily_pnl_records(
             "pnl_cny": _json_float(daily_return * capital),
             "daily_return": _json_float(daily_return),
         }
-        for date, daily_return in zip(rows["date"], returns)
+        for date, daily_return in zip(rows["date"], returns, strict=True)
     ]
 
 
@@ -118,7 +118,7 @@ def _trade_volume_records(rows: pd.DataFrame, capital: float) -> list[dict]:
             "buy_cny": _json_float(buy_turnover * capital),
             "sell_cny": _json_float(sell_turnover * capital),
         }
-        for date, buy_turnover, sell_turnover in zip(rows["date"], buy, sell)
+        for date, buy_turnover, sell_turnover in zip(rows["date"], buy, sell, strict=True)
     ]
 
 
@@ -138,7 +138,7 @@ def _benchmark_records(
             "benchmark_equity": _json_float(value),
             "benchmark_cny": _json_float(value * capital),
         }
-        for date, daily_return, value in zip(aligned["date"], aligned["return"], equity)
+        for date, daily_return, value in zip(aligned["date"], aligned["return"], equity, strict=True)
     ]
     return records, aligned
 
@@ -173,7 +173,7 @@ def _alpha_records(
             "alpha_equity": _json_float(value),
             "alpha_cny": _json_float(value * capital),
         }
-        for date, daily_return, value in zip(benchmark_returns["date"], excess, equity)
+        for date, daily_return, value in zip(benchmark_returns["date"], excess, equity, strict=True)
     ]
 
 
@@ -204,7 +204,7 @@ def _excess_records(
             "excess_equity": _json_float(value),
             "excess_cny": _json_float(value * capital),
         }
-        for date, daily_return, value in zip(benchmark_returns["date"], excess, equity)
+        for date, daily_return, value in zip(benchmark_returns["date"], excess, equity, strict=True)
     ]
 
 
@@ -272,7 +272,7 @@ def _group_cumulative_records(group_returns: pd.DataFrame) -> list[dict]:
     records = []
     for group, group_rows in rows.groupby("group", sort=True):
         cumulative = group_rows["return"].cumsum()
-        for date, value in zip(group_rows["date"], cumulative):
+        for date, value in zip(group_rows["date"], cumulative, strict=True):
             records.append(
                 {
                     "date": _date(date),

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from functools import cmp_to_key
-import math
-from typing import Any, Callable, Iterable, Literal
+from typing import Any, Literal
 
 from quantfish.submissions.models import Submission, SubmissionDataTrack, submission_label
-
 
 SortDirection = Literal["asc", "desc"]
 

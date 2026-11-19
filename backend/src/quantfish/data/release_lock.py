@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator
-from contextlib import contextmanager
 import errno
 import os
-from pathlib import Path
 import time
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
+from pathlib import Path
 
 if os.name == "nt":
     import msvcrt
@@ -59,13 +59,12 @@ class ReleaseLockManager:
             self._lock_path(release_name, "gate"),
             shared=False,
             should_cancel=should_cancel,
+        ), self._acquire_file(
+            self._lock_path(release_name, "data"),
+            shared=False,
+            should_cancel=should_cancel,
         ):
-            with self._acquire_file(
-                self._lock_path(release_name, "data"),
-                shared=False,
-                should_cancel=should_cancel,
-            ):
-                yield
+            yield
 
     @contextmanager
     def _acquire_file(

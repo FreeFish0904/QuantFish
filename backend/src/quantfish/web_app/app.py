@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,8 +27,8 @@ from quantfish.submissions.dispatcher import SubmissionScoringDispatcher
 from quantfish.submissions.repositories import SubmissionRepository, TeamRepository
 from quantfish.submissions.routes import router as submissions_router
 from quantfish.submissions.runners import BacktestSubmissionRunner
-from quantfish.submissions.session_routes import router as participant_session_router
 from quantfish.submissions.service import SubmissionRunner, SubmissionService
+from quantfish.submissions.session_routes import router as participant_session_router
 from quantfish.submissions.storage import SubmissionStorage
 from quantfish.team_cohorts import TeamCohortRepository, TeamCohortService
 from quantfish.web_app.schemas import HealthResponse

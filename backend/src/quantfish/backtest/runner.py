@@ -12,17 +12,17 @@ from quantfish.backtest.excess import (
     calculate_benchmark_relative_metrics,
 )
 from quantfish.backtest.graph import build_backtest_graph_data
-from quantfish.backtest.metrics import (
-    TRADING_DAYS_PER_YEAR,
-    build_yearly_performance_table,
-    calculate_backtest_metrics,
-    calculate_sharpe,
-)
 from quantfish.backtest.industry_neutralization import (
     DEFAULT_INDUSTRY_DATASET,
     disabled_summary,
     industry_column_for,
     neutralize_scores_by_industry,
+)
+from quantfish.backtest.metrics import (
+    TRADING_DAYS_PER_YEAR,
+    build_yearly_performance_table,
+    calculate_backtest_metrics,
+    calculate_sharpe,
 )
 from quantfish.backtest.panel import BacktestPanel
 from quantfish.backtest.panel_cache import load_or_build_backtest_panel
@@ -35,11 +35,12 @@ from quantfish.data.scoring_datasets import (
     RETURNS_DATASET,
 )
 from quantfish.factor_execution import StrategyExecutionConfig, execute_student_strategy
-from quantfish.stock_codes import normalize_stock_code
 from quantfish.market_types import (
     DEFAULT_ALLOWED_MARKET_TYPES,
     normalize_allowed_market_types,
 )
+from quantfish.stock_codes import normalize_stock_code
+
 
 def run_student_backtest(
     strategy_path: Path | str, data_root: Path | str, config: Any
@@ -459,7 +460,7 @@ def _filter_investable_universe(
     summary: dict[str, Any] = {
         "enabled": True,
         "selection_information_date": "signal_date",
-        "initial_rows": int(len(scores)),
+        "initial_rows": len(scores),
         "min_listing_days": int(min_listing_days),
         "company_info_dataset": COMPANY_INFO_DATASET,
         "company_info_available": False,
@@ -468,7 +469,7 @@ def _filter_investable_universe(
         "recent_listing_rows": 0,
         "missing_listing_date_rows": 0,
         "missing_signal_date_rows": 0,
-        "final_rows": int(len(scores)),
+        "final_rows": len(scores),
         "st_filter": {
             "enforced": False,
             "reason": "no point-in-time ST/delist field found in release data",
@@ -555,7 +556,7 @@ def _filter_investable_universe(
         )
 
     filtered = filtered.sort_values("_order").drop(columns=["_order"])
-    summary["final_rows"] = int(len(filtered))
+    summary["final_rows"] = len(filtered)
     return filtered.reset_index(drop=True), summary
 
 
@@ -586,7 +587,7 @@ def _load_listing_dates(bundle: DataBundle) -> tuple[pd.Series | None, dict[str,
     rows["listdt"] = pd.to_datetime(rows[listdt_column], errors="coerce").dt.normalize()
     listing_dates = rows.dropna(subset=["code", "listdt"]).groupby("code")["listdt"].min()
     summary["company_info_available"] = True
-    summary["listing_date_rows"] = int(len(listing_dates))
+    summary["listing_date_rows"] = len(listing_dates)
     return listing_dates, summary
 
 
@@ -621,7 +622,7 @@ def _calculate_group_returns(
     ranked["date"] = pd.to_datetime(ranked["date"]).dt.normalize()
     ranked["code"] = ranked["code"].map(normalize_stock_code)
     grouped_scores = []
-    for source_date, frame in ranked.groupby("date", sort=True):
+    for _source_date, frame in ranked.groupby("date", sort=True):
         ordered = frame.sort_values("score", kind="stable").reset_index(drop=True)
         group_count_for_date = min(group_count, len(ordered))
         ordered["group"] = [
@@ -698,7 +699,7 @@ def _calculate_group_returns(
             fallback_price_limit_threshold(market_type, trading_date)
             for market_type, trading_date in zip(
                 day_returns["market_type"],
-                day_returns["date"],
+                day_returns["date"], strict=True,
             )
         ],
         index=day_returns.index,
@@ -786,7 +787,7 @@ def _scoring_result(
 def _summary_frame(metrics: Any, daily_returns: pd.DataFrame) -> pd.DataFrame:
     summary = dict(metrics.summary)
     summary["total_return"] = summary.get("all_return", 0.0)
-    summary["trading_days"] = int(len(daily_returns))
+    summary["trading_days"] = len(daily_returns)
     return pd.DataFrame([summary])
 
 

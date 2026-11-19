@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, replace
 from datetime import date
-import math
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any
 
 import yaml
 
@@ -156,7 +157,7 @@ class PlatformConfig:
     execution: ExecutionConfig = ExecutionConfig()
 
     @classmethod
-    def default(cls) -> "PlatformConfig":
+    def default(cls) -> PlatformConfig:
         return cls(
             course=CourseConfig(),
             data_releases=DataReleasesConfig(),
@@ -166,7 +167,7 @@ class PlatformConfig:
         )
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "PlatformConfig":
+    def from_dict(cls, data: Mapping[str, Any]) -> PlatformConfig:
         defaults = cls.default()
         return cls(
             course=CourseConfig(
@@ -200,7 +201,7 @@ class PlatformConfig:
     def to_dict(self) -> dict[str, Any]:
         return _stringify_dates(asdict(self))
 
-    def validate(self) -> "PlatformConfig":
+    def validate(self) -> PlatformConfig:
         if not self.course.name:
             raise ValueError("course name is required")
         if not self.data_releases.raw_data_root:
@@ -416,11 +417,11 @@ class ConfigService:
     def update(
         self,
         *,
-        course: Optional[Mapping[str, Any]] = None,
-        data_releases: Optional[Mapping[str, Any]] = None,
-        backtest: Optional[Mapping[str, Any]] = None,
-        scoring: Optional[Mapping[str, Any]] = None,
-        execution: Optional[Mapping[str, Any]] = None,
+        course: Mapping[str, Any] | None = None,
+        data_releases: Mapping[str, Any] | None = None,
+        backtest: Mapping[str, Any] | None = None,
+        scoring: Mapping[str, Any] | None = None,
+        execution: Mapping[str, Any] | None = None,
     ) -> PlatformConfig:
         updated = self.build_updated(
             course=course,
@@ -435,11 +436,11 @@ class ConfigService:
     def build_updated(
         self,
         *,
-        course: Optional[Mapping[str, Any]] = None,
-        data_releases: Optional[Mapping[str, Any]] = None,
-        backtest: Optional[Mapping[str, Any]] = None,
-        scoring: Optional[Mapping[str, Any]] = None,
-        execution: Optional[Mapping[str, Any]] = None,
+        course: Mapping[str, Any] | None = None,
+        data_releases: Mapping[str, Any] | None = None,
+        backtest: Mapping[str, Any] | None = None,
+        scoring: Mapping[str, Any] | None = None,
+        execution: Mapping[str, Any] | None = None,
     ) -> PlatformConfig:
         current = self.repository.load()
         return PlatformConfig(

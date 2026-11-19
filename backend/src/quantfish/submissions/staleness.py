@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, is_dataclass
-from datetime import date, datetime
 import hashlib
 import json
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass, is_dataclass
+from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from quantfish.data.catalog import DataCatalog
 from quantfish.submissions.models import (
@@ -193,7 +194,7 @@ def release_generation(catalog_path: Path | str) -> str | None:
     return generation or None
 
 
-def _update_hash_with_file(digest: "hashlib._Hash", relative_path: str, path: Path) -> None:
+def _update_hash_with_file(digest: hashlib._Hash, relative_path: str, path: Path) -> None:
     digest.update(relative_path.encode("utf-8"))
     digest.update(b"\0")
     digest.update(sha256_file(path).encode("ascii"))

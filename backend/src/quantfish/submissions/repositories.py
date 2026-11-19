@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass, replace
 import json
 import os
-from pathlib import Path
 import sqlite3
-import threading
 import tempfile
-from typing import Any, Mapping, Sequence
+import threading
 import uuid
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, replace
+from pathlib import Path
+from typing import Any
 
 from quantfish.submissions.listing import (
     SubmissionListParams,
     SubmissionPage,
     data_tracks_matching_search,
-    submission_page,
 )
 from quantfish.submissions.models import (
     ScoreFingerprints,
@@ -339,10 +338,9 @@ class SubmissionRepository:
             return submission
 
     def save(self, submission: Submission) -> None:
-        with self._lock:
-            with self._connect() as connection:
-                _upsert_submission(connection, submission)
-                connection.commit()
+        with self._lock, self._connect() as connection:
+            _upsert_submission(connection, submission)
+            connection.commit()
 
     def delete(self, submission_id: str) -> bool:
         with self._lock:
@@ -371,23 +369,22 @@ class SubmissionRepository:
             team_names,
             sql_sort_expressions or {},
         )
-        with self._lock:
-            with self._connect() as connection:
-                total_count = int(
-                    connection.execute(
-                        f"SELECT COUNT(*) FROM submissions {where_sql}",
-                        values,
-                    ).fetchone()[0]
-                )
-                sql = f"SELECT * FROM submissions {where_sql} {order_sql.sql}"
-                query_values = list(values) + list(order_sql.values)
-                if limit is not None:
-                    sql += " LIMIT ? OFFSET ?"
-                    query_values.extend([limit, offset])
-                elif offset:
-                    sql += " LIMIT -1 OFFSET ?"
-                    query_values.append(offset)
-                rows = connection.execute(sql, query_values).fetchall()
+        with self._lock, self._connect() as connection:
+            total_count = int(
+                connection.execute(
+                    f"SELECT COUNT(*) FROM submissions {where_sql}",
+                    values,
+                ).fetchone()[0]
+            )
+            sql = f"SELECT * FROM submissions {where_sql} {order_sql.sql}"
+            query_values = list(values) + list(order_sql.values)
+            if limit is not None:
+                sql += " LIMIT ? OFFSET ?"
+                query_values.extend([limit, offset])
+            elif offset:
+                sql += " LIMIT -1 OFFSET ?"
+                query_values.append(offset)
+            rows = connection.execute(sql, query_values).fetchall()
         return SubmissionPage(
             items=[_submission_from_row(row) for row in rows],
             total_count=total_count,
@@ -401,16 +398,15 @@ class SubmissionRepository:
         team_names: dict[str, str],
     ) -> list[Submission]:
         where_sql, values = _submission_where(params, team_names)
-        with self._lock:
-            with self._connect() as connection:
-                rows = connection.execute(
-                    f"""
+        with self._lock, self._connect() as connection:
+            rows = connection.execute(
+                f"""
                     SELECT * FROM submissions
                     {where_sql}
                     ORDER BY submitted_at ASC, submission_id ASC
                     """,
-                    values,
-                ).fetchall()
+                values,
+            ).fetchall()
         return [_submission_from_row(row) for row in rows]
 
     def _connect(self) -> sqlite3.Connection:

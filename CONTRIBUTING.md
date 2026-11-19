@@ -35,6 +35,7 @@ you if they are missing.
 | Task | Command |
 | --- | --- |
 | Backend tests | `python -m pytest backend/tests -q` |
+| Backend lint | `python -m ruff check backend` |
 | Frontend tests | `npm --prefix frontend test -- --run` |
 | Type-check + build | `npm --prefix frontend run build` |
 | Dev servers (API + Vite) | `scripts/start-quantfish.sh --mode dev` |
@@ -65,6 +66,11 @@ data/                    placeholder for generated datasets (git-ignored)
 - **Tests first.** Every behavioural change should come with a pytest or
   vitest case. `backend/tests/test_project_naming.py` guards the branding and
   package layout, so keep module paths consistent with `quantfish`.
+- **Lint before pushing.** `python -m ruff check backend` must be clean; CI runs
+  it and fails the build otherwise. Rules live in `backend/pyproject.toml`
+  (`[tool.ruff]`). `E501` is deliberately off for now so the gate stays about
+  behaviour rather than reflowing files; `ruff format` is a separate, opt-in
+  change.
 - **Config over constants.** Tunables belong in `config/platform.yaml` and are
   validated by `quantfish.platform_config`. Avoid duplicate defaults in code.
 - **Types at the boundary.** API contracts come from the FastAPI models;
@@ -79,7 +85,8 @@ data/                    placeholder for generated datasets (git-ignored)
 
 1. Create a topic branch (`feat/…`, `fix/…`, `docs/…`).
 2. Keep commits focused; the history is meant to be readable.
-3. Make sure `python -m pytest backend/tests -q` and
+3. Make sure `python -m ruff check backend`,
+   `python -m pytest backend/tests -q` and
    `npm --prefix frontend test -- --run && npm --prefix frontend run build`
    pass locally.
 4. Describe the user-visible change and any trade-offs in the PR body.

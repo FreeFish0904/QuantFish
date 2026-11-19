@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
+from dataclasses import dataclass
 
 import pandas as pd
 
@@ -101,7 +101,7 @@ def calculate_long_only_active_returns(
     return LongOnlyActiveReturns(
         daily=scored.reset_index(drop=True),
         beta=beta,
-        observation_count=int(len(aligned)),
+        observation_count=len(aligned),
         tracking_error=tracking_error,
         information_ratio=information_ratio,
     )

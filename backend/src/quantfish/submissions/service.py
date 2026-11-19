@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import math
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol
-import uuid
 
 from quantfish.platform_config import ConfigRepository
 from quantfish.submissions.models import (
@@ -184,7 +184,7 @@ class SubmissionService:
             key=lambda submission: _submitted_at_datetime(submission.submitted_at),
         )
         latest_at = _submitted_at_datetime(latest.submitted_at)
-        elapsed_seconds = (datetime.now(timezone.utc) - latest_at).total_seconds()
+        elapsed_seconds = (datetime.now(UTC) - latest_at).total_seconds()
         remaining = self.submission_cooldown_seconds - elapsed_seconds
         if remaining > 0:
             raise SubmissionCooldownError(max(1, math.ceil(remaining)))
@@ -201,7 +201,7 @@ def _submitted_at_datetime(value: str) -> datetime:
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
-        return datetime.min.replace(tzinfo=timezone.utc)
+        return datetime.min.replace(tzinfo=UTC)
     if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        return parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)

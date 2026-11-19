@@ -10,10 +10,11 @@ from __future__ import annotations
 
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -153,7 +154,7 @@ def build_report_context(submission, report_dir, *, team_name=""):
         "submission_id": submission.submission_id,
         "submission_label": f"#{report_number}" if report_number else "—",
         "team_name": team_name or submission.team_id,
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        "generated_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
         "data_track": submission.data_track.value,
         "period": period,
         "verdict": _verdict(metrics, summary, diagnostics),
@@ -879,7 +880,7 @@ def _plot_yearly_bar(daily_returns, plots_dir):
     fig, ax = plt.subplots(figsize=(10, 3.2))
     bars = ax.bar(yearly.index.astype(str), yearly.values, color=colors, edgecolor="#333")
     ax.axhline(0, color="#555", linewidth=0.8)
-    for bar, value in zip(bars, yearly.values):
+    for bar, value in zip(bars, yearly.values, strict=True):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height(),

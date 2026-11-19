@@ -4,8 +4,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from quantfish.backtest import BacktestPanel, run_student_backtest
-from quantfish.backtest import runner
+from quantfish.backtest import BacktestPanel, run_student_backtest, runner
 from quantfish.backtest.excess import MIN_EXCESS_OBSERVATIONS
 from quantfish.backtest.report_writer import write_backtest_report
 from quantfish.backtest.runner import (
@@ -1399,7 +1398,7 @@ def generate_signals(data):
 
     with pytest.raises(
         ValueError,
-        match="industry_neutralization.*basic\\.STK_INDUSTRYCLASS",
+        match=r"industry_neutralization.*basic\.STK_INDUSTRYCLASS",
     ):
         run_student_backtest(
             strategy_path,

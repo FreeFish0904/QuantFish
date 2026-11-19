@@ -1,14 +1,15 @@
-from datetime import datetime
 import json
-from pathlib import Path
 import re
 import time
 import zipfile
+from datetime import datetime
+from pathlib import Path
 
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 from quantfish.platform_config import ConfigRepository, PlatformConfig
+from quantfish.submissions import score_worker
 from quantfish.submissions.models import (
     ScoreFingerprints,
     Submission,
@@ -21,7 +22,6 @@ from quantfish.submissions.staleness import (
     config_sha256,
     sha256_file,
 )
-from quantfish.submissions import score_worker
 from quantfish.web_app.app import create_app
 from quantfish.web_app.settings import WebSettings
 
@@ -1326,7 +1326,6 @@ def test_hidden_team_cohort_is_suppressed_except_dedicated_admin_history(
         _settings(tmp_path, submission_cooldown_seconds=0),
         submission_runner=FakeSubmissionRunner(),
     )
-    services = app.state.services
     client = TestClient(app)
     _login(client)
     alpha = client.post(
@@ -2422,7 +2421,6 @@ def test_manual_stale_marks_capture_completed_rows_and_revert_by_event(
         _settings(tmp_path),
         submission_runner=FakeSubmissionRunner(),
     )
-    services = app.state.services
     old_completed = _store_submission(
         app,
         submission_id="old-completed",

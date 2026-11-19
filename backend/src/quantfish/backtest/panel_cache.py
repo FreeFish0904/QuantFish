@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +10,6 @@ import pandas as pd
 
 from quantfish.backtest.panel import BacktestPanel, build_backtest_panel
 from quantfish.data import DataBundle
-
 
 PANEL_CACHE_SCHEMA_VERSION = 2
 PANEL_CACHE_DIR = ".quantfish-cache/backtest-panels"

@@ -1,7 +1,8 @@
+import re
+import shutil
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
-import shutil
 
 import pandas as pd
 import pytest
@@ -933,7 +934,7 @@ def test_config_release_builder_rejects_incomplete_scoring_source_without_replac
 
     with pytest.raises(
         ValueError,
-        match="stock.daily_returns, factor_benchmark.adj_factor",
+        match=re.escape("stock.daily_returns, factor_benchmark.adj_factor"),
     ):
         build_releases_from_config(
             config,
@@ -1039,7 +1040,7 @@ def test_config_release_builder_rejects_empty_required_window_without_replacing_
 
     with pytest.raises(
         ValueError,
-        match="learning_1 release has no usable rows.*stock.daily_returns",
+        match=r"learning_1 release has no usable rows.*stock\.daily_returns",
     ):
         build_releases_from_config(
             config,

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import tempfile
 import threading
-from typing import Iterable
+from collections.abc import Iterable
+from pathlib import Path
 
 from quantfish.team_cohorts.models import TeamCohort
-
 
 _LOCKS: dict[Path, threading.RLock] = {}
 _LOCKS_GUARD = threading.Lock()

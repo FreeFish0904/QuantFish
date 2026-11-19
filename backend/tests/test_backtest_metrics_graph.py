@@ -1,8 +1,8 @@
 import json
 import math
 
-import pytest
 import pandas as pd
+import pytest
 
 from quantfish.backtest import (
     BacktestResult,
@@ -253,7 +253,7 @@ def test_long_only_active_returns_beta_uses_excess_returns() -> None:
             }
             for date, benchmark_return in zip(
                 ["2023-01-03", "2023-01-04", "2023-01-05", "2023-01-06"],
-                benchmark_returns,
+                benchmark_returns, strict=True,
             )
         ]
     )
@@ -262,7 +262,7 @@ def test_long_only_active_returns_beta_uses_excess_returns() -> None:
             {"date": date, "return": benchmark_return}
             for date, benchmark_return in zip(
                 ["2023-01-03", "2023-01-04", "2023-01-05", "2023-01-06"],
-                benchmark_returns,
+                benchmark_returns, strict=True,
             )
         ]
     )

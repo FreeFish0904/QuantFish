@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from functools import cmp_to_key
 import math
+from datetime import UTC, datetime
+from functools import cmp_to_key
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Query, Request
@@ -17,7 +17,6 @@ from quantfish.submissions.models import SubmissionDataTrack
 from quantfish.submissions.result_staleness import is_zero_result_stale
 from quantfish.submissions.score_summary import score_summary_for_submission
 from quantfish.web_app.response_models import DashboardResponse, LeaderboardResponse
-
 
 router = APIRouter(tags=["leaderboard"])
 
@@ -283,7 +282,7 @@ def _runner_status(
         "status": "online" if submissions_enabled else "offline",
         "queued": status_counts.get("queued", 0),
         "running": status_counts.get("running", 0),
-        "updated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "updated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
         "scoring_timeout_seconds": (
             int(timeout_seconds) if timeout_enabled and timeout_seconds is not None else None
         ),

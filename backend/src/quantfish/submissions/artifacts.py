@@ -9,7 +9,6 @@ from typing import Any
 
 import pandas as pd
 
-
 PUBLIC_DIAGNOSTIC_KEYS = {
     "canonical_panel",
     "capital",

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from collections import OrderedDict
 import json
 import os
-from pathlib import Path
 import signal
 import subprocess
 import sys
 import threading
 import time
+from collections import OrderedDict
+from pathlib import Path
 from typing import Any
 
 from quantfish.platform_config import ConfigRepository
@@ -23,8 +23,8 @@ from quantfish.submissions.staleness import (
     ScoreFingerprintContext,
     config_sha256,
     fingerprints_from_context,
-    release_generation,
     release_file_signatures,
+    release_generation,
     sha256_release,
 )
 from quantfish.submissions.track_config import track_release_root, track_scoring_config
@@ -123,7 +123,7 @@ class BacktestSubmissionRunner:
         strategy_path: Path,
         report_dir: Path,
         data_track: SubmissionDataTrack | str = SubmissionDataTrack.HIDDEN_TEST,
-    ) -> "ScoreWorkerHandle":
+    ) -> ScoreWorkerHandle:
         config = self._load_config()
         track = _submission_data_track(data_track)
         timeout = (

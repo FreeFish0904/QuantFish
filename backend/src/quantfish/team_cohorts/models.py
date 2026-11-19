@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
-from datetime import datetime, timezone
-from typing import Any, Mapping
+from datetime import UTC, datetime
+from typing import Any
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 @dataclass(frozen=True)
@@ -19,7 +20,7 @@ class TeamCohort:
     created_at: str = ""
     updated_at: str = ""
 
-    def with_updates(self, **changes: Any) -> "TeamCohort":
+    def with_updates(self, **changes: Any) -> TeamCohort:
         return replace(self, updated_at=utc_now(), **changes)
 
     def to_dict(self) -> dict[str, Any]:
@@ -34,7 +35,7 @@ class TeamCohort:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "TeamCohort":
+    def from_dict(cls, data: Mapping[str, Any]) -> TeamCohort:
         created_at = str(data.get("created_at") or utc_now())
         return cls(
             cohort_id=str(data["cohort_id"]),

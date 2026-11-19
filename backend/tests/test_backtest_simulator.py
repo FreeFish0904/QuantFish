@@ -1,5 +1,5 @@
-import pytest
 import pandas as pd
+import pytest
 
 from quantfish.backtest import BacktestPanel, simulate_backtest
 

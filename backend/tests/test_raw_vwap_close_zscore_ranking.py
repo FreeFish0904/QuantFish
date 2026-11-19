@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pandas as pd
-
 
 SCRIPT_PATH = Path("docs/student/examples/raw_vwap_close_zscore_ranking.py")
 

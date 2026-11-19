@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass, field
 import logging
 import os
-from pathlib import Path
 import shutil
 import tempfile
-from typing import Callable, Iterable, Optional, Set
 import uuid
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
 
 import pandas as pd
 
@@ -57,8 +57,8 @@ ReleaseProgressCallback = Callable[[ReleaseBuildProgress], None]
 class _ReleaseTarget:
     name: str | None
     output_root: Path
-    start_date: Optional[pd.Timestamp]
-    end_date: Optional[pd.Timestamp]
+    start_date: pd.Timestamp | None
+    end_date: pd.Timestamp | None
     metadata: dict[str, object]
 
 
@@ -66,16 +66,16 @@ class _ReleaseTarget:
 class _PreparedReleaseTarget:
     target: _ReleaseTarget
     temp_output_root: Path
-    copied_docs: Set[str] = field(default_factory=set)
+    copied_docs: set[str] = field(default_factory=set)
     released_specs: list[DatasetSpec] = field(default_factory=list)
 
 
 def build_release(
     source: Path | str,
     output: Path | str,
-    start: Optional[str] = None,
-    end: Optional[str] = None,
-    release_metadata: Optional[dict[str, object]] = None,
+    start: str | None = None,
+    end: str | None = None,
+    release_metadata: dict[str, object] | None = None,
 ) -> DataCatalog:
     source_root = Path(source)
     output_root = Path(output)
@@ -176,7 +176,7 @@ def build_releases_from_config(
     )
     return {
         target.name or target.output_root.name: catalog
-        for target, catalog in zip(targets, catalogs)
+        for target, catalog in zip(targets, catalogs, strict=True)
     }
 
 
@@ -357,7 +357,7 @@ def _build_release_targets(
         )
         for dataset_index, spec in enumerate(source_catalog.datasets, start=1):
             stats = _write_dataset_to_release_targets(source_root, spec, prepared)
-            for target, (source_row_count, row_count) in zip(prepared, stats):
+            for target, (source_row_count, row_count) in zip(prepared, stats, strict=True):
                 target.released_specs.append(_released_spec(spec, source_row_count, row_count))
                 target.copied_docs.update(
                     _copy_dataset_docs(source_root, target.temp_output_root, spec)
@@ -594,8 +594,8 @@ def _hidden_hs300_error(start_date: pd.Timestamp, end_date: pd.Timestamp) -> str
 def _filter_for_release(
     df: pd.DataFrame,
     spec: DatasetSpec,
-    start_date: Optional[pd.Timestamp],
-    end_date: Optional[pd.Timestamp],
+    start_date: pd.Timestamp | None,
+    end_date: pd.Timestamp | None,
 ) -> pd.DataFrame:
     if spec.primary_asof_column is None:
         return df.copy()
@@ -665,8 +665,8 @@ def _write_streamed_csv_release(
     source_path: Path,
     output_path: Path,
     spec: DatasetSpec,
-    start_date: Optional[pd.Timestamp],
-    end_date: Optional[pd.Timestamp],
+    start_date: pd.Timestamp | None,
+    end_date: pd.Timestamp | None,
 ) -> tuple[int, int]:
     read_kwargs: dict[str, object] = {
         "encoding": "utf-8-sig",
@@ -781,7 +781,7 @@ def _write_streamed_parquet_release_targets(
     try:
         for batch in parquet_file.iter_batches(batch_size=_parquet_release_batch_rows()):
             chunk = batch.to_pandas()
-            for target, writer in zip(targets, writers):
+            for target, writer in zip(targets, writers, strict=True):
                 release_chunk = _filter_window_rows(
                     chunk,
                     spec,
@@ -831,8 +831,8 @@ class _ParquetReleaseWriter:
 def _filter_window_rows(
     df: pd.DataFrame,
     spec: DatasetSpec,
-    start_date: Optional[pd.Timestamp],
-    end_date: Optional[pd.Timestamp],
+    start_date: pd.Timestamp | None,
+    end_date: pd.Timestamp | None,
 ) -> pd.DataFrame:
     if spec.primary_asof_column is None:
         return df.copy()
@@ -893,8 +893,8 @@ def _positive_int_from_env(name: str, default: int) -> int:
     return value
 
 
-def _copy_dataset_docs(source_root: Path, output_root: Path, spec: DatasetSpec) -> Set[str]:
-    copied: Set[str] = set()
+def _copy_dataset_docs(source_root: Path, output_root: Path, spec: DatasetSpec) -> set[str]:
+    copied: set[str] = set()
     dataset_dir = Path(spec.relative_path).parent
     for doc_name in spec.doc_paths:
         source_doc = source_root / dataset_dir / doc_name
@@ -957,7 +957,7 @@ def _replace_output(temp_output_root: Path, output_root: Path) -> None:
             )
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build QuantFish data releases.")
     subparsers = parser.add_subparsers(dest="command", required=True)
     build_parser = subparsers.add_parser("build", help="Build a dated data release")

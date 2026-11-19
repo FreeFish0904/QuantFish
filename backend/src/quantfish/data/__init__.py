@@ -5,9 +5,9 @@ from quantfish.data.catalog import DataCatalog, DatasetSpec
 
 __all__ = [
     "DataBundle",
-    "DatedDataBundle",
     "DataCatalog",
     "DatasetSpec",
+    "DatedDataBundle",
     "FutureDataAccessError",
 ]
 

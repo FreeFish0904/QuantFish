@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import argparse
-from contextlib import redirect_stderr, redirect_stdout
 import json
-from pathlib import Path
 import sys
 import traceback
-from typing import Sequence
+from collections.abc import Sequence
+from contextlib import redirect_stderr, redirect_stdout
+from pathlib import Path
 
 import pandas as pd
 
@@ -75,15 +75,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     original_argv = list(sys.argv)
     sys.argv = ["quantfish-score-worker"]
     try:
-        with (report_dir / "worker_stdout.log").open("w", encoding="utf-8") as out:
-            with (report_dir / "worker_stderr.log").open("w", encoding="utf-8") as err:
-                with redirect_stdout(out), redirect_stderr(err):
-                    metrics = score_submission(
-                        Path(args.config),
-                        Path(args.strategy),
-                        report_dir,
-                        data_track=args.data_track,
-                    )
+        with (
+            (report_dir / "worker_stdout.log").open("w", encoding="utf-8") as out,
+            (report_dir / "worker_stderr.log").open("w", encoding="utf-8") as err,
+            redirect_stdout(out),
+            redirect_stderr(err),
+        ):
+            metrics = score_submission(
+                Path(args.config),
+                Path(args.strategy),
+                report_dir,
+                data_track=args.data_track,
+            )
     except Exception as exc:
         (report_dir / "worker_error.log").write_text(
             traceback.format_exc(),

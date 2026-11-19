@@ -1,19 +1,18 @@
 from __future__ import annotations
 
+import threading
+import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-import threading
 from typing import Any, Literal
-import uuid
 
 from quantfish.data.release_lock import ReleaseLockCancelled, ReleaseLockManager
 from quantfish.data.releases import ReleaseBuildProgress, build_releases_from_config
 from quantfish.data.scoring_datasets import scoring_required_dataset_ids
 from quantfish.platform_config import ConfigRepository, PlatformConfig
 from quantfish.submissions.track_config import track_scoring_config
-
 
 HistoricalReleaseName = Literal["learning_1", "learning_2", "learning_3"]
 HISTORICAL_RELEASE_NAMES: tuple[HistoricalReleaseName, ...] = (
@@ -202,7 +201,10 @@ class DataReleaseBuildService:
                     error_message=None,
                 )
 
-                def report(progress: ReleaseBuildProgress) -> None:
+                def report(
+                    progress: ReleaseBuildProgress,
+                    release_name: str = release_name,
+                ) -> None:
                     if progress.phase != "completed":
                         self._ensure_running()
                     self._update_track(
@@ -340,7 +342,7 @@ def _overall_progress(tracks: tuple[ReleaseTrackBuildProgress, ...]) -> float:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def _file_modified_at(path: Path) -> str | None:
@@ -348,4 +350,4 @@ def _file_modified_at(path: Path) -> str | None:
         modified_at = path.stat().st_mtime
     except OSError:
         return None
-    return datetime.fromtimestamp(modified_at, timezone.utc).isoformat(timespec="seconds")
+    return datetime.fromtimestamp(modified_at, UTC).isoformat(timespec="seconds")

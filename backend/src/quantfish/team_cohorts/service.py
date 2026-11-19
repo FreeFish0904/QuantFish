@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import replace
 import uuid
-from typing import Any, Iterable
+from collections.abc import Iterable
+from dataclasses import replace
+from typing import Any
 
 from quantfish.team_cohorts.models import TeamCohort, utc_now
 from quantfish.team_cohorts.repository import TeamCohortRepository

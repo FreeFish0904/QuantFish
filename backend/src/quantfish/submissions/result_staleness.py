@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from quantfish.submissions.models import SubmissionStatus
-
 
 REQUIRED_ZERO_METRICS: tuple[str, ...] = (
     "total_return",

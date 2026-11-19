@@ -5,7 +5,6 @@ from typing import Any
 
 import pandas as pd
 
-
 MARKET_TYPE_LABELS: dict[int, str] = {
     1: "上证A股市场(不包含科创板)",
     2: "上证B股市场",

@@ -1,12 +1,10 @@
 from __future__ import annotations
 
+import math
 from datetime import date, datetime
 from typing import Any
 
-import math
-
 import pandas as pd
-
 
 DEFAULT_PRICE_LIMIT_THRESHOLD = 0.0995
 CHINEXT_REFORM_DATE = date(2020, 8, 24)

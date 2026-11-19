@@ -3,10 +3,10 @@ import pytest
 from quantfish.leaderboard.ranking import (
     ScoringWeights,
     calculate_leaderboard_score,
-    rank_best_per_team_objective_leaderboard,
     rank_best_per_team_leaderboard,
-    rank_objective_leaderboard,
+    rank_best_per_team_objective_leaderboard,
     rank_leaderboard,
+    rank_objective_leaderboard,
     score_contributions,
 )
 

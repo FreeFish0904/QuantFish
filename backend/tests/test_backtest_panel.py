@@ -2,8 +2,8 @@ import math
 
 import pandas as pd
 
-from quantfish.backtest import build_backtest_panel, preprocess_signals
 import quantfish.backtest.panel as panel_module
+from quantfish.backtest import build_backtest_panel, preprocess_signals
 
 
 def test_panel_prefers_official_backward_factor_for_front_prices() -> None:

@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 RAW_ERROR_LOGS = ("worker_error.log", "worker_stderr.log", "worker_stdout.log")
 WORKER_FAILURE_FILE = "worker_failure.json"
 

@@ -1,12 +1,17 @@
-from pathlib import Path
 import zipfile
+from pathlib import Path
 
-from fastapi.testclient import TestClient
 import pandas as pd
 import pytest
+from fastapi.testclient import TestClient
 
 from quantfish.data.release_jobs import ReleaseBuildAlreadyRunning
-from quantfish.platform_config import ConfigRepository, DataReleasesConfig, ExecutionConfig, PlatformConfig
+from quantfish.platform_config import (
+    ConfigRepository,
+    DataReleasesConfig,
+    ExecutionConfig,
+    PlatformConfig,
+)
 from quantfish.submissions.models import (
     ScoreFingerprints,
     Submission,

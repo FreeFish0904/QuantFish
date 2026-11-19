@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 RETURNS_DATASET = "stock.daily_returns"
 ADJ_FACTOR_DATASET = "factor_benchmark.adj_factor"
 INDUSTRY_DATASET = "basic.STK_INDUSTRYCLASS"

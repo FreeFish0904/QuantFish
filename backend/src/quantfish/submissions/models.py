@@ -1,27 +1,28 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from enum import Enum
 import hashlib
 import hmac
 import math
 import secrets
-from typing import Any, Mapping
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from enum import StrEnum
+from typing import Any
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
-class SubmissionStatus(str, Enum):
+class SubmissionStatus(StrEnum):
     QUEUED = "queued"
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
 
 
-class SubmissionDataTrack(str, Enum):
+class SubmissionDataTrack(StrEnum):
     HIDDEN_TEST = "hidden_test"
     LEARNING = "learning"
     LEARNING_1 = "learning_1"
@@ -46,7 +47,7 @@ class Team:
         password: str,
         created_at: str | None = None,
         archived_at: str | None = None,
-    ) -> "Team":
+    ) -> Team:
         return cls(
             team_id=team_id,
             display_name=display_name,
@@ -65,7 +66,7 @@ class Team:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "Team":
+    def from_dict(cls, data: Mapping[str, Any]) -> Team:
         password_hash = data.get("password_hash")
         if password_hash is None and data.get("password") is not None:
             password_hash = hash_team_password(str(data["password"]))
@@ -102,7 +103,7 @@ class ScoreFingerprints:
         return payload
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "ScoreFingerprints":
+    def from_dict(cls, data: Mapping[str, Any]) -> ScoreFingerprints:
         return cls(
             config_sha256=str(data["config_sha256"]),
             hidden_catalog_sha256=str(data["hidden_catalog_sha256"]),
@@ -240,11 +241,11 @@ class SubmissionMetrics:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "SubmissionMetrics":
+    def from_dict(cls, data: Mapping[str, Any]) -> SubmissionMetrics:
         return cls.from_summary(data)
 
     @classmethod
-    def from_summary(cls, summary: Mapping[str, Any]) -> "SubmissionMetrics":
+    def from_summary(cls, summary: Mapping[str, Any]) -> SubmissionMetrics:
         return cls(
             total_return=_optional_float(summary.get("total_return")),
             annual_return=_optional_float(summary.get("annual_return")),
@@ -368,7 +369,7 @@ class Submission:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "Submission":
+    def from_dict(cls, data: Mapping[str, Any]) -> Submission:
         metrics = data.get("metrics")
         return cls(
             submission_id=str(data["submission_id"]),
@@ -492,7 +493,7 @@ def _snapshot_section(snapshot: Mapping[str, Any], key: str) -> Mapping[str, Any
 
 
 def _snapshot_value(section: Mapping[str, Any], key: str) -> Any:
-    return section[key] if key in section else None
+    return section.get(key)
 
 
 def submission_execution_parameters(submission: Submission) -> dict[str, Any] | None:

@@ -9,7 +9,6 @@ from quantfish.data import DataBundle
 from quantfish.data.scoring_datasets import HS300_DATASET
 from quantfish.stock_codes import normalize_stock_code
 
-
 LEGACY_HS300_DATASET = "TRD_Index"
 
 
@@ -61,7 +60,7 @@ def build_hs300_benchmark_records(
             "benchmark_equity": _json_float(value),
             "benchmark_cny": _json_float(value * capital),
         }
-        for date, daily_return, value in zip(rows["date"], returns, equity)
+        for date, daily_return, value in zip(rows["date"], returns, equity, strict=True)
     ]
 
 

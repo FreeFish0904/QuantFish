@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
-from datetime import datetime, timezone
 import hashlib
 import json
-from pathlib import Path
 import shutil
-from typing import Any, TYPE_CHECKING
 import uuid
 import zipfile
+from dataclasses import dataclass, replace
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
@@ -354,7 +354,7 @@ class StudentExportService:
             "status": "available" if available else status,
             "size_bytes": package_path.stat().st_size if available else None,
             "updated_at": (
-                datetime.fromtimestamp(package_path.stat().st_mtime, timezone.utc)
+                datetime.fromtimestamp(package_path.stat().st_mtime, UTC)
                 .replace(microsecond=0)
                 .isoformat()
                 if available
@@ -474,7 +474,7 @@ def _skip_packaged_path(path: Path) -> bool:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 def _runner_script_text() -> str:

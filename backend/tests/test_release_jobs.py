@@ -1,7 +1,7 @@
-from dataclasses import replace
-from pathlib import Path
 import threading
 import time
+from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -66,7 +66,7 @@ def test_release_job_runs_selected_tracks_sequentially_and_reports_progress(
             "factor_benchmark.adj_factor",
             "basic.company_info",
         )
-        release_name = tuple(release_names)[0]
+        release_name = next(iter(release_names))
         calls.append(release_name)
         progress_callback(
             ReleaseBuildProgress(
@@ -129,7 +129,7 @@ def test_release_job_preserves_completed_track_and_marks_failed_track(
         progress_callback,
         required_dataset_ids,
     ):
-        release_name = tuple(release_names)[0]
+        release_name = next(iter(release_names))
         progress_callback(ReleaseBuildProgress(phase="building", percent=25))
         if release_name == "learning_2":
             raise OSError("disk full")

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import csv
+import re
+import warnings
 from datetime import timedelta
 from pathlib import Path
-import re
-from typing import Optional
-import warnings
 
 import pandas as pd
 from pandas.errors import ParserError
@@ -67,12 +66,12 @@ class DataBundle:
         return self.catalog.path_for(dataset_id_or_alias, self.root)
 
     def load_raw(
-        self, dataset_id_or_alias: str, columns: Optional[list[str]] = None
+        self, dataset_id_or_alias: str, columns: list[str] | None = None
     ) -> pd.DataFrame:
         return self._load_raw_for_dated_access(dataset_id_or_alias, columns)
 
     def _load_raw_for_dated_access(
-        self, dataset_id_or_alias: str, columns: Optional[list[str]] = None
+        self, dataset_id_or_alias: str, columns: list[str] | None = None
     ) -> pd.DataFrame:
         spec = self.describe(dataset_id_or_alias)
         if self.allowed_market_types is None:
@@ -88,7 +87,7 @@ class DataBundle:
     def date_series_for(
         self,
         dataset_id_or_alias: str,
-        columns: Optional[list[str]],
+        columns: list[str] | None,
         frame: pd.DataFrame,
         date_column: str,
     ) -> pd.Series:
@@ -97,7 +96,7 @@ class DataBundle:
     def rows_for_date(
         self,
         dataset_id_or_alias: str,
-        columns: Optional[list[str]],
+        columns: list[str] | None,
         frame: pd.DataFrame,
         date_column: str,
         date: pd.Timestamp,
@@ -105,7 +104,7 @@ class DataBundle:
         dates = self.date_series_for(dataset_id_or_alias, columns, frame, date_column)
         return frame[dates == date].copy()
 
-    def at(self, date: str | pd.Timestamp) -> "DatedDataBundle":
+    def at(self, date: str | pd.Timestamp) -> DatedDataBundle:
         return DatedDataBundle(self, _to_timestamp(date))
 
 
@@ -117,11 +116,11 @@ class DatedDataBundle:
     def load(
         self,
         dataset_id_or_alias: str,
-        start: Optional[str | pd.Timestamp] = None,
-        end: Optional[str | pd.Timestamp] = None,
-        columns: Optional[list[str]] = None,
+        start: str | pd.Timestamp | None = None,
+        end: str | pd.Timestamp | None = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         return self._load_bounded(
             dataset_id_or_alias,
@@ -136,11 +135,11 @@ class DatedDataBundle:
     def _load_bounded(
         self,
         dataset_id_or_alias: str,
-        start: Optional[str | pd.Timestamp] = None,
-        end: Optional[str | pd.Timestamp] = None,
-        columns: Optional[list[str]] = None,
-        numeric_columns: Optional[list[str]] = None,
-        required_columns: Optional[list[str]] = None,
+        start: str | pd.Timestamp | None = None,
+        end: str | pd.Timestamp | None = None,
+        columns: list[str] | None = None,
+        numeric_columns: list[str] | None = None,
+        required_columns: list[str] | None = None,
         project: bool = True,
     ) -> pd.DataFrame:
         spec = self.bundle.describe(dataset_id_or_alias)
@@ -192,9 +191,9 @@ class DatedDataBundle:
     def current(
         self,
         dataset_id_or_alias: str,
-        columns: Optional[list[str]] = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         return self.load(
             dataset_id_or_alias,
@@ -207,11 +206,11 @@ class DatedDataBundle:
     def history(
         self,
         dataset_id_or_alias: str,
-        start: Optional[str | pd.Timestamp] = None,
-        lookback_days: Optional[int] = None,
-        columns: Optional[list[str]] = None,
+        start: str | pd.Timestamp | None = None,
+        lookback_days: int | None = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         if lookback_days is not None and start is not None:
             raise ValueError("pass either start or lookback_days, not both")
@@ -231,10 +230,10 @@ class DatedDataBundle:
     def latest(
         self,
         dataset_id_or_alias: str,
-        by: Optional[str] = None,
-        columns: Optional[list[str]] = None,
+        by: str | None = None,
+        columns: list[str] | None = None,
         *,
-        numeric_columns: Optional[list[str]] = None,
+        numeric_columns: list[str] | None = None,
     ) -> pd.DataFrame:
         spec = self.bundle.describe(dataset_id_or_alias)
         group_column = by or spec.symbol_column
@@ -272,7 +271,7 @@ class DatedDataBundle:
 
 
 def _read_dataset(
-    path: Path, spec: DatasetSpec, columns: Optional[list[str]] = None
+    path: Path, spec: DatasetSpec, columns: list[str] | None = None
 ) -> pd.DataFrame:
     if spec.format == "csv":
         return _read_csv_dataset(path, spec, columns=columns)
@@ -284,7 +283,7 @@ def _read_dataset(
 def _read_dataset_with_market_filter_columns(
     path: Path,
     spec: DatasetSpec,
-    columns: Optional[list[str]] = None,
+    columns: list[str] | None = None,
 ) -> pd.DataFrame:
     if columns is None or market_type_column(columns) is not None:
         return _read_dataset(path, spec, columns=columns)
@@ -313,7 +312,7 @@ def _is_missing_market_filter_column(exc: Exception, candidate: str) -> bool:
 
 
 def _read_csv_dataset(
-    path: Path, spec: DatasetSpec, columns: Optional[list[str]] = None
+    path: Path, spec: DatasetSpec, columns: list[str] | None = None
 ) -> pd.DataFrame:
     kwargs = {"encoding": "utf-8-sig"}
     if columns is not None:
@@ -327,8 +326,8 @@ def _read_csv_dataset(
 
 
 def _columns_with_required(
-    columns: Optional[list[str]], required_columns: list[str]
-) -> Optional[list[str]]:
+    columns: list[str] | None, required_columns: list[str]
+) -> list[str] | None:
     if columns is None:
         return None
     merged = list(columns)
@@ -338,7 +337,7 @@ def _columns_with_required(
     return merged
 
 
-def _project_columns(df: pd.DataFrame, columns: Optional[list[str]]) -> pd.DataFrame:
+def _project_columns(df: pd.DataFrame, columns: list[str] | None) -> pd.DataFrame:
     if columns is None:
         return df.copy()
     return df.loc[:, columns].copy()
@@ -346,7 +345,7 @@ def _project_columns(df: pd.DataFrame, columns: Optional[list[str]]) -> pd.DataF
 
 def _coerce_numeric_columns(
     df: pd.DataFrame,
-    numeric_columns: Optional[list[str]],
+    numeric_columns: list[str] | None,
 ) -> pd.DataFrame:
     if not numeric_columns:
         return df
@@ -360,7 +359,7 @@ def _coerce_numeric_columns(
 
 
 def _read_repaired_csmar_csv(
-    path: Path, spec: DatasetSpec, columns: Optional[list[str]] = None
+    path: Path, spec: DatasetSpec, columns: list[str] | None = None
 ) -> pd.DataFrame:
     rows = []
     with path.open(encoding="utf-8-sig", newline="") as file:
@@ -371,8 +370,8 @@ def _read_repaired_csmar_csv(
             return pd.DataFrame(columns=columns)
 
         expected_fields = len(header)
-        pending_row: Optional[list[str]] = None
-        pending_line_number: Optional[int] = None
+        pending_row: list[str] | None = None
+        pending_line_number: int | None = None
         for line_number, row in enumerate(reader, start=2):
             if not row:
                 continue
@@ -442,7 +441,7 @@ def _merge_overflow_fields(
     merged_text = ",".join(row[repair_index:tail_start])
     if merged_text.endswith('"'):
         merged_text = merged_text[:-1]
-    repaired = row[:repair_index] + [merged_text] + row[tail_start:]
+    repaired = [*row[:repair_index], merged_text, *row[tail_start:]]
     if len(repaired) != expected_fields:
         raise CSMARCSVRepairError(
             f"repair produced {len(repaired)} fields, expected {expected_fields}"
@@ -452,7 +451,9 @@ def _merge_overflow_fields(
 
 def _repair_score(header: list[str], row: list[str]) -> int:
     score = 0
-    for column, value in zip(header, row):
+    # Broken CSV rows can have more or fewer fields than the header; the
+    # heuristic must tolerate the mismatch instead of raising.
+    for column, value in zip(header, row, strict=False):
         if column in TEXT_REPAIR_COLUMNS:
             continue
         text = "" if value is None else str(value)

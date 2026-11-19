@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field, is_dataclass
-from datetime import date, datetime, timezone
 import json
 import os
-from pathlib import Path
 import tempfile
 import threading
-from typing import Any, Mapping
 import uuid
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass, field, is_dataclass
+from datetime import UTC, date, datetime
+from pathlib import Path
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -38,7 +39,7 @@ class AdminSettingsHistoryEntry:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "AdminSettingsHistoryEntry":
+    def from_dict(cls, data: Mapping[str, Any]) -> AdminSettingsHistoryEntry:
         settings = data.get("settings")
         if not isinstance(settings, Mapping):
             settings = {}
@@ -93,7 +94,7 @@ class AdminSettingsHistoryRepository:
             return None
         entry = AdminSettingsHistoryEntry(
             entry_id=uuid.uuid4().hex,
-            created_at=datetime.now(timezone.utc).isoformat(),
+            created_at=datetime.now(UTC).isoformat(),
             entry_type="settings_change",
             changed_fields=changed_fields,
             settings=previous_settings,
@@ -108,7 +109,7 @@ class AdminSettingsHistoryRepository:
     ) -> AdminSettingsHistoryEntry:
         entry = AdminSettingsHistoryEntry(
             entry_id=uuid.uuid4().hex,
-            created_at=datetime.now(timezone.utc).isoformat(),
+            created_at=datetime.now(UTC).isoformat(),
             entry_type="stale_mark",
             settings={},
             stale_marked=True,
@@ -137,7 +138,7 @@ class AdminSettingsHistoryRepository:
                             settings=entry.settings,
                             stale_marked=entry.stale_marked,
                             affected_submission_ids=entry.affected_submission_ids,
-                            reverted_at=datetime.now(timezone.utc).isoformat(),
+                            reverted_at=datetime.now(UTC).isoformat(),
                             config_sha256=entry.config_sha256,
                         )
                     )

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import math
-from numbers import Integral, Real
 import re
+from numbers import Integral, Real
 from typing import Any
 
 

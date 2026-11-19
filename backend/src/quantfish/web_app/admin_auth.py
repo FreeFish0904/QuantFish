@@ -6,7 +6,6 @@ import time
 
 from fastapi import HTTPException, Request, Response
 
-
 ADMIN_SESSION_COOKIE = "quantfish_admin_session"
 ADMIN_SESSION_SECONDS = 12 * 60 * 60
 
@@ -58,5 +57,5 @@ def require_admin_session(request: Request) -> None:
 
 def _session_signature(request: Request, issued_at: str, nonce: str) -> str:
     secret = request.app.state.services.settings.admin_session_secret
-    message = f"{issued_at}.{nonce}".encode("utf-8")
+    message = f"{issued_at}.{nonce}".encode()
     return hmac.new(secret.encode("utf-8"), message, "sha256").hexdigest()

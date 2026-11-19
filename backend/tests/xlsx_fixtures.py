@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile
 from xml.sax.saxutils import escape
+from zipfile import ZIP_DEFLATED, ZipFile
 
 
 def write_xlsx_field_dictionary(path: Path, sheet_name: str, rows: list[list[str]]) -> None:

@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import base64
 import hmac
 import secrets
 import time
+from dataclasses import dataclass
 from typing import Any
 
 from fastapi import HTTPException, Request, Response
 
 from quantfish.submissions.models import Team
-
 
 PARTICIPANT_SESSION_COOKIE = "quantfish_submission_session"
 PARTICIPANT_SESSION_SECONDS = 7 * 24 * 60 * 60
@@ -94,7 +93,7 @@ def _session_signature(
     nonce: str,
 ) -> str:
     secret = _session_secret(request.app.state.services.settings)
-    message = f"{issued_at}.{encoded_team_id}.{nonce}".encode("utf-8")
+    message = f"{issued_at}.{encoded_team_id}.{nonce}".encode()
     return hmac.new(secret.encode("utf-8"), message, "sha256").hexdigest()
 
 

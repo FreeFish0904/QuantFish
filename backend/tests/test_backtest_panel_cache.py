@@ -7,7 +7,6 @@ from quantfish.backtest.panel_cache import load_or_build_backtest_panel
 from quantfish.data import DataBundle
 from quantfish.data.catalog import DataCatalog, DatasetSpec
 
-
 RETURNS_DATASET = "stock.daily_returns"
 ADJ_FACTOR_DATASET = "factor_benchmark.adj_factor"
 

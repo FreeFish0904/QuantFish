@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import inspect
+import threading
 from contextlib import nullcontext
 from dataclasses import dataclass, replace
-import inspect
 from pathlib import Path
-import threading
 from typing import Any
 
 from quantfish.data.release_lock import ReleaseLockManager

@@ -2,15 +2,14 @@ from __future__ import annotations
 
 import posixpath
 import re
-from pathlib import Path
-from typing import Dict, Iterable, List, Optional
 import xml.etree.ElementTree as ET
+from collections.abc import Iterable
+from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
 import pandas as pd
 
 from quantfish.data.catalog import DataCatalog, DatasetSpec
-
 
 LOADABLE_SUFFIXES = {".csv": "csv", ".parquet": "parquet"}
 DOC_SUFFIXES = {".pdf", ".txt", ".xlsx"}
@@ -47,7 +46,7 @@ PKG_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 def scan_catalog(root: Path | str) -> DataCatalog:
     root_path = Path(root)
-    datasets: List[DatasetSpec] = []
+    datasets: list[DatasetSpec] = []
     for path in sorted(root_path.rglob("*")):
         if not path.is_file() or _is_hidden(path.relative_to(root_path)):
             continue
@@ -85,7 +84,7 @@ def _is_hidden(relative_path: Path) -> bool:
     return any(part.startswith(".") for part in relative_path.parts)
 
 
-def _read_columns(path: Path, file_format: str) -> List[str]:
+def _read_columns(path: Path, file_format: str) -> list[str]:
     if file_format == "csv":
         return list(pd.read_csv(path, nrows=0, encoding="utf-8-sig").columns)
     if file_format == "parquet":
@@ -104,15 +103,15 @@ def _dataset_id(relative_path: Path) -> str:
     return ".".join(parts)
 
 
-def _detect_csmar_table_code(path: Path) -> Optional[str]:
+def _detect_csmar_table_code(path: Path) -> str | None:
     stem = path.stem
     if CSMAR_TABLE_RE.match(stem):
         return stem
     return None
 
 
-def _build_aliases(path: Path, table_code: Optional[str]) -> List[str]:
-    aliases: List[str] = []
+def _build_aliases(path: Path, table_code: str | None) -> list[str]:
+    aliases: list[str] = []
     if table_code:
         aliases.append(table_code)
     if _is_datago_path(path):
@@ -120,11 +119,11 @@ def _build_aliases(path: Path, table_code: Optional[str]) -> List[str]:
     return aliases
 
 
-def _infer_date_columns(columns: Iterable[str]) -> List[str]:
+def _infer_date_columns(columns: Iterable[str]) -> list[str]:
     return [column for column in columns if column.lower() in DATE_NAMES]
 
 
-def _choose_primary_asof_column(date_columns: Iterable[str]) -> Optional[str]:
+def _choose_primary_asof_column(date_columns: Iterable[str]) -> str | None:
     columns_by_lower = {column.lower(): column for column in date_columns}
     for name in DATE_PRIORITY:
         if name in columns_by_lower:
@@ -132,7 +131,7 @@ def _choose_primary_asof_column(date_columns: Iterable[str]) -> Optional[str]:
     return None
 
 
-def _infer_symbol_column(columns: Iterable[str]) -> Optional[str]:
+def _infer_symbol_column(columns: Iterable[str]) -> str | None:
     columns_by_lower = {column.lower(): column for column in columns}
     for name in SYMBOL_PRIORITY:
         if name in columns_by_lower:
@@ -140,7 +139,7 @@ def _infer_symbol_column(columns: Iterable[str]) -> Optional[str]:
     return None
 
 
-def _nearby_doc_paths(path: Path) -> List[str]:
+def _nearby_doc_paths(path: Path) -> list[str]:
     docs = []
     for candidate in sorted(path.parent.iterdir()):
         if not candidate.is_file() or candidate == path or candidate.name.startswith("."):
@@ -150,8 +149,8 @@ def _nearby_doc_paths(path: Path) -> List[str]:
     return docs
 
 
-def _parse_descriptions(path: Path, columns: Iterable[str]) -> Dict[str, Dict[str, str]]:
-    descriptions: Dict[str, Dict[str, str]] = {}
+def _parse_descriptions(path: Path, columns: Iterable[str]) -> dict[str, dict[str, str]]:
+    descriptions: dict[str, dict[str, str]] = {}
     for candidate in _description_files_for(path):
         text = candidate.read_text(encoding="utf-8-sig", errors="replace")
         for line in text.splitlines():
@@ -168,7 +167,7 @@ def _parse_descriptions(path: Path, columns: Iterable[str]) -> Dict[str, Dict[st
     return descriptions
 
 
-def _description_files_for(path: Path) -> List[Path]:
+def _description_files_for(path: Path) -> list[Path]:
     stem = path.stem
     candidates = []
     for candidate in path.parent.glob("*.txt"):
@@ -178,7 +177,7 @@ def _description_files_for(path: Path) -> List[Path]:
     return sorted(candidates)
 
 
-def _xlsx_description_files_for(path: Path) -> List[Path]:
+def _xlsx_description_files_for(path: Path) -> list[Path]:
     return sorted(
         candidate
         for candidate in path.parent.glob("*.xlsx")
@@ -192,7 +191,7 @@ def _is_datago_path(path: Path) -> bool:
 
 def _parse_xlsx_descriptions(
     path: Path, table_stem: str, columns: Iterable[str]
-) -> Dict[str, Dict[str, str]]:
+) -> dict[str, dict[str, str]]:
     try:
         with ZipFile(path) as archive:
             shared_strings = _xlsx_shared_strings(archive)
@@ -214,12 +213,12 @@ def _parse_xlsx_descriptions(
         data_type_index = header.get("数据类型")
         if field_index is None or description_index is None:
             continue
-        descriptions: Dict[str, Dict[str, str]] = {}
+        descriptions: dict[str, dict[str, str]] = {}
         for value_row in rows[index + 1 :]:
             field_name = _row_value(value_row, field_index)
             if not field_name or field_name not in column_names:
                 continue
-            entry: Dict[str, str] = {}
+            entry: dict[str, str] = {}
             data_type = (
                 _row_value(value_row, data_type_index)
                 if data_type_index is not None

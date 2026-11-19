@@ -1,27 +1,25 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import replace
-from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
+from quantfish.admin_console.settings_history import AdminSettingsHistoryRepository
 from quantfish.leaderboard.ranking import ScoringWeights, calculate_leaderboard_score
 from quantfish.leaderboard.sql_scoring import score_sort_expression
 from quantfish.platform_config import ConfigRepository, ConfigService
-from quantfish.admin_console.settings_history import AdminSettingsHistoryRepository
-from quantfish.submissions.models import (
-    Submission,
-    SubmissionStatus,
-    submission_label,
-    team_public_payload,
-)
 from quantfish.submissions.error_details import raw_submission_error, submission_has_raw_error
 from quantfish.submissions.listing import (
     SubmissionListParams,
     team_name_map,
 )
+from quantfish.submissions.models import (
+    Submission,
+    SubmissionStatus,
+    submission_label,
+)
 from quantfish.submissions.result_staleness import is_zero_result_stale
 from quantfish.submissions.score_summary import score_summary_for_submission
-
 
 _RELEASE_GENERATION_UNAVAILABLE = object()
 
@@ -195,7 +193,7 @@ class AdminConsoleService:
         )
         if not callable(generation_for):
             return stale_ids
-        generation_by_track: dict[Any, str | None | object] = {}
+        generation_by_track: dict[Any, str | object | None] = {}
         for submission in self.submission_repository.list_all():
             if submission.status != SubmissionStatus.COMPLETED:
                 continue

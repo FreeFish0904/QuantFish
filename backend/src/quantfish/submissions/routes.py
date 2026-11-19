@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 import importlib.util
+from dataclasses import asdict
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -47,7 +47,6 @@ from quantfish.web_app.response_models import (
     SubmissionOptionsResponse,
     SubmissionSummary,
 )
-
 
 router = APIRouter(prefix="/api/submissions", tags=["submissions"])
 DEFAULT_SUBMISSION_LIST_LIMIT = 100

@@ -11,7 +11,6 @@ from quantfish.submissions.participant_session import (
 )
 from quantfish.web_app.response_models import ParticipantSessionResponse
 
-
 router = APIRouter(prefix="/api/session", tags=["session"])
 
 

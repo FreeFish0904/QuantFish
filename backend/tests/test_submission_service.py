@@ -1,12 +1,14 @@
-from dataclasses import dataclass, replace
-from datetime import date, datetime, timedelta, timezone
 import json
-from pathlib import Path
+import re
 import subprocess
 import sys
 import threading
 import time
+from dataclasses import dataclass, replace
+from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from types import SimpleNamespace
+from typing import ClassVar
 
 import pandas as pd
 import pytest
@@ -24,6 +26,9 @@ from quantfish.platform_config import (
     PlatformConfig,
 )
 from quantfish.submissions.artifacts import ReportArtifactReader
+from quantfish.submissions.dispatcher import SubmissionScoringDispatcher
+from quantfish.submissions.error_details import WORKER_FAILURE_FILE, submission_has_raw_error
+from quantfish.submissions.listing import SubmissionListParams, submission_page
 from quantfish.submissions.models import (
     ScoreFingerprints,
     Submission,
@@ -31,16 +36,13 @@ from quantfish.submissions.models import (
     SubmissionMetrics,
     SubmissionStatus,
     Team,
-    submission_detail_payload,
     submission_list_payload,
     team_public_payload,
 )
-from quantfish.submissions.dispatcher import SubmissionScoringDispatcher
-from quantfish.submissions.error_details import WORKER_FAILURE_FILE, submission_has_raw_error
 from quantfish.submissions.repositories import SubmissionRepository, TeamRepository
 from quantfish.submissions.runners import BacktestSubmissionRunner
-from quantfish.submissions.listing import SubmissionListParams, submission_page
-from quantfish.submissions.score_worker import main as score_worker_main, score_submission
+from quantfish.submissions.score_worker import main as score_worker_main
+from quantfish.submissions.score_worker import score_submission
 from quantfish.submissions.service import SubmissionCooldownError, SubmissionService
 from quantfish.submissions.storage import SubmissionStorage
 
@@ -767,7 +769,7 @@ def test_submission_service_rejects_same_team_uploads_inside_cooldown(
 
     stored_first = submissions.get(first.submission_id)
     assert stored_first is not None
-    old_enough = datetime.now(timezone.utc) - timedelta(seconds=3)
+    old_enough = datetime.now(UTC) - timedelta(seconds=3)
     submissions.save(
         replace(
             stored_first,
@@ -1222,7 +1224,7 @@ def test_submission_storage_validates_uploads_and_generates_student_text(
 ) -> None:
     storage = SubmissionStorage(tmp_path / "runtime", max_upload_bytes=80)
 
-    with pytest.raises(ValueError, match="Python .py"):
+    with pytest.raises(ValueError, match=re.escape("Python .py")):
         storage.store_strategy("sub-1", "strategy.txt", b"print('no')\n")
     with pytest.raises(ValueError, match="exceeds"):
         storage.store_strategy("sub-1", "strategy.py", b"x" * 81)
@@ -1260,7 +1262,7 @@ class FakePopen:
     stderr_payload = ""
     returncode_payload = 0
     timeout = False
-    calls: dict[str, object] = {}
+    calls: ClassVar[dict[str, object]] = {}
     terminated = False
     killed = False
 

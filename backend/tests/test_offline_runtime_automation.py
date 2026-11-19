@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
+import re
 import subprocess
 import sys
 import zipfile
+from pathlib import Path
 
 import pytest
 
+from quantfish.platform_config import ConfigRepository
 from quantfish.student_exports.runtime_packages import (
     RuntimeBuildRequest,
     build_runtime_package,
@@ -16,7 +18,6 @@ from quantfish.student_exports.runtime_packages import (
 )
 from quantfish.student_exports.service import StudentExportService
 from quantfish.web_app.settings import WebSettings
-from quantfish.platform_config import ConfigRepository
 
 
 def _write_runtime_zip(path: Path, executable: str) -> None:
@@ -59,7 +60,7 @@ def test_import_runtime_package_rejects_zip_without_expected_python(tmp_path: Pa
     source_zip = tmp_path / "windows-x86_64.zip"
     _write_runtime_zip(source_zip, "bin/python")
 
-    with pytest.raises(ValueError, match="python.exe"):
+    with pytest.raises(ValueError, match=re.escape("python.exe")):
         import_runtime_package(
             platform="windows-x86_64",
             zip_path=source_zip,
@@ -95,8 +96,7 @@ print(payload["platform"])
         cwd=Path.cwd(),
         env=env,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
     )
 
     assert result.returncode == 0, result.stderr
@@ -127,8 +127,7 @@ print(monitor.__name__)
         cwd=Path.cwd(),
         env=env,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
     )
 
     assert result.returncode == 0, result.stderr

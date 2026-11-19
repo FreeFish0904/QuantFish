@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import time
-from typing import Sequence
+from collections.abc import Sequence
+from pathlib import Path
 
 from quantfish.platform_config import ConfigRepository
 from quantfish.student_exports.service import StudentExportService

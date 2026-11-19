@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-from pathlib import Path
 import subprocess
 import tarfile
-
+from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = PROJECT_ROOT / "scripts" / "backup-quantfish-user-data.sh"

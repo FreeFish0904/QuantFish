@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 from quantfish.submissions.starter_strategy import starter_strategy_text as _starter_strategy_text
 

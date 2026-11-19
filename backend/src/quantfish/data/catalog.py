@@ -1,32 +1,33 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
 import json
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any
 
 
 @dataclass(frozen=True)
 class DatasetSpec:
     dataset_id: str
-    aliases: List[str]
-    csmar_table_code: Optional[str]
+    aliases: list[str]
+    csmar_table_code: str | None
     relative_path: str
     format: str
     is_static: bool
-    date_columns: List[str] = field(default_factory=list)
-    primary_asof_column: Optional[str] = None
-    symbol_column: Optional[str] = None
-    column_descriptions: Dict[str, Dict[str, str]] = field(default_factory=dict)
-    doc_paths: List[str] = field(default_factory=list)
-    row_count: Optional[int] = None
-    source_row_count: Optional[int] = None
+    date_columns: list[str] = field(default_factory=list)
+    primary_asof_column: str | None = None
+    symbol_column: str | None = None
+    column_descriptions: dict[str, dict[str, str]] = field(default_factory=dict)
+    doc_paths: list[str] = field(default_factory=list)
+    row_count: int | None = None
+    source_row_count: int | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DatasetSpec":
+    def from_dict(cls, data: dict[str, Any]) -> DatasetSpec:
         return cls(
             dataset_id=data["dataset_id"],
             aliases=list(data.get("aliases", [])),
@@ -46,25 +47,25 @@ class DatasetSpec:
 
 @dataclass
 class DataCatalog:
-    root: Optional[str]
-    datasets: List[DatasetSpec]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    root: str | None
+    datasets: list[DatasetSpec]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self._index = self._build_index(self.datasets)
 
     @staticmethod
-    def _build_index(datasets: Iterable[DatasetSpec]) -> Dict[str, DatasetSpec]:
-        index: Dict[str, DatasetSpec] = {}
+    def _build_index(datasets: Iterable[DatasetSpec]) -> dict[str, DatasetSpec]:
+        index: dict[str, DatasetSpec] = {}
         for spec in datasets:
-            keys = [spec.dataset_id] + list(spec.aliases)
+            keys = [spec.dataset_id, *spec.aliases]
             for key in keys:
                 if key in index and index[key].dataset_id != spec.dataset_id:
                     raise ValueError(f"duplicate dataset key: {key}")
                 index[key] = spec
         return index
 
-    def list_datasets(self) -> List[str]:
+    def list_datasets(self) -> list[str]:
         return sorted(spec.dataset_id for spec in self.datasets)
 
     def resolve(self, dataset_id_or_alias: str) -> DatasetSpec:
@@ -76,12 +77,12 @@ class DataCatalog:
     def describe(self, dataset_id_or_alias: str) -> DatasetSpec:
         return self.resolve(dataset_id_or_alias)
 
-    def path_for(self, dataset_id_or_alias: str, root: Optional[Path] = None) -> Path:
+    def path_for(self, dataset_id_or_alias: str, root: Path | None = None) -> Path:
         spec = self.resolve(dataset_id_or_alias)
         base = root or (Path(self.root) if self.root else Path("."))
         return base / spec.relative_path
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "root": self.root,
             "metadata": self.metadata,
@@ -92,7 +93,7 @@ class DataCatalog:
         return json.dumps(self.to_dict(), ensure_ascii=False, indent=2, sort_keys=True)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DataCatalog":
+    def from_dict(cls, data: dict[str, Any]) -> DataCatalog:
         return cls(
             root=data.get("root"),
             metadata=dict(data.get("metadata", {})),
@@ -100,11 +101,11 @@ class DataCatalog:
         )
 
     @classmethod
-    def from_json(cls, text: str) -> "DataCatalog":
+    def from_json(cls, text: str) -> DataCatalog:
         return cls.from_dict(json.loads(text))
 
     @classmethod
-    def load(cls, path: Path | str) -> "DataCatalog":
+    def load(cls, path: Path | str) -> DataCatalog:
         catalog_path = Path(path)
         return cls.from_json(catalog_path.read_text(encoding="utf-8"))
 

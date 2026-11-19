@@ -8,7 +8,6 @@ import pandas as pd
 from quantfish.data.scoring_datasets import INDUSTRY_DATASET
 from quantfish.stock_codes import normalize_stock_code
 
-
 DEFAULT_INDUSTRY_DATASET = INDUSTRY_DATASET
 INDUSTRY_COLUMN_CANDIDATES = [
     "IndustryName",
@@ -92,7 +91,7 @@ def neutralize_scores_by_industry(
         enabled=True,
         dataset=dataset,
         industry_column=industry_column,
-        signal_rows=int(len(scores)),
+        signal_rows=len(scores),
         neutralized_rows=int(neutralizable.sum()),
         missing_industry_rows=int(missing_industry.sum()),
         industry_count=int(merged.loc[known_industry, "industry"].nunique()),

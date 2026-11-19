@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
+from dataclasses import dataclass
 
 import pandas as pd
 
 from quantfish.backtest.equity import arithmetic_equity, relative_drawdown_from_equity
 from quantfish.backtest.simulator import BacktestResult
-
 
 TRADING_DAYS_PER_YEAR = 252
 PERFORMANCE_TABLE_COLUMNS = [
@@ -263,7 +262,7 @@ def _summarize_group_returns(group_returns: pd.DataFrame) -> pd.DataFrame:
     records = []
     for group, group_rows in rows.groupby("group", sort=True):
         cumulative = float(group_rows["return"].sum())
-        count = int(len(group_rows))
+        count = len(group_rows)
         records.append(
             {
                 "group": group,
@@ -324,7 +323,7 @@ def _cagr(returns: pd.Series) -> float | None:
     equity = _compounded_equity(returns)
     if equity is None:
         return None
-    count = int(len(returns))
+    count = len(returns)
     if count <= 0:
         return 0.0
     ending_value = float(equity.iloc[-1])

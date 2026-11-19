@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
+from dataclasses import dataclass
 
 import pandas as pd
 
 from quantfish.backtest.equity import arithmetic_equity, relative_drawdown_from_equity
 from quantfish.backtest.metrics import TRADING_DAYS_PER_YEAR
-
 
 HS300_BENCHMARK_LABEL = "hs300"
 MIN_EXCESS_OBSERVATIONS = 20
@@ -125,7 +124,7 @@ def calculate_benchmark_relative_metrics(
     strategy_returns = aligned[return_column].astype(float)
     benchmark_returns = aligned["benchmark_return"].astype(float)
     excess_returns = strategy_returns - benchmark_returns
-    count = int(len(aligned))
+    count = len(aligned)
 
     strategy_total_return = float(strategy_returns.sum())
     benchmark_total_return = float(benchmark_returns.sum())

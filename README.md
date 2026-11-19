@@ -145,6 +145,15 @@ with no server at all. `.github/workflows/pages.yml` publishes it on every push 
 - **Offline classroom kit.** `quantfish.student_exports` builds student data zips and
   conda-packed offline runtimes with a dependency-signature manifest, so a classroom can
   work without internet access.
+- **Operable by default.** `GET /api/health` is a liveness ping; `GET /api/ready` checks
+  the runtime directory, the submission store, the platform config and the scoring
+  dispatcher, answers `503` when a critical check fails and includes a per-check payload
+  (see [docs/observability.md](docs/observability.md)). Every `/api/*` request logs one
+  `event=request` line with a request id, and scoring failures keep their traceback in the
+  server log instead of only a truncated `error_message` in the database.
+- **Gated in CI.** `ruff check`, `eslint --max-warnings=0`, pytest with coverage, vitest,
+  `tsc -b && vite build`, plus a job that regenerates `api-types.ts` from the live OpenAPI
+  schema and fails on drift.
 
 ## Repository layout
 

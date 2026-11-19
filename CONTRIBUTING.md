@@ -77,6 +77,10 @@ data/                    placeholder for generated datasets (git-ignored)
   reflowing files; `ruff format` is a separate, opt-in change.
 - **Config over constants.** Tunables belong in `config/platform.yaml` and are
   validated by `quantfish.platform_config`. Avoid duplicate defaults in code.
+- **Log events, not sentences.** Use
+  `log_event(logger, logging.INFO, "score_completed", submission_id=...)` so lines
+  stay `event=… key=value` greppable. Never log strategy source, passwords,
+  cookies or request bodies. See [docs/observability.md](docs/observability.md).
 - **Types at the boundary.** API contracts come from the FastAPI models. After
   touching a route or response model, regenerate the frontend types with
   `npm --prefix frontend run api-types` and commit the result: CI re-runs the

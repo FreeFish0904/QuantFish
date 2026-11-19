@@ -295,6 +295,15 @@ class SubmissionRepository:
                 value = connection.execute("SELECT COUNT(*) FROM submissions").fetchone()[0]
             return int(value)
 
+    def ping(self) -> None:
+        """Cheap readiness probe: raise if the database cannot answer."""
+        with self._lock:
+            connection = self._connect()
+            try:
+                connection.execute("SELECT 1").fetchone()
+            finally:
+                connection.close()
+
     def count_by_team(self) -> dict[str, int]:
         with self._lock:
             with self._connect() as connection:

@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -18,6 +18,7 @@ from quantfish.admin_console.settings_history import AdminSettingsHistoryReposit
 from quantfish.data.release_jobs import DataReleaseBuildService
 from quantfish.data.release_lock import ReleaseLockManager
 from quantfish.leaderboard.routes import router as leaderboard_router
+from quantfish.observability import configure_logging
 from quantfish.platform_config import ConfigRepository
 from quantfish.result_comparison.routes import router as comparison_router
 from quantfish.result_comparison.service import ComparisonService
@@ -31,7 +32,13 @@ from quantfish.submissions.service import SubmissionRunner, SubmissionService
 from quantfish.submissions.session_routes import router as participant_session_router
 from quantfish.submissions.storage import SubmissionStorage
 from quantfish.team_cohorts import TeamCohortRepository, TeamCohortService
-from quantfish.web_app.schemas import HealthResponse
+from quantfish.web_app.readiness import build_readiness_report
+from quantfish.web_app.request_logging import install_request_logging
+from quantfish.web_app.schemas import (
+    HealthResponse,
+    ReadinessCheckResponse,
+    ReadyResponse,
+)
 from quantfish.web_app.settings import WebSettings
 
 
@@ -61,6 +68,7 @@ class AppServices:
     admin_service: AdminConsoleService
     student_export_service: StudentExportService
     data_release_build_service: DataReleaseBuildService
+    config_repository: ConfigRepository
 
 
 def create_app(
@@ -92,6 +100,7 @@ def create_app(
             allow_headers=["*"],
         )
     app.add_middleware(GZipMiddleware, minimum_size=1024)
+    install_request_logging(app)
 
     @app.get("/api/health", response_model=HealthResponse)
     def health() -> HealthResponse:
@@ -99,6 +108,25 @@ def create_app(
             app="QuantFish",
             status="ok",
             engine_version=resolved.engine_version,
+        )
+
+    @app.get("/api/ready", response_model=ReadyResponse)
+    def ready(response: Response) -> ReadyResponse:
+        services = app.state.services
+        report = build_readiness_report(
+            settings=resolved,
+            submission_repository=services.submission_repository,
+            config_repository=services.config_repository,
+            scoring_dispatcher=services.scoring_dispatcher,
+        )
+        response.status_code = report.http_status_code
+        return ReadyResponse(
+            app="QuantFish",
+            status=report.status,
+            engine_version=resolved.engine_version,
+            checks=[
+                ReadinessCheckResponse(**check.to_payload()) for check in report.checks
+            ],
         )
 
     _include_routes(app)
@@ -190,6 +218,7 @@ def _build_services(
         admin_service=admin_service,
         student_export_service=student_export_service,
         data_release_build_service=data_release_build_service,
+        config_repository=config_repository,
     )
 
 
@@ -228,6 +257,7 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     import uvicorn
 
+    configure_logging()
     settings = WebSettings(
         runtime_root=Path(args.runtime_root),
         config_path=Path(args.config),

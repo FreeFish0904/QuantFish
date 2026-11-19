@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 import threading
 from contextlib import nullcontext
 from dataclasses import dataclass, replace
@@ -8,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from quantfish.data.release_lock import ReleaseLockManager
+from quantfish.observability import get_logger, log_event
 from quantfish.platform_config import ConfigRepository
 from quantfish.submissions.artifacts import ReportArtifactReader
 from quantfish.submissions.models import (
@@ -17,6 +19,8 @@ from quantfish.submissions.models import (
     _utc_now,
 )
 from quantfish.submissions.repositories import SubmissionRepository
+
+_LOGGER = get_logger("submissions.dispatcher")
 
 
 @dataclass
@@ -141,12 +145,29 @@ class SubmissionScoringDispatcher:
             if should_pump:
                 self.pump()
 
+    def status(self) -> dict[str, Any]:
+        """Snapshot for the readiness probe; never touches the filesystem."""
+        with self._lock:
+            return {
+                "started": self._started,
+                "stopped": self._stopped,
+                "active_submissions": len(self._active),
+            }
+
     def _score_job(self, job: _ActiveJob) -> None:
         submission = self.submission_repository.get(job.submission_id)
         if submission is None or submission.status != SubmissionStatus.QUEUED:
             return
         strategy_path = Path(submission.strategy_path)
         report_dir = Path(submission.report_dir)
+        log_event(
+            _LOGGER,
+            logging.INFO,
+            "score_started",
+            submission_id=job.submission_id,
+            team_id=submission.team_id,
+            data_track=submission.data_track.value,
+        )
         try:
             with self._release_read_lock(job, submission.data_track):
                 self._score_job_with_release_lock(
@@ -157,6 +178,12 @@ class SubmissionScoringDispatcher:
                 )
         except Exception as exc:
             if job.cancel_event.is_set():
+                log_event(
+                    _LOGGER,
+                    logging.INFO,
+                    "score_cancelled",
+                    submission_id=job.submission_id,
+                )
                 return
             current = self.submission_repository.get(job.submission_id)
             if current is None:
@@ -169,6 +196,15 @@ class SubmissionScoringDispatcher:
                     error_message=str(exc),
                     scored_at=_utc_now(),
                 )
+            )
+            # The database only keeps `str(exc)`; keep the traceback here so a
+            # failing strategy can be diagnosed without re-running it.
+            _LOGGER.exception(
+                "event=score_failed submission_id=%s team_id=%s data_track=%s error=%s",
+                job.submission_id,
+                submission.team_id,
+                submission.data_track.value,
+                type(exc).__name__,
             )
 
     def _score_job_with_release_lock(
@@ -227,6 +263,16 @@ class SubmissionScoringDispatcher:
                 scored_at=_utc_now(),
             )
         )
+        log_event(
+            _LOGGER,
+            logging.INFO,
+            "score_completed",
+            submission_id=job.submission_id,
+            team_id=submission.team_id,
+            data_track=submission.data_track.value,
+            sharpe=metrics.sharpe,
+            trading_days=metrics.trading_days,
+        )
 
     def _release_read_lock(
         self,
@@ -262,7 +308,14 @@ class SubmissionScoringDispatcher:
     def _concurrency_limit(self) -> int:
         try:
             return max(1, int(self.config_repository.load().execution.max_concurrent_scoring))
-        except Exception:
+        except Exception as exc:
+            # Never block the queue on a broken config, but do not hide it.
+            log_event(
+                _LOGGER,
+                logging.WARNING,
+                "concurrency_limit_fallback",
+                error=type(exc).__name__,
+            )
             return 1
 
 

@@ -32,6 +32,9 @@ FastAPI wires feature-owned routers in `backend/src/quantfish/web_app/app.py`:
 - `/api/compare` combines artifacts for selected submissions.
 - `/api/admin/*` handles admin auth, settings, teams, submissions, source/error viewing, and downloads.
 - `/api/downloads/*` serves learning data and optional platform runtime zips.
+- `/api/health` is the liveness ping and `/api/ready` is the readiness probe (runtime
+  directory, submission store, platform config, frontend bundle, scoring dispatcher); see
+  [observability.md](observability.md) for the payload and the log format.
 
 ## Service And Engine Flow
 

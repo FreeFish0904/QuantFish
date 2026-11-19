@@ -51,6 +51,6 @@ RUN python scripts/gen_sample_dataset.py --config config/platform.demo.yaml
 EXPOSE 8010
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=12 \
-  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8010/api/health').status==200 else 1)"
+  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8010/api/ready').status==200 else 1)"
 
 ENTRYPOINT ["./deploy/entrypoint.sh"]

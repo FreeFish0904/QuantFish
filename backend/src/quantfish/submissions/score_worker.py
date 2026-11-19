@@ -13,6 +13,7 @@ import pandas as pd
 from quantfish.backtest import run_student_backtest
 from quantfish.backtest.report_writer import write_backtest_report
 from quantfish.backtest.simulator import TerminalStalePositionsError
+from quantfish.observability import format_event
 from quantfish.platform_config import ConfigRepository
 from quantfish.submissions.error_details import WORKER_FAILURE_FILE
 from quantfish.submissions.models import (
@@ -105,7 +106,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             json.dumps(failure, ensure_ascii=False),
             encoding="utf-8",
         )
-        print("scoring failed", file=sys.stderr)
+        # stdout/stderr are already restored here, so the parent process
+        # captures this line and the traceback lands in the server log.
+        print(
+            format_event(
+                "score_worker_failed",
+                {
+                    "code": failure["code"],
+                    "error": type(exc).__name__,
+                    "strategy": Path(args.strategy).name,
+                    "report_dir": report_dir.as_posix(),
+                },
+            ),
+            file=sys.stderr,
+        )
+        traceback.print_exc()
         return 1
     finally:
         sys.argv = original_argv

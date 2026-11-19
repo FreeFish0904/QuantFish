@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import signal
 import subprocess
@@ -11,6 +12,7 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
+from quantfish.observability import get_logger, log_event
 from quantfish.platform_config import ConfigRepository
 from quantfish.submissions.error_details import worker_failure_message
 from quantfish.submissions.models import (
@@ -28,6 +30,9 @@ from quantfish.submissions.staleness import (
     sha256_release,
 )
 from quantfish.submissions.track_config import track_release_root, track_scoring_config
+
+_LOGGER = get_logger("submissions.runner")
+_STDERR_TAIL_CHARS = 2000
 
 
 class BacktestSubmissionRunner:
@@ -176,13 +181,21 @@ class ScoreWorkerHandle:
 
     def wait(self) -> SubmissionMetrics:
         try:
-            stdout, _stderr = self.process.communicate(timeout=self.timeout)
+            stdout, stderr = self.process.communicate(timeout=self.timeout)
         except subprocess.TimeoutExpired as exc:
             self.terminate()
             raise TimeoutError(
                 f"scoring timed out after {self.timeout} seconds"
             ) from exc
         if self.process.returncode != 0:
+            log_event(
+                _LOGGER,
+                logging.ERROR,
+                "score_worker_failed",
+                returncode=self.process.returncode,
+                report_dir=self.report_dir.as_posix(),
+                stderr_tail=_tail(stderr),
+            )
             raise RuntimeError(
                 worker_failure_message(self.report_dir) or "score worker failed"
             )
@@ -210,6 +223,15 @@ class ScoreWorkerHandle:
             os.killpg(self.process.pid, signal.SIGKILL)
         except (AttributeError, ProcessLookupError, PermissionError, OSError):
             self.process.kill()
+
+
+def _tail(text: str | None) -> str | None:
+    if not text:
+        return None
+    trimmed = text.strip()
+    if not trimmed:
+        return None
+    return trimmed[-_STDERR_TAIL_CHARS:]
 
 
 def _worker_environment() -> dict[str, str]:

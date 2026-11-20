@@ -178,17 +178,8 @@ def simulate_backtest(
         limit_up = source_limit_up | fallback_limit_up
         limit_down = source_limit_down | fallback_limit_down
         if mode == "longshort":
-            blocked = (
-                ~tradable_values[index]
-                | ~(valid_close & valid_vwap)
-                | limit_up
-                | limit_down
-            )
-            cap = (
-                10.0
-                * np.nan_to_num(dnvaltrd[index], nan=0.0, posinf=0.0, neginf=0.0)
-                / capital
-            )
+            blocked = ~tradable_values[index] | ~(valid_close & valid_vwap) | limit_up | limit_down
+            cap = 10.0 * np.nan_to_num(dnvaltrd[index], nan=0.0, posinf=0.0, neginf=0.0) / capital
             executed_change = np.clip(desired_change, -cap, cap)
             executed_change[blocked] = 0.0
             current_positions = previous_positions + executed_change
@@ -197,10 +188,7 @@ def simulate_backtest(
                 max_leverage,
             )
         else:
-            base_blocked = (
-                ~tradable_values[index]
-                | ~(valid_close & valid_vwap)
-            )
+            base_blocked = ~tradable_values[index] | ~(valid_close & valid_vwap)
             buy_blocked = base_blocked | limit_up
             sell_blocked = base_blocked | limit_down
             cap = (
@@ -219,18 +207,18 @@ def simulate_backtest(
 
         close_to_vwap_terms = np.zeros(len(symbols), dtype=float)
         close_to_vwap_mask = previous_close_valid & valid_vwap & valid_close
-        close_to_vwap_terms[close_to_vwap_mask] = previous_positions[
-            close_to_vwap_mask
-        ] * (day_vwap[close_to_vwap_mask] / previous_close[close_to_vwap_mask] - 1.0)
+        close_to_vwap_terms[close_to_vwap_mask] = previous_positions[close_to_vwap_mask] * (
+            day_vwap[close_to_vwap_mask] / previous_close[close_to_vwap_mask] - 1.0
+        )
         missing_vwap_mark_mask = previous_close_valid & valid_close & ~valid_vwap
-        close_to_vwap_terms[missing_vwap_mark_mask] = previous_positions[
-            missing_vwap_mark_mask
-        ] * close_return[missing_vwap_mark_mask]
+        close_to_vwap_terms[missing_vwap_mark_mask] = (
+            previous_positions[missing_vwap_mark_mask] * close_return[missing_vwap_mark_mask]
+        )
         vwap_to_close_terms = np.zeros(len(symbols), dtype=float)
         vwap_to_close_mask = valid_vwap & valid_close
-        vwap_to_close_terms[vwap_to_close_mask] = current_positions[
-            vwap_to_close_mask
-        ] * (day_close[vwap_to_close_mask] / day_vwap[vwap_to_close_mask] - 1.0)
+        vwap_to_close_terms[vwap_to_close_mask] = current_positions[vwap_to_close_mask] * (
+            day_close[vwap_to_close_mask] / day_vwap[vwap_to_close_mask] - 1.0
+        )
 
         close_to_vwap = float(close_to_vwap_terms.sum())
         vwap_to_close = float(vwap_to_close_terms.sum())
@@ -247,8 +235,7 @@ def simulate_backtest(
         buy_turnover = float(position_change[position_change > 0].sum())
         sell_turnover = float(-position_change[position_change < 0].sum())
         transaction_cost = (
-            turnover * (commission_rate + slippage_rate)
-            + sell_turnover * sell_stamp_duty_rate
+            turnover * (commission_rate + slippage_rate) + sell_turnover * sell_stamp_duty_rate
         )
         long_exposure = float(current_positions[current_positions > 0].sum())
         short_exposure = float(current_positions[current_positions < 0].sum())
@@ -342,15 +329,12 @@ def _pivot(
     dates: pd.Index,
     symbols: pd.Index,
 ) -> pd.DataFrame:
-    return (
-        rows.pivot_table(
-            index="date",
-            columns="symbol",
-            values=value_column,
-            aggfunc="last",
-        )
-        .reindex(index=dates, columns=symbols)
-    )
+    return rows.pivot_table(
+        index="date",
+        columns="symbol",
+        values=value_column,
+        aggfunc="last",
+    ).reindex(index=dates, columns=symbols)
 
 
 def _optional_numeric_matrix(
@@ -362,9 +346,7 @@ def _optional_numeric_matrix(
     source = rows[column] if column in rows.columns else np.nan
     numeric_rows = rows.assign(**{column: source})
     matrix = _pivot(numeric_rows, column, dates, symbols)
-    return matrix.apply(lambda values: pd.to_numeric(values, errors="coerce")).to_numpy(
-        dtype=float
-    )
+    return matrix.apply(lambda values: pd.to_numeric(values, errors="coerce")).to_numpy(dtype=float)
 
 
 def _finite_number(name: str, value: Any) -> float:
@@ -448,12 +430,9 @@ def _apply_execution_with_gross_limit(
         & (np.sign(previous_positions) != np.sign(executed_change))
         & (np.abs(executed_change) > 1e-12)
     )
-    reducing_change[opposite_direction] = (
-        np.sign(executed_change[opposite_direction])
-        * np.minimum(
-            np.abs(executed_change[opposite_direction]),
-            np.abs(previous_positions[opposite_direction]),
-        )
+    reducing_change[opposite_direction] = np.sign(executed_change[opposite_direction]) * np.minimum(
+        np.abs(executed_change[opposite_direction]),
+        np.abs(previous_positions[opposite_direction]),
     )
     exposure_increasing_change = executed_change - reducing_change
     base_positions = previous_positions + reducing_change

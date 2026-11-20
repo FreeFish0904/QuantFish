@@ -341,9 +341,7 @@ def test_group_returns_use_chinext_twenty_percent_fallback_limit() -> None:
             ]
         ).assign(date=lambda df: pd.to_datetime(df["date"]))
     )
-    scores = pd.DataFrame(
-        [{"date": "2023-01-02", "code": "300001", "score": 1.0}]
-    )
+    scores = pd.DataFrame([{"date": "2023-01-02", "code": "300001", "score": 1.0}])
 
     returns = _calculate_group_returns(panel, scores, group_count=1)
 
@@ -429,9 +427,7 @@ def test_run_student_backtest_returns_public_result_contract(tmp_path: Path) -> 
         pd.Timestamp("2023-01-03"),
         pd.Timestamp("2023-01-04"),
     ]
-    assert result.daily_returns["daily_return"].tolist() == pytest.approx(
-        [0.09, 0.05553620695]
-    )
+    assert result.daily_returns["daily_return"].tolist() == pytest.approx([0.09, 0.05553620695])
     assert result.net_value["net_value"].round(6).tolist() == [1.09, 1.145536]
     assert result.positions[["date", "code", "weight"]].to_dict("records") == [
         {"date": pd.Timestamp("2023-01-03"), "code": "000001", "weight": 0.5},
@@ -583,15 +579,13 @@ def test_run_student_backtest_longonly_scores_active_returns_and_keeps_raw_colum
     assert [point["equity"] for point in result.graph_data["equity"]] == pytest.approx(
         raw_graph_equity.tolist()
     )
-    assert [
-        point["daily_return"] for point in result.graph_data["daily_pnl"]
-    ] == pytest.approx(result.daily_returns["portfolio_return"].tolist())
+    assert [point["daily_return"] for point in result.graph_data["daily_pnl"]] == pytest.approx(
+        result.daily_returns["portfolio_return"].tolist()
+    )
     assert result.graph_data["alpha"][0]["alpha_return"] == pytest.approx(
         result.daily_returns.loc[0, "active_return"]
     )
-    assert [
-        point["excess_return"] for point in result.graph_data["excess"]
-    ] == pytest.approx(
+    assert [point["excess_return"] for point in result.graph_data["excess"]] == pytest.approx(
         [
             strategy - benchmark
             for strategy, benchmark in zip(
@@ -607,7 +601,9 @@ def test_run_student_backtest_longonly_scores_active_returns_and_keeps_raw_colum
     assert "alpha_type" not in result.diagnostics
     assert result.diagnostics["long_only_scoring"]["benchmark"] == "hs300"
     assert result.diagnostics["long_only_scoring"]["risk_free_rate"] == pytest.approx(0.0175)
-    assert result.diagnostics["long_only_scoring"]["risk_free_daily_return"] == pytest.approx(0.0175 / 252)
+    assert result.diagnostics["long_only_scoring"]["risk_free_daily_return"] == pytest.approx(
+        0.0175 / 252
+    )
 
 
 def test_run_student_backtest_unbenchmarked_longonly_tolerates_missing_index(
@@ -618,9 +614,7 @@ def test_run_student_backtest_unbenchmarked_longonly_tolerates_missing_index(
     catalog = DataCatalog.load(data_root / "data_catalog.json")
     DataCatalog(
         root=catalog.root,
-        datasets=[
-            spec for spec in catalog.datasets if spec.dataset_id != "market.index_daily"
-        ],
+        datasets=[spec for spec in catalog.datasets if spec.dataset_id != "market.index_daily"],
     ).save(data_root / "data_catalog.json")
 
     result = run_student_backtest(
@@ -801,12 +795,12 @@ def test_run_student_backtest_keeps_legacy_longshort_participation_model(
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.5, "000002": -0.5, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.5, "000002": -0.5, "300001": 0.0})
 
 
 def test_run_student_backtest_filters_longonly_universe_on_signal_date(
@@ -816,14 +810,12 @@ def test_run_student_backtest_filters_longonly_universe_on_signal_date(
     _write_release(data_root)
     daily_path = data_root / "distribute" / "stock" / "daily_returns.parquet"
     daily = pd.read_parquet(daily_path)
-    illiquid_signal_date = (
-        (daily["TradingDate"] == "2023-01-03")
-        & (daily["Symbol"].map(str).str.zfill(6) == "000001")
+    illiquid_signal_date = (daily["TradingDate"] == "2023-01-03") & (
+        daily["Symbol"].map(str).str.zfill(6) == "000001"
     )
     daily.loc[illiquid_signal_date, ["Dnshrtrd", "Dnvaltrd"]] = 0.0
-    execution_date = (
-        (daily["TradingDate"] == "2023-01-04")
-        & (daily["Symbol"].map(str).str.zfill(6) == "000001")
+    execution_date = (daily["TradingDate"] == "2023-01-04") & (
+        daily["Symbol"].map(str).str.zfill(6) == "000001"
     )
     daily.loc[execution_date, "Clsprc"] = 11.4
     daily.to_parquet(daily_path, index=False)
@@ -861,17 +853,14 @@ def generate_signals(data):
         },
     )
 
-    positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-04")
-    ].set_index("code")["weight"].to_dict()
-    assert positions == pytest.approx(
-        {"000001": 0.0, "000002": 1.0, "300001": 0.0}
+    positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-04")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert positions == pytest.approx({"000001": 0.0, "000002": 1.0, "300001": 0.0})
     assert result.diagnostics["investable_universe"]["non_tradable_rows"] == 1
-    assert (
-        result.diagnostics["investable_universe"]["selection_information_date"]
-        == "signal_date"
-    )
+    assert result.diagnostics["investable_universe"]["selection_information_date"] == "signal_date"
 
 
 def test_run_student_backtest_does_not_use_next_day_tradability_to_promote_runner_up(
@@ -881,9 +870,8 @@ def test_run_student_backtest_does_not_use_next_day_tradability_to_promote_runne
     _write_release(data_root)
     daily_path = data_root / "distribute" / "stock" / "daily_returns.parquet"
     daily = pd.read_parquet(daily_path)
-    blocked_execution = (
-        (daily["TradingDate"] == "2023-01-04")
-        & (daily["Symbol"].map(str).str.zfill(6) == "000001")
+    blocked_execution = (daily["TradingDate"] == "2023-01-04") & (
+        daily["Symbol"].map(str).str.zfill(6) == "000001"
     )
     daily.loc[blocked_execution, ["Dnshrtrd", "Dnvaltrd"]] = 0.0
     daily.to_parquet(daily_path, index=False)
@@ -925,12 +913,12 @@ def generate_signals(data):
         },
     )
 
-    positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-04")
-    ].set_index("code")["weight"].to_dict()
-    assert positions == pytest.approx(
-        {"000001": 0.0, "000002": 0.0, "300001": 0.0}
+    positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-04")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert positions == pytest.approx({"000001": 0.0, "000002": 0.0, "300001": 0.0})
 
 
 def test_run_student_backtest_does_not_apply_longonly_position_cap_to_longshort(
@@ -958,12 +946,12 @@ def test_run_student_backtest_does_not_apply_longonly_position_cap_to_longshort(
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.5, "000002": -0.5, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.5, "000002": -0.5, "300001": 0.0})
     assert result.diagnostics["investable_universe"] is None
 
 
@@ -1011,12 +999,12 @@ def generate_signals(data):
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.5, "000002": -0.5, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.5, "000002": -0.5, "300001": 0.0})
     assert result.diagnostics["investable_universe"] is None
     assert result.diagnostics["long_only_universe"] is None
 
@@ -1066,12 +1054,12 @@ def generate_signals(data):
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.0, "000002": 1.0, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.0, "000002": 1.0, "300001": 0.0})
     assert result.diagnostics["long_only_universe"]["recent_listing_rows"] > 0
     assert result.diagnostics["long_only_universe"]["min_listing_days"] == 60
 
@@ -1121,12 +1109,12 @@ def generate_signals(data):
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.0, "000002": 0.0, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.0, "000002": 0.0, "300001": 0.0})
     assert result.diagnostics["long_only_universe"]["missing_listing_date_rows"] > 0
     assert result.diagnostics["long_only_universe"]["recent_listing_rows"] > 0
 
@@ -1307,12 +1295,12 @@ def generate_signals(data):
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.5, "000002": -0.5, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.5, "000002": -0.5, "300001": 0.0})
     assert result.diagnostics["industry_neutralization"] == {
         "enabled": True,
         "dataset": "basic.STK_INDUSTRYCLASS",
@@ -1366,12 +1354,12 @@ def test_run_student_backtest_longonly_rank_equal_skips_zeroed_missing_industrie
         },
     )
 
-    first_scoring_positions = result.positions[
-        result.positions["date"] == pd.Timestamp("2023-01-03")
-    ].set_index("code")["weight"].to_dict()
-    assert first_scoring_positions == pytest.approx(
-        {"000001": 0.0, "000002": 0.0, "300001": 0.0}
+    first_scoring_positions = (
+        result.positions[result.positions["date"] == pd.Timestamp("2023-01-03")]
+        .set_index("code")["weight"]
+        .to_dict()
     )
+    assert first_scoring_positions == pytest.approx({"000001": 0.0, "000002": 0.0, "300001": 0.0})
     assert result.diagnostics["industry_neutralization"]["missing_industry_rows"] > 0
 
 
@@ -1382,9 +1370,7 @@ def test_run_student_backtest_preflights_industry_neutralization_before_strategy
     _write_release(data_root)
     catalog = DataCatalog.load(data_root / "data_catalog.json")
     catalog.datasets = [
-        spec
-        for spec in catalog.datasets
-        if spec.dataset_id != "basic.STK_INDUSTRYCLASS"
+        spec for spec in catalog.datasets if spec.dataset_id != "basic.STK_INDUSTRYCLASS"
     ]
     catalog.save(data_root / "data_catalog.json")
     strategy_path = tmp_path / "student_strategy.py"

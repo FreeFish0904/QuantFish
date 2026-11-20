@@ -214,18 +214,14 @@ def test_health_probes_are_not_logged_as_requests(
     with TestClient(app) as client:
         client.get("/api/health")
 
-    assert not [
-        record for record in caplog.records if "event=request" in record.getMessage()
-    ]
+    assert not [record for record in caplog.records if "event=request" in record.getMessage()]
 
 
 def test_container_healthcheck_probes_readiness_not_liveness() -> None:
     project_root = Path(__file__).resolve().parents[2]
 
     dockerfile = (project_root / "deploy" / "Dockerfile").read_text(encoding="utf-8")
-    compose = (project_root / "deploy" / "docker-compose.yml").read_text(
-        encoding="utf-8"
-    )
+    compose = (project_root / "deploy" / "docker-compose.yml").read_text(encoding="utf-8")
 
     assert "/api/ready" in dockerfile
     assert "/api/ready" in compose

@@ -50,19 +50,17 @@ class CachedDataBundle(DataBundle):
     ):
         super().__init__(root, allowed_market_types=allowed_market_types)
         self._max_cache_entries = max(1, int(max_cache_entries))
-        self._raw_cache: OrderedDict[
-            tuple[str, tuple[str, ...] | None], pd.DataFrame
-        ] = OrderedDict()
-        self._date_cache: OrderedDict[
-            tuple[str, tuple[str, ...] | None, str], pd.Series
-        ] = OrderedDict()
+        self._raw_cache: OrderedDict[tuple[str, tuple[str, ...] | None], pd.DataFrame] = (
+            OrderedDict()
+        )
+        self._date_cache: OrderedDict[tuple[str, tuple[str, ...] | None, str], pd.Series] = (
+            OrderedDict()
+        )
         self._date_index_cache: OrderedDict[
             tuple[str, tuple[str, ...] | None, str], dict[pd.Timestamp, pd.Index]
         ] = OrderedDict()
 
-    def load_raw(
-        self, dataset_id_or_alias: str, columns: list[str] | None = None
-    ) -> pd.DataFrame:
+    def load_raw(self, dataset_id_or_alias: str, columns: list[str] | None = None) -> pd.DataFrame:
         return self._load_raw_for_dated_access(dataset_id_or_alias, columns).copy()
 
     def _load_raw_for_dated_access(
@@ -336,9 +334,7 @@ def _load_strategy_module(strategy_path: Path) -> ModuleType:
     return module
 
 
-def _trading_dates(
-    bundle: DataBundle, config: StrategyExecutionConfig
-) -> list[pd.Timestamp]:
+def _trading_dates(bundle: DataBundle, config: StrategyExecutionConfig) -> list[pd.Timestamp]:
     spec = bundle.describe(config.canonical_panel)
     if spec.primary_asof_column is None:
         raise StrategySignalError(
@@ -397,9 +393,7 @@ def _signals_to_frame(raw_signals: Any) -> pd.DataFrame:
         if len(raw_signals.columns) == 1:
             column = raw_signals.columns[0]
             return pd.DataFrame({"code": raw_signals.index, "score": raw_signals[column]})
-    raise StrategySignalError(
-        "generate_signals must return a pandas Series or DataFrame of scores"
-    )
+    raise StrategySignalError("generate_signals must return a pandas Series or DataFrame of scores")
 
 
 def _normalize_code(value: Any) -> str:

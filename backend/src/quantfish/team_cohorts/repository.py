@@ -28,7 +28,9 @@ class TeamCohortRepository:
         return None
 
     def save_all(self, cohorts: Iterable[TeamCohort]) -> None:
-        ordered = sorted(cohorts, key=lambda cohort: (cohort.created_at, cohort.name, cohort.cohort_id))
+        ordered = sorted(
+            cohorts, key=lambda cohort: (cohort.created_at, cohort.name, cohort.cohort_id)
+        )
         with self._lock:
             _atomic_write_json(self.path, [cohort.to_dict() for cohort in ordered])
 

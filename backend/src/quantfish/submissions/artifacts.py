@@ -134,11 +134,7 @@ class ReportArtifactReader:
 
     def _read_diagnostics(self, path: Path) -> dict[str, Any]:
         diagnostics = self._read_json(path)
-        return {
-            key: value
-            for key, value in diagnostics.items()
-            if key in PUBLIC_DIAGNOSTIC_KEYS
-        }
+        return {key: value for key, value in diagnostics.items() if key in PUBLIC_DIAGNOSTIC_KEYS}
 
     def _read_parquet_artifacts(self, root: Path) -> dict[str, list[dict[str, Any]]]:
         artifacts: dict[str, list[dict[str, Any]]] = {}

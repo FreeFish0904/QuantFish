@@ -35,9 +35,7 @@ def _build_fixture_release(tmp_path: Path) -> Path:
 
     static_dir = source / "distribute" / "basic"
     static_dir.mkdir(parents=True)
-    pd.DataFrame([{"Code": "A", "Name": "Alpha"}]).to_csv(
-        static_dir / "lookup.csv", index=False
-    )
+    pd.DataFrame([{"Code": "A", "Name": "Alpha"}]).to_csv(static_dir / "lookup.csv", index=False)
 
     output = tmp_path / "release"
     build_release(source, output, end="2025-12-31")

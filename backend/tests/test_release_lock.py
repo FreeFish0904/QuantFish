@@ -110,7 +110,8 @@ def test_waiting_writer_prevents_later_readers_from_leapfrogging(
 def test_release_lock_rejects_unsafe_track_names(tmp_path: Path) -> None:
     manager = ReleaseLockManager(tmp_path / "locks")
 
-    with pytest.raises(ValueError, match="invalid release lock name"), manager.write(
-        "../learning_1"
+    with (
+        pytest.raises(ValueError, match="invalid release lock name"),
+        manager.write("../learning_1"),
     ):
         pass

@@ -162,9 +162,7 @@ class AdminConsoleService:
         if self.settings_history_repository is None:
             raise RuntimeError("settings history repository unavailable")
         submissions = (
-            self.submission_repository.list_all()
-            if self.submission_repository is not None
-            else []
+            self.submission_repository.list_all() if self.submission_repository is not None else []
         )
         submission_ids = [
             submission.submission_id
@@ -205,17 +203,12 @@ class AdminConsoleService:
                         submission.data_track
                     )
                 except Exception:
-                    generation_by_track[
-                        submission.data_track
-                    ] = _RELEASE_GENERATION_UNAVAILABLE
+                    generation_by_track[submission.data_track] = _RELEASE_GENERATION_UNAVAILABLE
             current_generation = generation_by_track[submission.data_track]
             fingerprints = submission.fingerprints
             if (
                 current_generation is _RELEASE_GENERATION_UNAVAILABLE
-                or (
-                    fingerprints is None
-                    and current_generation is not None
-                )
+                or (fingerprints is None and current_generation is not None)
                 or (
                     fingerprints is not None
                     and (
@@ -236,9 +229,7 @@ class AdminConsoleService:
         counts = self._submission_counts_by_team()
         cohorts = self._cohorts()
         cohort_by_team = {
-            team_id: cohort
-            for cohort in cohorts
-            for team_id in getattr(cohort, "team_ids", ())
+            team_id: cohort for cohort in cohorts for team_id in getattr(cohort, "team_ids", ())
         }
         active = [
             self._team_record(
@@ -723,7 +714,9 @@ class AdminConsoleService:
         team_names: dict[str, str] | None = None,
         include_raw_error: bool = True,
     ) -> dict[str, Any]:
-        names = team_names if team_names is not None else team_name_map(self.team_repository.list_all())
+        names = (
+            team_names if team_names is not None else team_name_map(self.team_repository.list_all())
+        )
         scoring_weights = weights or self.scoring_weights()
         score_summary = score_summary_for_submission(submission, self.artifact_reader)
         stale = self._is_stale(
@@ -766,7 +759,11 @@ class AdminConsoleService:
     ) -> bool:
         if submission.status != SubmissionStatus.COMPLETED:
             return False
-        stale_ids = stale_submission_ids if stale_submission_ids is not None else self.active_stale_submission_ids()
+        stale_ids = (
+            stale_submission_ids
+            if stale_submission_ids is not None
+            else self.active_stale_submission_ids()
+        )
         return submission.submission_id in stale_ids or is_zero_result_stale(
             submission,
             summary,
@@ -784,6 +781,7 @@ class AdminConsoleService:
             self.submission_repository.save(_submission_for_rescore(submission))
             requeued += 1
         return requeued
+
 
 def _admin_status(status: SubmissionStatus) -> str:
     return {

@@ -64,9 +64,7 @@ def _expected_execution_parameters(
         "mark_price": backtest["mark_price"],
         "long_only_benchmark": backtest["long_only_benchmark"],
         "long_only_risk_free_rate": backtest["long_only_risk_free_rate"],
-        "long_only_min_beta_observations": backtest[
-            "long_only_min_beta_observations"
-        ],
+        "long_only_min_beta_observations": backtest["long_only_min_beta_observations"],
         "commission_rate": execution["commission_rate"],
         "slippage_rate": execution["slippage_rate"],
         "sell_stamp_duty_rate": execution["sell_stamp_duty_rate"],
@@ -78,9 +76,7 @@ def _expected_execution_parameters(
         "max_position_weight": execution["max_position_weight"],
         "max_participation_rate": execution["max_participation_rate"],
         "min_listing_days": execution["min_listing_days"],
-        "terminal_stale_position_policy": execution[
-            "terminal_stale_position_policy"
-        ],
+        "terminal_stale_position_policy": execution["terminal_stale_position_policy"],
         "allowed_market_types": execution["allowed_market_types"],
         "submission_timeout_enabled": execution["submission_timeout_enabled"],
         "submission_timeout_seconds": execution["submission_timeout_seconds"],
@@ -105,7 +101,9 @@ def _login(client: TestClient) -> None:
     assert response.status_code == 200
 
 
-def _create_team(client: TestClient, team_name: str = "Team Alpha", password: str = "secret") -> dict:
+def _create_team(
+    client: TestClient, team_name: str = "Team Alpha", password: str = "secret"
+) -> dict:
     _login(client)
     response = client.post(
         "/api/admin/teams",
@@ -242,9 +240,7 @@ class FakeSubmissionRunner:
 
 class TrackFingerprintRunner(FakeSubmissionRunner):
     def __init__(self) -> None:
-        self.release_sha_by_track = {
-            track: "catalog" for track in SubmissionDataTrack
-        }
+        self.release_sha_by_track = {track: "catalog" for track in SubmissionDataTrack}
         self.release_generation_by_track: dict[SubmissionDataTrack, str | None] = {
             track: None for track in SubmissionDataTrack
         }
@@ -319,7 +315,9 @@ class FakeStudentExportService:
         self.environment_zip = self.root / "environment-macos-arm64.zip"
         with zipfile.ZipFile(self.learning_zip, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             archive.writestr("data_releases/learning/data_catalog.json", "{}")
-        with zipfile.ZipFile(self.environment_zip, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        with zipfile.ZipFile(
+            self.environment_zip, "w", compression=zipfile.ZIP_DEFLATED
+        ) as archive:
             archive.writestr("README.zh-CN.md", "# QuantFish")
 
     def learning_data_zip_path(self) -> Path:
@@ -417,7 +415,7 @@ def test_frontend_deep_links_fall_back_to_spa_index(tmp_path: Path) -> None:
     frontend_dist = tmp_path / "frontend-dist"
     frontend_dist.mkdir()
     (frontend_dist / "index.html").write_text(
-        "<!doctype html><title>QuantFish</title><div id=\"root\"></div>",
+        '<!doctype html><title>QuantFish</title><div id="root"></div>',
         encoding="utf-8",
     )
     client = TestClient(
@@ -568,7 +566,13 @@ def test_logged_in_participant_can_upload_without_retyping_credentials(
     unauthenticated_upload = client.post(
         "/api/submissions",
         data={"data_track": "hidden_test"},
-        files={"file": ("strategy.py", b"def generate_signals(data):\n    return []\n", "text/x-python")},
+        files={
+            "file": (
+                "strategy.py",
+                b"def generate_signals(data):\n    return []\n",
+                "text/x-python",
+            )
+        },
     )
     assert unauthenticated_upload.status_code == 401
     assert unauthenticated_upload.json()["detail"] == "team login required"
@@ -633,9 +637,7 @@ def test_logged_in_participant_can_view_only_own_submission_source(
     Path(missing_source.strategy_path).unlink()
 
     anonymous = TestClient(app)
-    unauthenticated = anonymous.get(
-        f"/api/submissions/{alpha_submission.submission_id}/source"
-    )
+    unauthenticated = anonymous.get(f"/api/submissions/{alpha_submission.submission_id}/source")
 
     client = TestClient(app)
     login_response = client.post(
@@ -738,9 +740,7 @@ def test_submission_upload_detail_leaderboard_and_compare_routes(
         "calmar": 567.0,
     }
     assert detail["artifacts"]["graph_data"]["equity"][1]["equity"] == 1.21
-    assert detail["artifacts"]["diagnostics"] == {
-        "scoring_dates": ["2026-01-01", "2026-01-02"]
-    }
+    assert detail["artifacts"]["diagnostics"] == {"scoring_dates": ["2026-01-01", "2026-01-02"]}
     assert detail["execution_parameters"] == expected_execution_parameters
     assert "strategy_path" not in detail
     assert "report_dir" not in detail
@@ -799,10 +799,13 @@ def test_learning_tracks_run_history_detail_compare_and_track_leaderboard(
     )
     client = TestClient(app)
     _login(client)
-    assert client.post(
-        "/api/admin/teams",
-        json={"team_name": "Team Alpha", "password": "secret"},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/admin/teams",
+            json={"team_name": "Team Alpha", "password": "secret"},
+        ).status_code
+        == 200
+    )
 
     upload_response = client.post(
         "/api/submissions",
@@ -871,7 +874,9 @@ def test_submission_history_and_detail_expose_raw_error_logs(tmp_path: Path) -> 
     client = TestClient(app)
     team = _create_team(client)
     strategy_path = tmp_path / "broken_strategy.py"
-    strategy_path.write_text("def generate_signals(data):\n    raise RuntimeError('boom')\n", encoding="utf-8")
+    strategy_path.write_text(
+        "def generate_signals(data):\n    raise RuntimeError('boom')\n", encoding="utf-8"
+    )
     report_dir = tmp_path / "runtime" / "reports" / "failed-submission"
     report_dir.mkdir(parents=True)
     (report_dir / "worker_error.log").write_text(
@@ -926,10 +931,13 @@ def test_hidden_test_toggle_only_controls_new_hidden_uploads(
     )
     client = TestClient(app)
     _login(client)
-    assert client.post(
-        "/api/admin/teams",
-        json={"team_name": "Team Alpha", "password": "secret"},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/admin/teams",
+            json={"team_name": "Team Alpha", "password": "secret"},
+        ).status_code
+        == 200
+    )
 
     hidden_upload = client.post(
         "/api/submissions",
@@ -1201,19 +1209,17 @@ def test_existing_submission_scores_are_recalculated_from_report_short_profit(
     assert leaderboard[0]["score"] == pytest.approx(1.7)
     assert detail["score"] == pytest.approx(expected_score)
     assert admin_submissions[0]["score"] == pytest.approx(expected_score)
-    assert {
-        item["key"] for item in detail["score_breakdown"]
-    } >= {"short_profit_penalty"}
+    assert {item["key"] for item in detail["score_breakdown"]} >= {"short_profit_penalty"}
     assert detail["metrics"]["average_short_exposure"] == pytest.approx(-0.5)
     assert detail["metrics"]["short_total_return"] == pytest.approx(0.08)
     assert detail["metrics"]["annualized_short_profit"] == pytest.approx(0.10)
     assert detail["metrics"]["terminal_stale_position_count"] == 3
-    assert detail["metrics"]["terminal_stale_gross_exposure"] == pytest.approx(
-        0.058303
-    )
+    assert detail["metrics"]["terminal_stale_gross_exposure"] == pytest.approx(0.058303)
 
 
-def test_score_worker_uses_current_execution_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_score_worker_uses_current_execution_settings(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     config_path = _copied_config(tmp_path)
     settings = _settings(tmp_path, config_path=config_path)
     client = TestClient(create_app(settings))
@@ -1289,7 +1295,10 @@ def test_leaderboard_shows_best_submission_per_team_while_history_lists_all(
 
     for team_name, body in (
         ("Team Alpha", b"def generate_signals(data):\n    return []\n"),
-        ("Team Alpha", b"def generate_signals(data):\n    return data.current('stock.daily_returns')\n"),
+        (
+            "Team Alpha",
+            b"def generate_signals(data):\n    return data.current('stock.daily_returns')\n",
+        ),
         ("Team Beta", b"def generate_signals(data):\n    return []\n"),
     ):
         response = client.post(
@@ -1379,15 +1388,11 @@ def test_hidden_team_cohort_is_suppressed_except_dedicated_admin_history(
         },
     ).json()["submissions"]
     hidden_detail = client.get(f"/api/submissions/{hidden_submission.submission_id}")
-    hidden_raw_error = client.get(
-        f"/api/submissions/{hidden_submission.submission_id}/raw-error"
-    )
+    hidden_raw_error = client.get(f"/api/submissions/{hidden_submission.submission_id}/raw-error")
     hidden_admin_source = client.get(
         f"/api/admin/submissions/{hidden_submission.submission_id}/source"
     )
-    cohort_history = client.get(
-        f"/api/admin/team-cohorts/{cohort['cohort_id']}/submissions"
-    ).json()
+    cohort_history = client.get(f"/api/admin/team-cohorts/{cohort['cohort_id']}/submissions").json()
 
     assert [row["submission_id"] for row in history] == [visible_submission.submission_id]
     assert [row["submission_id"] for row in admin_history] == [visible_submission.submission_id]
@@ -1541,10 +1546,14 @@ def test_leaderboard_data_track_filter_keeps_best_learning_submission_per_team(
     )
 
     hidden_payload = TestClient(app).get("/api/leaderboard").json()
-    learning_payload = TestClient(app).get(
-        "/api/leaderboard",
-        params={"data_track": "learning"},
-    ).json()
+    learning_payload = (
+        TestClient(app)
+        .get(
+            "/api/leaderboard",
+            params={"data_track": "learning"},
+        )
+        .json()
+    )
 
     assert [row["id"] for row in hidden_payload["rows"]] == ["hidden-best"]
     assert hidden_payload["count"] == 1
@@ -1606,9 +1615,7 @@ def test_release_rebuild_marks_only_existing_completed_track_scores_ineligible(
     )
 
     runner.release_sha_by_track[SubmissionDataTrack.LEARNING_1] = "rebuilt-catalog"
-    runner.release_generation_by_track[SubmissionDataTrack.LEARNING_1] = (
-        "learning-1-generation-2"
-    )
+    runner.release_generation_by_track[SubmissionDataTrack.LEARNING_1] = "learning-1-generation-2"
 
     client = TestClient(app)
     learning_1_rows = client.get(
@@ -1639,9 +1646,7 @@ def test_release_rebuild_marks_only_existing_completed_track_scores_ineligible(
     assert rerun.status_code == 200
     assert rerun.json()["queued_submission_ids"] == ["learning-one-old-score"]
     rescored_detail = _wait_for_submission(client, "learning-one-old-score")
-    assert rescored_detail["fingerprints"]["release_generation"] == (
-        "learning-1-generation-2"
-    )
+    assert rescored_detail["fingerprints"]["release_generation"] == ("learning-1-generation-2")
 
     rescored_row = next(
         row
@@ -2474,16 +2479,12 @@ def test_manual_stale_marks_capture_completed_rows_and_revert_by_event(
     second_entry = second_mark.json()["settings_history"][0]
     assert second_entry["affected_count"] == 2
 
-    revert_first = client.post(
-        f"/api/admin/stale-marks/{first_entry['entry_id']}/revert"
-    )
+    revert_first = client.post(f"/api/admin/stale-marks/{first_entry['entry_id']}/revert")
     assert revert_first.status_code == 200
     assert client.get("/api/submissions/old-completed").json()["stale"] is True
     assert client.get("/api/submissions/new-completed").json()["stale"] is True
 
-    revert_second = client.post(
-        f"/api/admin/stale-marks/{second_entry['entry_id']}/revert"
-    )
+    revert_second = client.post(f"/api/admin/stale-marks/{second_entry['entry_id']}/revert")
     assert revert_second.status_code == 200
     assert client.get("/api/submissions/old-completed").json()["stale"] is False
     assert client.get("/api/submissions/new-completed").json()["stale"] is False
@@ -2677,9 +2678,7 @@ def test_dashboard_includes_backend_runner_status_snapshot(
     assert response.status_code == 200
     execution = ConfigRepository(config_path).load().execution
     expected_timeout = (
-        execution.submission_timeout_seconds
-        if execution.submission_timeout_enabled
-        else None
+        execution.submission_timeout_seconds if execution.submission_timeout_enabled else None
     )
     runner_status = response.json()["runner_status"]
     assert runner_status["status"] == "online"
@@ -3050,9 +3049,9 @@ def test_admin_rejects_duplicate_team_without_overwriting_credentials(
 
     assert first_response.status_code == 200
     assert duplicate_response.status_code == 409
-    assert "old-secret" not in (
-        tmp_path / "runtime" / "repositories" / "teams.json"
-    ).read_text(encoding="utf-8")
+    assert "old-secret" not in (tmp_path / "runtime" / "repositories" / "teams.json").read_text(
+        encoding="utf-8"
+    )
 
     old_password_upload = client.post(
         "/api/submissions",
@@ -3176,10 +3175,7 @@ def test_submission_detail_reads_complete_report_when_status_is_stale(
     assert detail["artifacts"]["graph_data"]["equity"][1]["equity"] == 1.67
     assert detail["performance_table"] == []
     assert detail["score"] == pytest.approx(
-        45.0
-        + 35.0 * (0.22 / 0.30)
-        - 15.0 * (0.04 / 0.30)
-        - 5.0 * (0.31 / 3.0)
+        45.0 + 35.0 * (0.22 / 0.30) - 15.0 * (0.04 / 0.30) - 5.0 * (0.31 / 3.0)
     )
 
     assert compare_response.status_code == 200

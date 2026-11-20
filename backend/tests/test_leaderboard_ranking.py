@@ -305,7 +305,9 @@ def test_short_profit_penalty_discourages_profitable_short_books() -> None:
     }
     profitable_short_book = {**no_short_profit, "annualized_short_profit": 0.15}
 
-    assert calculate_leaderboard_score(no_short_profit, ScoringWeights()) - calculate_leaderboard_score(
+    assert calculate_leaderboard_score(
+        no_short_profit, ScoringWeights()
+    ) - calculate_leaderboard_score(
         profitable_short_book,
         ScoringWeights(),
     ) == pytest.approx(25.0)
@@ -432,18 +434,17 @@ def test_rank_best_per_team_objective_leaderboard_picks_best_for_each_metric() -
         },
     ]
 
+    assert [row.id for row in rank_best_per_team_objective_leaderboard(rows, metric="sharpe")] == [
+        "alpha-sharpe",
+        "beta-risk",
+    ]
     assert [
-        row.id
-        for row in rank_best_per_team_objective_leaderboard(rows, metric="sharpe")
-    ] == ["alpha-sharpe", "beta-risk"]
-    assert [
-        row.id
-        for row in rank_best_per_team_objective_leaderboard(rows, metric="max_drawdown")
+        row.id for row in rank_best_per_team_objective_leaderboard(rows, metric="max_drawdown")
     ] == ["beta-risk", "alpha-risk"]
-    assert [
-        row.id
-        for row in rank_best_per_team_objective_leaderboard(rows, metric="calmar")
-    ] == ["alpha-risk", "beta-risk"]
+    assert [row.id for row in rank_best_per_team_objective_leaderboard(rows, metric="calmar")] == [
+        "alpha-risk",
+        "beta-risk",
+    ]
 
 
 def test_rank_best_per_team_leaderboard_falls_back_to_team_name() -> None:

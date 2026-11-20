@@ -63,15 +63,18 @@ def test_learning_window_roots_follow_a_custom_learning_release_root(
     learning_root = tmp_path / "isolated_releases" / "learning"
     releases = DataReleasesConfig(learning_output_root=learning_root.as_posix())
 
-    assert releases.release_window("learning_1").output_root == (
-        learning_root.parent / "learning_1"
-    ).as_posix()
-    assert releases.release_window("learning_2").output_root == (
-        learning_root.parent / "learning_2"
-    ).as_posix()
-    assert releases.release_window("learning_3").output_root == (
-        learning_root.parent / "learning_3"
-    ).as_posix()
+    assert (
+        releases.release_window("learning_1").output_root
+        == (learning_root.parent / "learning_1").as_posix()
+    )
+    assert (
+        releases.release_window("learning_2").output_root
+        == (learning_root.parent / "learning_2").as_posix()
+    )
+    assert (
+        releases.release_window("learning_3").output_root
+        == (learning_root.parent / "learning_3").as_posix()
+    )
 
 
 def test_platform_config_validates_learning_windows_and_release_roots() -> None:

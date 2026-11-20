@@ -7,17 +7,12 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 def write_xlsx_field_dictionary(path: Path, sheet_name: str, rows: list[list[str]]) -> None:
     def cell(column: str, row_number: int, value: str) -> str:
-        return (
-            f'<c r="{column}{row_number}" t="inlineStr">'
-            f"<is><t>{escape(value)}</t></is>"
-            "</c>"
-        )
+        return f'<c r="{column}{row_number}" t="inlineStr"><is><t>{escape(value)}</t></is></c>'
 
     sheet_rows = []
     for row_number, row in enumerate(rows, start=1):
         cells = "".join(
-            cell(chr(ord("A") + index), row_number, value)
-            for index, value in enumerate(row)
+            cell(chr(ord("A") + index), row_number, value) for index, value in enumerate(row)
         )
         sheet_rows.append(f'<row r="{row_number}">{cells}</row>')
 
@@ -64,7 +59,7 @@ def write_xlsx_field_dictionary(path: Path, sheet_name: str, rows: list[list[str
             f"""<?xml version="1.0" encoding="UTF-8"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <sheetData>
-    {''.join(sheet_rows)}
+    {"".join(sheet_rows)}
   </sheetData>
 </worksheet>
 """,

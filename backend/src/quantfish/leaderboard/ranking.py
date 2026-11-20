@@ -71,10 +71,7 @@ def rank_best_per_team_leaderboard(
     weights: ScoringWeights,
 ) -> list[LeaderboardRow]:
     candidates = sorted(
-        [
-            (_team_key(record), _to_leaderboard_row(record, weights))
-            for record in records
-        ],
+        [(_team_key(record), _to_leaderboard_row(record, weights)) for record in records],
         key=lambda item: _sort_key(item[1]),
     )
     best_by_team: dict[str, LeaderboardRow] = {}
@@ -101,10 +98,7 @@ def rank_best_per_team_objective_leaderboard(
     metric: LeaderboardMetric,
 ) -> list[LeaderboardRow]:
     candidates = sorted(
-        [
-            (_team_key(record), _to_objective_leaderboard_row(record, metric))
-            for record in records
-        ],
+        [(_team_key(record), _to_objective_leaderboard_row(record, metric)) for record in records],
         key=lambda item: _objective_sort_key(item[1], metric),
     )
     best_by_team: dict[str, LeaderboardRow] = {}
@@ -133,15 +127,17 @@ def _rank_rows(rows: Sequence[LeaderboardRow]) -> list[LeaderboardRow]:
     ]
 
 
-def _to_leaderboard_row(
-    record: Mapping[str, Any], weights: ScoringWeights
-) -> LeaderboardRow:
+def _to_leaderboard_row(record: Mapping[str, Any], weights: ScoringWeights) -> LeaderboardRow:
     status = str(record.get("status", "unknown"))
     stale = bool(record.get("stale", False))
     summary = _summary_as_floats(record.get("summary", {}))
-    eligible = status == "completed" and not stale and _meets_minimum_days(
-        summary,
-        weights.minimum_slice_trading_days,
+    eligible = (
+        status == "completed"
+        and not stale
+        and _meets_minimum_days(
+            summary,
+            weights.minimum_slice_trading_days,
+        )
     )
     score = calculate_leaderboard_score(summary, weights)
     return LeaderboardRow(
@@ -209,10 +205,7 @@ def calculate_leaderboard_score(
     summary: Mapping[str, Any],
     weights: ScoringWeights,
 ) -> float:
-    return sum(
-        contribution.contribution
-        for contribution in score_contributions(summary, weights)
-    )
+    return sum(contribution.contribution for contribution in score_contributions(summary, weights))
 
 
 def score_contributions(
@@ -231,8 +224,7 @@ def score_contributions(
             "Sharpe",
             sharpe,
             weights.sharpe_weight,
-            weights.sharpe_weight
-            * _clamp(_safe_ratio(sharpe, weights.sharpe_target), -1.0, 1.0),
+            weights.sharpe_weight * _clamp(_safe_ratio(sharpe, weights.sharpe_target), -1.0, 1.0),
         ),
         (
             "annual_return",

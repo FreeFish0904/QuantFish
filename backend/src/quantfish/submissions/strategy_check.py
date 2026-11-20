@@ -94,9 +94,7 @@ def _success_payload(
     diagnostics: dict,  # type: ignore[type-arg]
     track: SubmissionDataTrack,
 ) -> dict:  # type: ignore[type-arg]
-    dates = (
-        scores["date"] if "date" in scores.columns else pd.Series(dtype="datetime64[ns]")
-    )
+    dates = scores["date"] if "date" in scores.columns else pd.Series(dtype="datetime64[ns]")
     unique_dates = sorted(pd.to_datetime(dates).dropna().unique().tolist())
     codes = sorted(set(scores["code"])) if "code" in scores.columns else []
     trading_dates_checked = int(diagnostics.get("trading_dates_checked") or 0)

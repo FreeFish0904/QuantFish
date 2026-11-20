@@ -173,9 +173,7 @@ def test_simulator_carries_previous_position_when_limit_hit_blocks_trade() -> No
             },
         ]
     )
-    signals = pd.DataFrame(
-        [{"date": "2023-01-02", "symbol": "000001", "signal": 1.0}]
-    )
+    signals = pd.DataFrame([{"date": "2023-01-02", "symbol": "000001", "signal": 1.0}])
 
     result = simulate_backtest(panel, signals, capital=100.0, mode="longonly")
 
@@ -434,9 +432,7 @@ def test_simulator_blocks_trade_when_limit_status_marks_stock_restricted() -> No
             },
         ]
     )
-    signals = pd.DataFrame(
-        [{"date": "2023-01-02", "symbol": "000001", "signal": 1.0}]
-    )
+    signals = pd.DataFrame([{"date": "2023-01-02", "symbol": "000001", "signal": 1.0}])
 
     result = simulate_backtest(panel, signals, capital=100.0, mode="longonly")
 
@@ -468,9 +464,7 @@ def test_simulator_fallback_uses_chinext_twenty_percent_price_limit() -> None:
             },
         ]
     )
-    signals = pd.DataFrame(
-        [{"date": "2023-01-02", "symbol": "300001", "signal": 1.0}]
-    )
+    signals = pd.DataFrame([{"date": "2023-01-02", "symbol": "300001", "signal": 1.0}])
 
     result = simulate_backtest(panel, signals, capital=100.0, mode="longonly")
 
@@ -501,9 +495,7 @@ def test_simulator_blocks_trade_when_execution_vwap_is_missing() -> None:
             },
         ]
     )
-    signals = pd.DataFrame(
-        [{"date": "2023-01-02", "symbol": "000001", "signal": 1.0}]
-    )
+    signals = pd.DataFrame([{"date": "2023-01-02", "symbol": "000001", "signal": 1.0}])
 
     result = simulate_backtest(panel, signals, capital=100.0, mode="longonly")
 
@@ -604,9 +596,7 @@ def test_simulator_keeps_missing_close_position_stale_without_vwap_mark_pnl() ->
     assert daily.loc[pd.Timestamp("2023-01-04"), "vwap_to_close_return"] == 0.0
     assert daily.loc[pd.Timestamp("2023-01-04"), "portfolio_return"] == 0.0
     assert daily.loc[pd.Timestamp("2023-01-04"), "stale_position_count"] == 1
-    assert daily.loc[pd.Timestamp("2023-01-04"), "stale_gross_exposure"] == pytest.approx(
-        1.0
-    )
+    assert daily.loc[pd.Timestamp("2023-01-04"), "stale_gross_exposure"] == pytest.approx(1.0)
 
 
 def test_simulator_catches_up_from_last_valid_close_when_stale_price_returns() -> None:
@@ -1188,9 +1178,5 @@ def test_simulator_applies_sell_stamp_duty_only_to_sells() -> None:
     )
 
     daily = result.daily.set_index("date")
-    assert daily.loc[pd.Timestamp("2023-01-03"), "transaction_cost"] == pytest.approx(
-        0.003
-    )
-    assert daily.loc[pd.Timestamp("2023-01-04"), "transaction_cost"] == pytest.approx(
-        0.0035
-    )
+    assert daily.loc[pd.Timestamp("2023-01-03"), "transaction_cost"] == pytest.approx(0.003)
+    assert daily.loc[pd.Timestamp("2023-01-04"), "transaction_cost"] == pytest.approx(0.0035)

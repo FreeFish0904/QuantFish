@@ -29,9 +29,7 @@ def test_startup_script_waits_for_http_readiness_before_printing_urls() -> None:
     wait_for_http = text[text.index("wait_for_http()") : text.index("wait_for_servers()")]
     assert wait_for_http.index("server_died") < wait_for_http.index("curl -fsS")
     wait_for_servers = text[text.index("wait_for_servers()") :]
-    assert wait_for_servers.index('wait_for_http "backend"') < wait_for_servers.index(
-        "print_urls"
-    )
+    assert wait_for_servers.index('wait_for_http "backend"') < wait_for_servers.index("print_urls")
 
 
 def test_startup_script_waits_for_backend_before_starting_frontend_dev() -> None:
@@ -55,9 +53,7 @@ def test_startup_script_secures_admin_password_before_startup() -> None:
     assert "QUANTFISH_ADMIN_PASSWORD" in text
     assert "QUANTFISH_ADMIN_SESSION_SECRET" in text
     assert "QUANTFISH_PARTICIPANT_SESSION_SECRET" in text
-    admin_password_block = text[
-        text.index("ensure_admin_password()") : text.index("run_verify()")
-    ]
+    admin_password_block = text[text.index("ensure_admin_password()") : text.index("run_verify()")]
     assert 'QUANTFISH_ADMIN_PASSWORD="quantfish-admin"' not in admin_password_block
     assert "GENERATED_ADMIN_PASSWORD" in admin_password_block
     assert "token_urlsafe" in admin_password_block

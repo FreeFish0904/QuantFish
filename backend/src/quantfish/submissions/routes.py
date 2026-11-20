@@ -239,8 +239,7 @@ def list_submissions(
 def submission_options(request: Request) -> dict[str, Any]:
     return {
         "available_data_tracks": [
-            track.value
-            for track in public_data_tracks(request.app.state.services)
+            track.value for track in public_data_tracks(request.app.state.services)
         ]
     }
 
@@ -297,8 +296,7 @@ def submission_detail(request: Request, submission_id: str) -> dict[str, Any]:
     artifacts = {}
     report_dir = Path(submission.report_dir)
     if report_dir.exists() and (
-        submission.status == SubmissionStatus.COMPLETED
-        or report_artifacts_available(report_dir)
+        submission.status == SubmissionStatus.COMPLETED or report_artifacts_available(report_dir)
     ):
         artifacts = services.artifact_reader.read(report_dir, include_parquet=False)
         artifacts = _complete_hs300_benchmark_artifacts(services, submission, artifacts)
@@ -316,10 +314,7 @@ def submission_detail(request: Request, submission_id: str) -> dict[str, Any]:
     if score_summary:
         payload["metrics"] = SubmissionMetrics.from_summary(score_summary).to_dict()
     contributions = score_contributions(score_summary, weights)
-    payload["score_breakdown"] = [
-        asdict(contribution)
-        for contribution in contributions
-    ]
+    payload["score_breakdown"] = [asdict(contribution) for contribution in contributions]
     payload["score_calculation"] = (
         score_calculation_text(score_summary, weights) if score is not None else None
     )
@@ -335,7 +330,9 @@ def download_pdf_report(request: Request, submission_id: str):
     if submission is None or not _submission_visible(services, submission):
         raise HTTPException(status_code=404, detail="submission not found")
     if submission.status != SubmissionStatus.COMPLETED:
-        raise HTTPException(status_code=404, detail="report is not available: submission not completed")
+        raise HTTPException(
+            status_code=404, detail="report is not available: submission not completed"
+        )
 
     report_dir = Path(submission.report_dir)
 
@@ -348,6 +345,7 @@ def download_pdf_report(request: Request, submission_id: str):
 
     try:
         from quantfish.backtest.pdf_report import generate_pdf_report
+
         team_name = _team_name(services, submission.team_id)
         generated = generate_pdf_report(submission, report_dir, team_name=team_name)
 
@@ -484,7 +482,11 @@ def _submission_stale(
 ) -> bool:
     if submission.status != SubmissionStatus.COMPLETED:
         return False
-    stale_ids = stale_submission_ids if stale_submission_ids is not None else _active_stale_submission_ids(services)
+    stale_ids = (
+        stale_submission_ids
+        if stale_submission_ids is not None
+        else _active_stale_submission_ids(services)
+    )
     return submission.submission_id in stale_ids or is_zero_result_stale(
         submission,
         summary,

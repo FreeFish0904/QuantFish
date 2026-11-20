@@ -141,9 +141,7 @@ def build_failure_summary(
         key=lambda submission: _submitted_at(submission) or since,
         reverse=True,
     )
-    samples = [
-        _failure_sample(submission, team_names=team_names) for submission in failures
-    ]
+    samples = [_failure_sample(submission, team_names=team_names) for submission in failures]
     return FailureSummary(
         since=since.isoformat(),
         window_days=window_days,

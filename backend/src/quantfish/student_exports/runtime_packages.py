@@ -137,9 +137,7 @@ def import_runtime_package(
         supplied = _read_manifest(manifest_path)
         supplied_signature = supplied.get("dependency_signature")
         if supplied_signature and supplied_signature != manifest["dependency_signature"]:
-            raise ValueError(
-                "runtime manifest dependency_signature does not match this project"
-            )
+            raise ValueError("runtime manifest dependency_signature does not match this project")
         if supplied.get("platform") not in (None, platform):
             raise ValueError("runtime manifest platform does not match requested platform")
         manifest.update({key: value for key, value in supplied.items() if key != "platform"})

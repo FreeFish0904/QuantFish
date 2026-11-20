@@ -109,9 +109,7 @@ def test_neutralize_scores_by_industry_accepts_mixed_datetime_units() -> None:
     )
     industries = pd.DataFrame(
         {
-            "ImplementDate": pd.Series(
-                ["2022-12-31", "2022-12-31"], dtype="datetime64[us]"
-            ),
+            "ImplementDate": pd.Series(["2022-12-31", "2022-12-31"], dtype="datetime64[us]"),
             "Symbol": ["000001", "000002"],
             "IndustryName": ["制造业", "制造业"],
         }

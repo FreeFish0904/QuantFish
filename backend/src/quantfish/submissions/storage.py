@@ -56,9 +56,7 @@ class SubmissionStorage:
         if Path(filename).suffix.lower() != ".py":
             raise ValueError("strategy upload must be a Python .py file")
         if len(content) > self.max_upload_bytes:
-            raise ValueError(
-                f"strategy upload exceeds {self.max_upload_bytes} bytes"
-            )
+            raise ValueError(f"strategy upload exceeds {self.max_upload_bytes} bytes")
         if not content:
             raise ValueError("strategy upload cannot be empty")
         try:

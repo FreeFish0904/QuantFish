@@ -53,9 +53,7 @@ class AdminSettingsHistoryEntry:
             settings=dict(settings),
             stale_marked=bool(data.get("stale_marked", entry_type == "stale_mark")),
             affected_submission_ids=tuple(str(item) for item in affected_submission_ids),
-            reverted_at=(
-                str(data["reverted_at"]) if data.get("reverted_at") is not None else None
-            ),
+            reverted_at=(str(data["reverted_at"]) if data.get("reverted_at") is not None else None),
             config_sha256=(
                 str(data["config_sha256"]) if data.get("config_sha256") is not None else None
             ),
@@ -70,8 +68,7 @@ class AdminSettingsHistoryRepository:
     def list_recent(self) -> list[AdminSettingsHistoryEntry]:
         with self._lock:
             return [
-                AdminSettingsHistoryEntry.from_dict(item)
-                for item in _read_json_list(self.path)
+                AdminSettingsHistoryEntry.from_dict(item) for item in _read_json_list(self.path)
             ]
 
     def get(self, entry_id: str) -> AdminSettingsHistoryEntry | None:

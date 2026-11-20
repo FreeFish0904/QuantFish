@@ -78,9 +78,9 @@ def neutralize_scores_by_industry(
     missing_industry = score_present & ~known_industry
 
     if neutralizable.any():
-        industry_means = merged.loc[neutralizable].groupby(
-            ["date", "industry"]
-        )["score"].transform("mean")
+        industry_means = (
+            merged.loc[neutralizable].groupby(["date", "industry"])["score"].transform("mean")
+        )
         neutralized.loc[neutralizable, "score"] = (
             merged.loc[neutralizable, "score"].astype(float).to_numpy()
             - industry_means.astype(float).to_numpy()
@@ -112,9 +112,7 @@ def _with_asof_industry(
 
     industry_date = _find_column(industry_rows, ["ImplementDate", "date", "TradingDate"])
     industry_symbol = _find_column(industry_rows, ["Symbol", "code", "Stkcd", "stkcd"])
-    industries = industry_rows.loc[
-        :, [industry_date, industry_symbol, industry_column]
-    ].rename(
+    industries = industry_rows.loc[:, [industry_date, industry_symbol, industry_column]].rename(
         columns={
             industry_date: "date",
             industry_symbol: "code",

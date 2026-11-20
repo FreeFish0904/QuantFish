@@ -44,6 +44,7 @@ EXCESS_SUMMARY = {
     "excess_observations": 242,
 }
 
+
 def test_cover_cards_label_scoring_basis_and_add_excess_cards() -> None:
     labels = [card["label"] for card in pdf_report._cover_cards({}, SUMMARY)]
     assert "Annual Return (scoring)" in labels
@@ -71,6 +72,7 @@ def test_card_groups_skip_the_benchmark_block_without_index_data() -> None:
     groups = pdf_report._card_groups({}, SUMMARY)
 
     assert [group["title"] for group in groups] == ["Strategy performance"]
+
 
 def test_verdict_reports_a_win_with_information_ratio() -> None:
     verdict = pdf_report._verdict({}, EXCESS_SUMMARY)
@@ -128,6 +130,7 @@ def test_highlights_cover_window_risk_benchmark_and_extremes() -> None:
 
 def test_highlights_stay_quiet_without_metrics() -> None:
     assert pdf_report._highlights({}, {}, period={}) == []
+
 
 def test_risk_rows_label_the_scoring_basis_side_of_the_benchmark_block() -> None:
     rows = dict(
@@ -196,9 +199,7 @@ def test_benchmark_sections_carry_a_sign_tone_for_excess_values() -> None:
 
 
 def test_benchmark_sections_include_scoring_basis_when_beta_adjusted() -> None:
-    sections = pdf_report._benchmark_sections(
-        {"active_annual_return": 0.08}, EXCESS_SUMMARY
-    )
+    sections = pdf_report._benchmark_sections({"active_annual_return": 0.08}, EXCESS_SUMMARY)
 
     coverage = _rows_by_label(sections[-1])
     assert coverage["Beta-adjusted excess, annualized (scoring basis)"] == "8.0%"
@@ -239,6 +240,7 @@ def test_yearly_rows_use_the_period_column_and_signed_returns() -> None:
             "tone": "up",
         }
     ]
+
 
 def _graph_data():
     return {
@@ -311,6 +313,7 @@ def test_render_plots_adds_the_new_activity_charts(tmp_path: Path) -> None:
     assert paths["exposure"] == "plots/exposure.png"
     assert paths["group_cumulative"] == "plots/group_cumulative.png"
 
+
 def test_render_plots_skips_malformed_records(tmp_path: Path) -> None:
     graph_data = {
         "equity_cny": [
@@ -354,9 +357,7 @@ def test_template_renders_the_cover_and_benchmark_section() -> None:
             "benchmark_sections": pdf_report._benchmark_sections({}, EXCESS_SUMMARY),
         }
     )
-    without_rows = pdf_report._render_template(
-        {**_template_context(), "benchmark_sections": []}
-    )
+    without_rows = pdf_report._render_template({**_template_context(), "benchmark_sections": []})
 
     assert "Benchmark &amp; Excess Return" in with_rows
     assert "Excess return (strategy " in with_rows

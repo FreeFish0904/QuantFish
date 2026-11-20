@@ -40,21 +40,23 @@ PALETTE = (
     "#a1887f",
 )
 
-matplotlib.rcParams.update({
-    "font.family": "sans-serif",
-    "axes.facecolor": "#1a1a2e",
-    "figure.facecolor": "#1a1a2e",
-    "axes.edgecolor": "#333",
-    "axes.labelcolor": "#ccc",
-    "xtick.color": "#999",
-    "ytick.color": "#999",
-    "text.color": "#ccc",
-    "grid.color": "#333",
-    "grid.alpha": 0.5,
-    "lines.linewidth": 1.2,
-    "figure.dpi": 160,
-    "savefig.dpi": 160,
-})
+matplotlib.rcParams.update(
+    {
+        "font.family": "sans-serif",
+        "axes.facecolor": "#1a1a2e",
+        "figure.facecolor": "#1a1a2e",
+        "axes.edgecolor": "#333",
+        "axes.labelcolor": "#ccc",
+        "xtick.color": "#999",
+        "ytick.color": "#999",
+        "text.color": "#ccc",
+        "grid.color": "#333",
+        "grid.alpha": 0.5,
+        "lines.linewidth": 1.2,
+        "figure.dpi": 160,
+        "savefig.dpi": 160,
+    }
+)
 
 
 def _safe_float(value):
@@ -178,9 +180,7 @@ def build_report_context(submission, report_dir, *, team_name=""):
 def _render_template(context):
     from jinja2 import Environment, FileSystemLoader
 
-    env = Environment(
-        loader=FileSystemLoader(str(TEMPLATE_DIR)), autoescape=True
-    )
+    env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)), autoescape=True)
     return env.get_template("report.html").render(**context)
 
 
@@ -508,9 +508,7 @@ def _yearly_rows(artifacts):
         result.append(
             {
                 "year": str(year) if year is not None else "—",
-                "return": _fmt_signed_pct(
-                    record.get("total_return", record.get("return"))
-                ),
+                "return": _fmt_signed_pct(record.get("total_return", record.get("return"))),
                 "annualized": _fmt_pct(record.get("annualized_return")),
                 "sharpe": _fmt(record.get("sharpe"), 2),
                 "turnover": _fmt_pct(record.get("turnover")),
@@ -654,9 +652,9 @@ def _plot_monthly_excess(excess, plots_dir):
     if len(points) < 20:
         return ""
     frame = pd.DataFrame(points, columns=["date", "excess_return"])
-    monthly = frame.groupby([frame["date"].dt.year, frame["date"].dt.month])[
-        "excess_return"
-    ].apply(lambda values: (1.0 + values).prod() - 1.0)
+    monthly = frame.groupby([frame["date"].dt.year, frame["date"].dt.month])["excess_return"].apply(
+        lambda values: (1.0 + values).prod() - 1.0
+    )
     if monthly.empty:
         return ""
     labels = [f"{year}-{month:02d}" for year, month in monthly.index]
@@ -726,9 +724,7 @@ def _plot_turnover(turnover, plots_dir):
 
 def _plot_exposure(exposure, plots_dir):
     long_points = _plot_points(exposure, ("long_exposure",))
-    short_points = [
-        (date, -value) for date, value in _plot_points(exposure, ("short_exposure",))
-    ]
+    short_points = [(date, -value) for date, value in _plot_points(exposure, ("short_exposure",))]
     if not long_points and not short_points:
         return ""
     fig, ax = plt.subplots(figsize=(10, 2.6))
@@ -901,9 +897,13 @@ def _plot_rolling_sharpe(daily_returns, plots_dir, window=60):
     frame = _returns_frame(daily_returns)
     if len(frame) <= window:
         return ""
-    rolling = frame["daily_return"].rolling(window).apply(
-        lambda values: np.mean(values) / (np.std(values) + 1e-10) * np.sqrt(252),
-        raw=True,
+    rolling = (
+        frame["daily_return"]
+        .rolling(window)
+        .apply(
+            lambda values: np.mean(values) / (np.std(values) + 1e-10) * np.sqrt(252),
+            raw=True,
+        )
     )
 
     fig, ax = plt.subplots(figsize=(10, 2.6))

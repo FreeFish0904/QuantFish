@@ -55,14 +55,17 @@ class ReleaseLockManager:
         *,
         should_cancel: Callable[[], bool] | None = None,
     ) -> Iterator[None]:
-        with self._acquire_file(
-            self._lock_path(release_name, "gate"),
-            shared=False,
-            should_cancel=should_cancel,
-        ), self._acquire_file(
-            self._lock_path(release_name, "data"),
-            shared=False,
-            should_cancel=should_cancel,
+        with (
+            self._acquire_file(
+                self._lock_path(release_name, "gate"),
+                shared=False,
+                should_cancel=should_cancel,
+            ),
+            self._acquire_file(
+                self._lock_path(release_name, "data"),
+                shared=False,
+                should_cancel=should_cancel,
+            ),
         ):
             yield
 
@@ -99,8 +102,7 @@ class ReleaseLockManager:
 
     def _lock_path(self, release_name: str, purpose: str) -> Path:
         if not release_name or any(
-            character not in "abcdefghijklmnopqrstuvwxyz0123456789_-"
-            for character in release_name
+            character not in "abcdefghijklmnopqrstuvwxyz0123456789_-" for character in release_name
         ):
             raise ValueError(f"invalid release lock name: {release_name}")
         return self.root / f"{release_name}.{purpose}.lock"

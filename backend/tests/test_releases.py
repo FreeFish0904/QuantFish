@@ -104,9 +104,7 @@ def test_release_builder_preserves_structure_and_filters_hidden_test_dates(
 
     static_dir = source / "distribute" / "basic"
     static_dir.mkdir(parents=True)
-    pd.DataFrame([{"Code": "A", "Name": "Alpha"}]).to_csv(
-        static_dir / "lookup.csv", index=False
-    )
+    pd.DataFrame([{"Code": "A", "Name": "Alpha"}]).to_csv(static_dir / "lookup.csv", index=False)
     (static_dir / "manual.pdf").write_bytes(b"%PDF fixture")
 
     output = tmp_path / "data_releases" / "hidden_test"
@@ -116,11 +114,7 @@ def test_release_builder_preserves_structure_and_filters_hidden_test_dates(
     assert returns["TradingDate"].tolist() == ["2023-01-03", "2025-12-31"]
 
     forecast = pd.read_csv(
-        output
-        / "teacher"
-        / "financial_supplement"
-        / "forecast_vs_report"
-        / "BF_FORECAST.csv",
+        output / "teacher" / "financial_supplement" / "forecast_vs_report" / "BF_FORECAST.csv",
         dtype={"Stkcd": str},
     )
     assert forecast["PubliDate"].tolist() == ["2023-01-01", "2025-12-31"]
@@ -151,11 +145,7 @@ def test_release_builder_learning_default_keeps_rows_before_2023(tmp_path: Path)
     build_release(source, output, end="2022-12-31")
 
     momentum = pd.read_csv(
-        output
-        / "teacher"
-        / "factor_benchmark"
-        / "momentum_factor"
-        / "STK_MKT_MOMENTUM.csv"
+        output / "teacher" / "factor_benchmark" / "momentum_factor" / "STK_MKT_MOMENTUM.csv"
     )
     assert momentum["TradingMonth"].tolist() == ["2022-12"]
 
@@ -269,9 +259,7 @@ def test_release_builder_carries_adjustment_factor_baseline_rows(
         dtype={"symbol": str},
     )
 
-    assert factors[["tradingdate", "symbol", "cumulatefwardfactor"]].to_dict(
-        "records"
-    ) == [
+    assert factors[["tradingdate", "symbol", "cumulatefwardfactor"]].to_dict("records") == [
         {
             "tradingdate": "2022-12-30",
             "symbol": "000001",
@@ -328,9 +316,7 @@ def test_release_builder_carries_industry_classification_baseline_rows(
         output / "teacher" / "basic" / "STK_INDUSTRYCLASS.csv",
         dtype={"Symbol": str},
     )
-    assert industry[["ImplementDate", "Symbol", "IndustryName"]].to_dict(
-        "records"
-    ) == [
+    assert industry[["ImplementDate", "Symbol", "IndustryName"]].to_dict("records") == [
         {
             "ImplementDate": "2009-12-31",
             "Symbol": "000001",
@@ -415,11 +401,7 @@ def test_release_builder_repairs_malformed_csmar_text_fields(tmp_path: Path) -> 
     build_release(source, output, start="2023-01-01", end="2025-12-31")
 
     forecast = pd.read_csv(
-        output
-        / "teacher"
-        / "financial_supplement"
-        / "forecast_vs_report"
-        / "BF_FORECAST.csv",
+        output / "teacher" / "financial_supplement" / "forecast_vs_report" / "BF_FORECAST.csv",
         dtype={"Stkcd": str},
     )
     assert forecast["Stkcd"].tolist() == ["000001", "000002"]
@@ -905,6 +887,7 @@ def test_config_release_builder_rejects_empty_source_without_replacing_output(
     assert sentinel.read_text(encoding="utf-8") == "previous release"
     assert not list(release_root.glob(".learning_1.*.tmp"))
 
+
 def test_config_release_builder_rejects_incomplete_scoring_source_without_replacing_output(
     tmp_path: Path,
 ) -> None:
@@ -1259,9 +1242,7 @@ def test_release_cli_build_from_config_uses_yaml_config(tmp_path: Path) -> None:
             data_releases=DataReleasesConfig(
                 raw_data_root=source.as_posix(),
                 learning_output_root=(tmp_path / "data_releases" / "learning").as_posix(),
-                hidden_output_root=(
-                    tmp_path / "data_releases" / "hidden_test"
-                ).as_posix(),
+                hidden_output_root=(tmp_path / "data_releases" / "hidden_test").as_posix(),
             ),
             backtest=PlatformConfig.default().backtest,
         )
@@ -1279,12 +1260,7 @@ def test_release_cli_build_from_config_uses_yaml_config(tmp_path: Path) -> None:
 
     assert exit_code == 0
     learning_2 = pd.read_parquet(
-        tmp_path
-        / "data_releases"
-        / "learning_2"
-        / "distribute"
-        / "stock"
-        / "daily_returns.parquet"
+        tmp_path / "data_releases" / "learning_2" / "distribute" / "stock" / "daily_returns.parquet"
     )
     assert learning_2["Symbol"].tolist() == ["000001"]
     assert not (tmp_path / "data_releases" / "learning").exists()

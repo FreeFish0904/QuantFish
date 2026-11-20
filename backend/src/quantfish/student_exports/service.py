@@ -123,10 +123,7 @@ class StudentExportService:
 
     def environment_options(self) -> dict[str, Any]:
         return {
-            "platforms": [
-                self._environment_option(platform)
-                for platform in ENVIRONMENT_PLATFORMS
-            ]
+            "platforms": [self._environment_option(platform) for platform in ENVIRONMENT_PLATFORMS]
         }
 
     def dependency_signature(self) -> str:
@@ -360,9 +357,7 @@ class StudentExportService:
                 if available
                 else None
             ),
-            "download_url": (
-                f"/api/downloads/environment/{platform}.zip" if available else None
-            ),
+            "download_url": (f"/api/downloads/environment/{platform}.zip" if available else None),
         }
 
     def _platform_ids(self) -> list[str]:

@@ -38,9 +38,9 @@ def test_scanner_detects_csmar_aliases_descriptions_and_dates(tmp_path: Path) ->
 
     parquet_dir = source / "distribute" / "stock"
     parquet_dir.mkdir(parents=True)
-    pd.DataFrame(
-        [{"TradingDate": "2023-01-03", "Symbol": "000001", "Ret": 0.02}]
-    ).to_parquet(parquet_dir / "daily_returns.parquet", index=False)
+    pd.DataFrame([{"TradingDate": "2023-01-03", "Symbol": "000001", "Ret": 0.02}]).to_parquet(
+        parquet_dir / "daily_returns.parquet", index=False
+    )
 
     catalog = scan_catalog(source)
 
@@ -68,9 +68,7 @@ def test_scanner_marks_tables_without_date_columns_as_static(tmp_path: Path) -> 
     source = tmp_path / "new_data"
     table_dir = source / "distribute" / "basic"
     table_dir.mkdir(parents=True)
-    pd.DataFrame([{"Code": "A", "Name": "Alpha"}]).to_csv(
-        table_dir / "lookup.csv", index=False
-    )
+    pd.DataFrame([{"Code": "A", "Name": "Alpha"}]).to_csv(table_dir / "lookup.csv", index=False)
 
     catalog = scan_catalog(source)
 

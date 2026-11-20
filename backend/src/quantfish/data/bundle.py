@@ -65,9 +65,7 @@ class DataBundle:
     def path(self, dataset_id_or_alias: str) -> Path:
         return self.catalog.path_for(dataset_id_or_alias, self.root)
 
-    def load_raw(
-        self, dataset_id_or_alias: str, columns: list[str] | None = None
-    ) -> pd.DataFrame:
+    def load_raw(self, dataset_id_or_alias: str, columns: list[str] | None = None) -> pd.DataFrame:
         return self._load_raw_for_dated_access(dataset_id_or_alias, columns)
 
     def _load_raw_for_dated_access(
@@ -270,9 +268,7 @@ class DatedDataBundle:
         return _coerce_numeric_columns(projected, numeric_columns)
 
 
-def _read_dataset(
-    path: Path, spec: DatasetSpec, columns: list[str] | None = None
-) -> pd.DataFrame:
+def _read_dataset(path: Path, spec: DatasetSpec, columns: list[str] | None = None) -> pd.DataFrame:
     if spec.format == "csv":
         return _read_csv_dataset(path, spec, columns=columns)
     if spec.format == "parquet":
@@ -399,9 +395,7 @@ def _read_repaired_csmar_csv(
     return df
 
 
-def _repair_csmar_row(
-    path: Path, line_number: int, header: list[str], row: list[str]
-) -> list[str]:
+def _repair_csmar_row(path: Path, line_number: int, header: list[str], row: list[str]) -> list[str]:
     expected_fields = len(header)
     if len(row) == expected_fields:
         return row
@@ -431,9 +425,7 @@ def _repair_column_indexes(header: list[str]) -> list[int]:
     return [index for index, column in enumerate(header) if column in TEXT_REPAIR_COLUMNS]
 
 
-def _merge_overflow_fields(
-    row: list[str], expected_fields: int, repair_index: int
-) -> list[str]:
+def _merge_overflow_fields(row: list[str], expected_fields: int, repair_index: int) -> list[str]:
     tail_field_count = expected_fields - repair_index - 1
     tail_start = len(row) - tail_field_count
     if tail_start <= repair_index:

@@ -82,19 +82,13 @@ def build_backtest_panel(
     rows["market_type"] = pd.to_numeric(rows["market_type"], errors="coerce")
     rows["raw_limit_up"] = pd.to_numeric(rows["raw_limit_up"], errors="coerce")
     rows["raw_limit_down"] = pd.to_numeric(rows["raw_limit_down"], errors="coerce")
-    rows["cumulatefwardfactor"] = pd.to_numeric(
-        rows["cumulatefwardfactor"], errors="coerce"
-    )
+    rows["cumulatefwardfactor"] = pd.to_numeric(rows["cumulatefwardfactor"], errors="coerce")
 
     shares_positive = rows["dnshrtrd"] > 0
     valid_liquidity = shares_positive & (rows["dnvaltrd"] > 0)
     rows["raw_vwap"] = calculate_raw_vwap(rows["dnvaltrd"], rows["dnshrtrd"])
-    rows["front_close"] = apply_front_adjustment(
-        rows["raw_close"], rows["cumulatefwardfactor"]
-    )
-    rows["front_vwap"] = apply_front_adjustment(
-        rows["raw_vwap"], rows["cumulatefwardfactor"]
-    )
+    rows["front_close"] = apply_front_adjustment(rows["raw_close"], rows["cumulatefwardfactor"])
+    rows["front_vwap"] = apply_front_adjustment(rows["raw_vwap"], rows["cumulatefwardfactor"])
     rows["front_limit_up"] = apply_front_adjustment(
         rows["raw_limit_up"], rows["cumulatefwardfactor"]
     )
@@ -147,9 +141,7 @@ def preprocess_signals(
     if signal_column not in signals.columns:
         signal_column = _find_column(signals, ["signal", "factor", "score", "weight"])
 
-    rows = signals.rename(
-        columns={date: "date", symbol: "symbol", signal_column: "signal"}
-    ).copy()
+    rows = signals.rename(columns={date: "date", symbol: "symbol", signal_column: "signal"}).copy()
     rows["date"] = pd.to_datetime(rows["date"])
     rows["symbol"] = rows["symbol"].map(normalize_stock_code)
     rows["signal"] = pd.to_numeric(rows["signal"], errors="coerce")
@@ -206,9 +198,13 @@ def _join_factors_asof(daily: pd.DataFrame, factors: pd.DataFrame) -> pd.DataFra
     daily_sorted = daily.sort_values(["date", "symbol"]).reset_index(drop=True)
     if daily_sorted.empty:
         return daily.assign(cumulatefwardfactor=pd.Series(dtype="float64"))
-    factor_subset = factors.loc[:, factor_columns].sort_values(
-        ["date", "symbol"],
-    ).reset_index(drop=True)
+    factor_subset = (
+        factors.loc[:, factor_columns]
+        .sort_values(
+            ["date", "symbol"],
+        )
+        .reset_index(drop=True)
+    )
     if factor_subset.empty:
         merged = daily_sorted.copy()
         merged["cumulatefwardfactor"] = float("nan")

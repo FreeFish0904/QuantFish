@@ -447,10 +447,7 @@ class SubmissionRepository:
             _create_submission_schema(connection)
             count = int(connection.execute("SELECT COUNT(*) FROM submissions").fetchone()[0])
             if count == 0 and self.path.exists():
-                submissions = [
-                    Submission.from_dict(item)
-                    for item in _read_json_list(self.path)
-                ]
+                submissions = [Submission.from_dict(item) for item in _read_json_list(self.path)]
                 for submission in _backfill_submission_numbers(submissions):
                     _upsert_submission(connection, submission)
             connection.commit()
@@ -548,18 +545,12 @@ def _upsert_submission(
             submission.strategy_path,
             submission.report_dir,
             _json_dumps(
-                submission.fingerprints.to_dict()
-                if submission.fingerprints is not None
-                else None
+                submission.fingerprints.to_dict() if submission.fingerprints is not None else None
             ),
             submission.original_filename,
             submission.data_track.value,
             submission.submission_number,
-            _json_dumps(
-                submission.metrics.to_dict()
-                if submission.metrics is not None
-                else None
-            ),
+            _json_dumps(submission.metrics.to_dict() if submission.metrics is not None else None),
             submission.error_message,
             submission.submitted_at,
             submission.scored_at,
@@ -579,21 +570,15 @@ def _submission_from_row(row: sqlite3.Row) -> Submission:
         strategy_path=str(row["strategy_path"]),
         report_dir=str(row["report_dir"]),
         fingerprints=(
-            ScoreFingerprints.from_dict(fingerprints)
-            if isinstance(fingerprints, dict)
-            else None
+            ScoreFingerprints.from_dict(fingerprints) if isinstance(fingerprints, dict) else None
         ),
         original_filename=str(row["original_filename"] or "strategy.py"),
         data_track=SubmissionDataTrack(str(row["data_track"])),
         submission_number=(
-            int(row["submission_number"])
-            if row["submission_number"] is not None
-            else None
+            int(row["submission_number"]) if row["submission_number"] is not None else None
         ),
         metrics=SubmissionMetrics.from_dict(metrics) if isinstance(metrics, dict) else None,
-        error_message=(
-            str(row["error_message"]) if row["error_message"] is not None else None
-        ),
+        error_message=(str(row["error_message"]) if row["error_message"] is not None else None),
         submitted_at=str(row["submitted_at"]),
         scored_at=str(row["scored_at"]) if row["scored_at"] is not None else None,
         config_snapshot=config_snapshot if isinstance(config_snapshot, dict) else None,
@@ -692,9 +677,7 @@ def _submission_order_sql(
         sql_sort_expressions,
     )
     tie_direction = (
-        "ASC"
-        if params.sort_by in {"submission_number", "id"} and direction == "ASC"
-        else "DESC"
+        "ASC" if params.sort_by in {"submission_number", "id"} and direction == "ASC" else "DESC"
     )
     return _OrderSql(
         sql=(
@@ -819,8 +802,7 @@ def _new_team_id() -> str:
 
 def _backfill_submission_numbers(submissions: list[Submission]) -> list[Submission]:
     next_number = (
-        max((submission.submission_number or 0 for submission in submissions), default=0)
-        + 1
+        max((submission.submission_number or 0 for submission in submissions), default=0) + 1
     )
     backfilled: list[Submission] = []
     for submission in sorted(submissions, key=lambda item: item.submitted_at):

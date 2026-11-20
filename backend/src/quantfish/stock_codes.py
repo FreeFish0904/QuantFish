@@ -42,9 +42,7 @@ def normalize_stock_code(value: Any) -> str:
         matched = pattern.fullmatch(text)
         if matched is not None:
             return matched.group(1).zfill(6)
-    raise StockCodeError(
-        "stock code must be 1-6 digits or a supported exchange-qualified code"
-    )
+    raise StockCodeError("stock code must be 1-6 digits or a supported exchange-qualified code")
 
 
 def _format_numeric_code(value: int) -> str:

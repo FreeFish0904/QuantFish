@@ -88,9 +88,7 @@ def _load_hs300_benchmark_candidate(
 
     benchmark = rows.copy()
     benchmark["date"] = pd.to_datetime(benchmark[date_column]).dt.normalize()
-    benchmark = benchmark[
-        benchmark[code_column].map(normalize_stock_code) == "000300"
-    ]
+    benchmark = benchmark[benchmark[code_column].map(normalize_stock_code) == "000300"]
     benchmark = benchmark[
         (benchmark["date"] >= scoring_start) & (benchmark["date"] <= scoring_end)
     ].sort_values("date")
@@ -108,8 +106,10 @@ def _load_hs300_benchmark_candidate(
     else:
         return pd.DataFrame(columns=["date", "return"])
 
-    return benchmark.assign(return_=returns).loc[:, ["date", "return_"]].rename(
-        columns={"return_": "return"}
+    return (
+        benchmark.assign(return_=returns)
+        .loc[:, ["date", "return_"]]
+        .rename(columns={"return_": "return"})
     )
 
 

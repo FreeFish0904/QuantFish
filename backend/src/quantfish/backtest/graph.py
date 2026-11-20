@@ -22,9 +22,7 @@ def build_backtest_graph_data(
     returns = _return_series(daily, graph_return_column)
     equity = arithmetic_equity(returns)
     drawdown = relative_drawdown_from_equity(equity)
-    benchmark_records, benchmark_returns = _benchmark_records(
-        daily["date"], benchmark, capital
-    )
+    benchmark_records, benchmark_returns = _benchmark_records(daily["date"], benchmark, capital)
     active_returns = (
         pd.to_numeric(daily["active_return"], errors="coerce")
         if "active_return" in daily.columns
@@ -95,9 +93,7 @@ def _series_records(
     ]
 
 
-def _daily_pnl_records(
-    rows: pd.DataFrame, capital: float, return_column: str
-) -> list[dict]:
+def _daily_pnl_records(rows: pd.DataFrame, capital: float, return_column: str) -> list[dict]:
     returns = _return_series(rows, return_column)
     return [
         {
@@ -138,7 +134,9 @@ def _benchmark_records(
             "benchmark_equity": _json_float(value),
             "benchmark_cny": _json_float(value * capital),
         }
-        for date, daily_return, value in zip(aligned["date"], aligned["return"], equity, strict=True)
+        for date, daily_return, value in zip(
+            aligned["date"], aligned["return"], equity, strict=True
+        )
     ]
     return records, aligned
 
@@ -158,9 +156,9 @@ def _alpha_records(
         if active_returns is not None
         else strategy_returns.reset_index(drop=True)
     )
-    aligned_strategy = strategy.iloc[
-        benchmark_returns["strategy_index"].to_numpy()
-    ].reset_index(drop=True)
+    aligned_strategy = strategy.iloc[benchmark_returns["strategy_index"].to_numpy()].reset_index(
+        drop=True
+    )
     if active_returns is not None:
         excess = aligned_strategy.fillna(0.0)
     else:
@@ -190,12 +188,12 @@ def _excess_records(
 
     if benchmark_returns.empty:
         return []
-    aligned_strategy = strategy_returns.reset_index(drop=True).iloc[
-        benchmark_returns["strategy_index"].to_numpy()
-    ].reset_index(drop=True)
-    excess = aligned_strategy.fillna(0.0) - benchmark_returns["return"].reset_index(
-        drop=True
+    aligned_strategy = (
+        strategy_returns.reset_index(drop=True)
+        .iloc[benchmark_returns["strategy_index"].to_numpy()]
+        .reset_index(drop=True)
     )
+    excess = aligned_strategy.fillna(0.0) - benchmark_returns["return"].reset_index(drop=True)
     equity = arithmetic_equity(excess)
     return [
         {
@@ -231,9 +229,11 @@ def _aligned_benchmark_returns(
     aligned = aligned.dropna(subset=["return_"])
     if aligned.empty:
         return pd.DataFrame(columns=["strategy_index", "date", "return"])
-    return aligned.rename(columns={"return_": "return"}).loc[
-        :, ["strategy_index", "date", "return"]
-    ].reset_index(drop=True)
+    return (
+        aligned.rename(columns={"return_": "return"})
+        .loc[:, ["strategy_index", "date", "return"]]
+        .reset_index(drop=True)
+    )
 
 
 def _numeric_column(rows: pd.DataFrame, column: str) -> pd.Series:

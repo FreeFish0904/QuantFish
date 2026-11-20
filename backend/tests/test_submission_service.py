@@ -158,16 +158,14 @@ class PumpRecorder:
         self.calls += 1
 
 
-def _service(tmp_path: Path, runner: FakeRunner) -> tuple[
-    SubmissionService, TeamRepository, SubmissionRepository, SubmissionStorage
-]:
+def _service(
+    tmp_path: Path, runner: FakeRunner
+) -> tuple[SubmissionService, TeamRepository, SubmissionRepository, SubmissionStorage]:
     teams = TeamRepository(tmp_path / "runtime")
     submissions = SubmissionRepository(tmp_path / "runtime")
     storage = SubmissionStorage(tmp_path / "runtime", max_upload_bytes=200)
     teams.save(
-        Team.from_plaintext_password(
-            team_id="team-a", display_name="Team A", password="secret"
-        )
+        Team.from_plaintext_password(team_id="team-a", display_name="Team A", password="secret")
     )
     return SubmissionService(teams, submissions, storage, runner), teams, submissions, storage
 
@@ -261,8 +259,7 @@ def test_submission_repository_migrates_json_to_sqlite_once(tmp_path: Path) -> N
     ]
     legacy_path = repository_dir / "submissions.json"
     legacy_path.write_text(
-        json.dumps([submission.to_dict() for submission in legacy_submissions], indent=2)
-        + "\n",
+        json.dumps([submission.to_dict() for submission in legacy_submissions], indent=2) + "\n",
         encoding="utf-8",
     )
 
@@ -1392,7 +1389,9 @@ def test_backtest_submission_runner_uses_configured_hidden_release(
     strategy_path.write_text("def generate_signals(data):\n    return []\n", encoding="utf-8")
     calls: dict[str, object] = {}
 
-    def fake_run_student_backtest(strategy: Path, data_root: Path, config: PlatformConfig) -> object:
+    def fake_run_student_backtest(
+        strategy: Path, data_root: Path, config: PlatformConfig
+    ) -> object:
         calls["strategy"] = strategy
         calls["data_root"] = data_root
         calls["scoring_start"] = config.backtest.scoring_start.isoformat()
@@ -1472,15 +1471,15 @@ def test_score_worker_uses_learning_release_and_dates_for_learning_track(
     strategy_path.write_text("def generate_signals(data):\n    return []\n", encoding="utf-8")
     calls: dict[str, object] = {}
 
-    def fake_run_student_backtest(strategy: Path, data_root: Path, config: PlatformConfig) -> object:
+    def fake_run_student_backtest(
+        strategy: Path, data_root: Path, config: PlatformConfig
+    ) -> object:
         calls["strategy"] = strategy
         calls["data_root"] = data_root
         calls["data_start"] = config.backtest.data_start.isoformat()
         calls["scoring_start"] = config.backtest.scoring_start.isoformat()
         calls["scoring_end"] = config.backtest.scoring_end.isoformat()
-        calls["terminal_stale_position_policy"] = (
-            config.execution.terminal_stale_position_policy
-        )
+        calls["terminal_stale_position_policy"] = config.execution.terminal_stale_position_policy
         return object()
 
     def fake_write_backtest_report(result: object, report_dir: Path) -> list[Path]:
@@ -1574,9 +1573,7 @@ def test_backtest_submission_runner_caches_fingerprint_context_until_release_cha
     assert first == second
     assert first.hidden_catalog_sha256 == "release-1"
     assert first.release_generation == "generation-1"
-    assert runner.current_release_generation(SubmissionDataTrack.HIDDEN_TEST) == (
-        "generation-1"
-    )
+    assert runner.current_release_generation(SubmissionDataTrack.HIDDEN_TEST) == ("generation-1")
     assert calls == [hidden_root / "data_catalog.json"]
 
     data_path.write_text("value\n123\n", encoding="utf-8")
@@ -1741,7 +1738,9 @@ def test_score_worker_resolves_relative_hidden_release_from_config_directory(
     strategy_path.write_text("def generate_signals(data):\n    return []\n", encoding="utf-8")
     calls: dict[str, object] = {}
 
-    def fake_run_student_backtest(strategy: Path, data_root: Path, config: PlatformConfig) -> object:
+    def fake_run_student_backtest(
+        strategy: Path, data_root: Path, config: PlatformConfig
+    ) -> object:
         calls["strategy"] = strategy
         calls["data_root"] = data_root
         calls["group_count"] = config.backtest.group_count
@@ -1884,8 +1883,7 @@ def test_backtest_submission_runner_uses_sanitized_worker_failure(
             {
                 "code": "terminal_stale_positions",
                 "message": (
-                    "Backtest ended with 3 unpriced terminal positions "
-                    "(gross exposure 0.125000)"
+                    "Backtest ended with 3 unpriced terminal positions (gross exposure 0.125000)"
                 ),
             }
         ),
@@ -1938,14 +1936,11 @@ def test_score_worker_records_terminal_failure_and_clears_it_after_success(
     capsys.readouterr()
     assert json.loads((report_dir / WORKER_FAILURE_FILE).read_text(encoding="utf-8")) == {
         "code": "terminal_stale_positions",
-        "message": (
-            "Backtest ended with 2 unpriced terminal positions "
-            "(gross exposure 0.250000)"
-        ),
+        "message": ("Backtest ended with 2 unpriced terminal positions (gross exposure 0.250000)"),
     }
-    assert "TerminalStalePositionsError" in (
-        report_dir / "worker_error.log"
-    ).read_text(encoding="utf-8")
+    assert "TerminalStalePositionsError" in (report_dir / "worker_error.log").read_text(
+        encoding="utf-8"
+    )
 
     monkeypatch.setattr(
         "quantfish.submissions.score_worker.score_submission",
@@ -1958,9 +1953,7 @@ def test_score_worker_records_terminal_failure_and_clears_it_after_success(
     assert not (report_dir / "worker_error.log").exists()
     (report_dir / "worker_stdout.log").touch()
     (report_dir / "worker_stderr.log").touch()
-    assert not submission_has_raw_error(
-        SimpleNamespace(report_dir=report_dir, error_message=None)
-    )
+    assert not submission_has_raw_error(SimpleNamespace(report_dir=report_dir, error_message=None))
 
 
 def test_score_worker_keeps_student_stdout_out_of_machine_response(
@@ -1973,7 +1966,9 @@ def test_score_worker_keeps_student_stdout_out_of_machine_response(
     strategy_path = tmp_path / "strategy.py"
     strategy_path.write_text("def generate_signals(data):\n    return []\n", encoding="utf-8")
 
-    def fake_run_student_backtest(strategy: Path, data_root: Path, config: BacktestConfig) -> object:
+    def fake_run_student_backtest(
+        strategy: Path, data_root: Path, config: BacktestConfig
+    ) -> object:
         print("STUDENT-PRINTED-HIDDEN-DATA")
         return object()
 

@@ -153,8 +153,7 @@ def test_release_job_status_reports_source_and_catalog_readiness(tmp_path: Path)
     repository = _config_repository(tmp_path)
     config = repository.load()
     learning_2_catalog = (
-        Path(config.data_releases.release_window("learning_2").output_root)
-        / "data_catalog.json"
+        Path(config.data_releases.release_window("learning_2").output_root) / "data_catalog.json"
     )
     learning_2_catalog.parent.mkdir(parents=True)
     learning_2_catalog.write_text("{}", encoding="utf-8")

@@ -18,9 +18,7 @@ def write_backtest_report(result: BacktestResult, output_dir: Path | str) -> lis
         _write_parquet(output_path / "daily_returns.parquet", result.daily_returns),
         _write_parquet(output_path / "net_value.parquet", result.net_value),
         _write_parquet(output_path / "turnover.parquet", result.turnover),
-        _write_parquet(
-            output_path / "group_daily_returns.parquet", result.group_daily_returns
-        ),
+        _write_parquet(output_path / "group_daily_returns.parquet", result.group_daily_returns),
         _write_csv(output_path / "performance_by_year.csv", result.performance_by_year),
         _write_json(output_path / "graph_data.json", result.graph_data),
         _write_json(output_path / "diagnostics.json", result.diagnostics),
@@ -40,8 +38,7 @@ def _write_parquet(path: Path, frame: pd.DataFrame) -> Path:
 
 def _write_json(path: Path, payload: dict[str, Any]) -> Path:
     path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True, default=str)
-        + "\n",
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True, default=str) + "\n",
         encoding="utf-8",
     )
     return path

@@ -125,10 +125,7 @@ def test_refresh_rebuilds_both_releases_and_student_archives(tmp_path: Path) -> 
         / "daily_returns.csv"
     )
     hidden_returns = pd.read_csv(
-        Path(config.data_releases.hidden_output_root)
-        / "distribute"
-        / "stock"
-        / "daily_returns.csv"
+        Path(config.data_releases.hidden_output_root) / "distribute" / "stock" / "daily_returns.csv"
     )
     assert learning_returns["TradingDate"].tolist() == ["2022-06-01"]
     assert hidden_returns["TradingDate"].tolist() == ["2023-06-01"]
@@ -186,10 +183,7 @@ def test_refresh_does_not_rebuild_explicit_historical_release_roots(
     tmp_path: Path,
 ) -> None:
     config = _config(tmp_path)
-    historical_roots = [
-        tmp_path / "live_releases" / f"learning_{index}"
-        for index in range(1, 4)
-    ]
+    historical_roots = [tmp_path / "live_releases" / f"learning_{index}" for index in range(1, 4)]
     for root in historical_roots:
         root.mkdir(parents=True)
         (root / "sentinel.txt").write_text("keep", encoding="utf-8")
@@ -398,9 +392,9 @@ def test_refresh_preserves_previous_releases_when_rebuild_fails(tmp_path: Path) 
     with pytest.raises(FileNotFoundError):
         service.refresh(bad_config)
 
-    assert (
-        Path(config.data_releases.learning_output_root) / "data_catalog.json"
-    ).read_text(encoding="utf-8") == original_learning
+    assert (Path(config.data_releases.learning_output_root) / "data_catalog.json").read_text(
+        encoding="utf-8"
+    ) == original_learning
 
 
 def test_export_monitor_status_and_refresh_commands(

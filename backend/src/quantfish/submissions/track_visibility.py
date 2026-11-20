@@ -16,8 +16,7 @@ def public_data_tracks(services: Any) -> list[SubmissionDataTrack]:
         SubmissionDataTrack.LEARNING_3,
     ):
         if config is None or (
-            config.data_releases.release_window(track.value).end
-            < config.data_releases.hidden_start
+            config.data_releases.release_window(track.value).end < config.data_releases.hidden_start
         ):
             tracks.append(track)
     if config is None or config.execution.hidden_test_enabled:

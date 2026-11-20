@@ -95,9 +95,7 @@ def test_learning_windows_that_overlap_hidden_data_are_not_public(
     ).validate()
     repository = ConfigRepository(tmp_path / "platform.yaml")
     repository.save(config)
-    services = SimpleNamespace(
-        submission_service=SimpleNamespace(config_repository=repository)
-    )
+    services = SimpleNamespace(submission_service=SimpleNamespace(config_repository=repository))
 
     assert public_data_tracks(services) == [
         SubmissionDataTrack.LEARNING,

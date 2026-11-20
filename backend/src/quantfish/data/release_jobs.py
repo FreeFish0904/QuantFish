@@ -149,9 +149,7 @@ class DataReleaseBuildService:
             status="queued",
             release_names=selected,
             progress_percent=0,
-            tracks=tuple(
-                ReleaseTrackBuildProgress(release_name=name) for name in selected
-            ),
+            tracks=tuple(ReleaseTrackBuildProgress(release_name=name) for name in selected),
             created_at=created_at,
         )
         with self._lock:
@@ -282,9 +280,7 @@ class DataReleaseBuildService:
             if self._job is None or self._job.job_id != job_id:
                 return
             tracks = tuple(
-                replace(track, **changes)
-                if track.release_name == release_name
-                else track
+                replace(track, **changes) if track.release_name == release_name else track
                 for track in self._job.tracks
             )
             overall = _overall_progress(tracks)

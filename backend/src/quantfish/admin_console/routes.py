@@ -172,9 +172,7 @@ def build_admin_data_releases(
 ) -> dict[str, Any]:
     require_admin_session(request)
     try:
-        return request.app.state.services.data_release_build_service.start(
-            payload.release_names
-        )
+        return request.app.state.services.data_release_build_service.start(payload.release_names)
     except ReleaseBuildAlreadyRunning as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except (ValueError, FileNotFoundError) as exc:
@@ -428,7 +426,11 @@ def rerun_admin_team_cohort_submissions(
         raise HTTPException(status_code=404, detail="cohort not found") from exc
 
 
-@router.get("/api/admin/submissions", response_model=AdminSubmissionsResponse, response_model_exclude_unset=True)
+@router.get(
+    "/api/admin/submissions",
+    response_model=AdminSubmissionsResponse,
+    response_model_exclude_unset=True,
+)
 def admin_submissions(
     request: Request,
     limit: Annotated[int | None, Query(ge=1, le=100)] = None,
@@ -580,13 +582,14 @@ def environment_options(request: Request) -> dict[str, Any]:
 def environment_download(request: Request, platform: str) -> FileResponse:
     service = request.app.state.services.student_export_service
     options = {
-        option["platform"]: option
-        for option in service.environment_options().get("platforms", [])
+        option["platform"]: option for option in service.environment_options().get("platforms", [])
     }
     option = options.get(platform)
     path = service.environment_zip_path(platform)
     if option is None or option.get("status") != "available" or not path.exists():
-        raise HTTPException(status_code=404, detail=f"environment package is not available: {platform}")
+        raise HTTPException(
+            status_code=404, detail=f"environment package is not available: {platform}"
+        )
     return FileResponse(
         path,
         media_type="application/zip",

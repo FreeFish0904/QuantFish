@@ -239,10 +239,13 @@ def test_admin_data_release_routes_require_auth_and_start_selected_tracks(
     assert start_response.status_code == 202
     assert start_response.json() == job_payload
     assert started == [["learning_1", "learning_3"]]
-    assert client.post(
-        "/api/admin/data-releases/build",
-        json={"release_names": ["learning"]},
-    ).status_code == 422
+    assert (
+        client.post(
+            "/api/admin/data-releases/build",
+            json={"release_names": ["learning"]},
+        ).status_code
+        == 422
+    )
 
 
 def test_admin_data_release_route_returns_conflict_for_active_job(
@@ -687,9 +690,9 @@ def test_admin_team_lifecycle_uses_generated_ids_and_never_lists_passwords(
     assert edited.status_code == 200
     assert edited.json()["team_name"] == "Alpha Renamed"
     assert edited.json()["password"] == "second-secret"
-    assert "second-secret" not in (
-        settings.repositories_root / "teams.json"
-    ).read_text(encoding="utf-8")
+    assert "second-secret" not in (settings.repositories_root / "teams.json").read_text(
+        encoding="utf-8"
+    )
 
     assert client.post(
         "/api/submissions",
@@ -805,9 +808,7 @@ def test_admin_team_cohorts_manage_membership_and_dedicated_history(
     )
 
     regular_admin_history = client.get("/api/admin/submissions").json()
-    cohort_history = client.get(
-        f"/api/admin/team-cohorts/{cohort['cohort_id']}/submissions"
-    ).json()
+    cohort_history = client.get(f"/api/admin/team-cohorts/{cohort['cohort_id']}/submissions").json()
 
     assert regular_admin_history["submissions"] == []
     assert cohort_history["total_count"] == 1
@@ -860,6 +861,7 @@ def test_admin_submission_records_include_raw_details_and_delete_safely(
     settings = _settings(tmp_path)
     app = create_app(settings)
     services = app.state.services
+
     class CancelRecorder:
         def __init__(self) -> None:
             self.cancelled: list[str] = []
@@ -1067,9 +1069,7 @@ def test_admin_rerun_all_requeues_terminal_visible_submissions_and_preserves_his
         "/api/submissions",
         params={"sort_by": "submission_number", "sort_dir": "asc"},
     ).json()["submissions"]
-    assert [row["submission_id"] for row in after] == [
-        row["submission_id"] for row in before
-    ]
+    assert [row["submission_id"] for row in after] == [row["submission_id"] for row in before]
 
 
 def test_admin_rerun_selected_requeues_terminal_rows_and_reports_skips(
@@ -1288,9 +1288,14 @@ def test_admin_backfill_short_profit_requeues_only_missing_completed_submissions
         "submission_ids": ["missing-short-profit"],
     }
     assert pump_recorder.pumps == 1
-    assert services.submission_repository.get("missing-short-profit").status == SubmissionStatus.QUEUED
+    assert (
+        services.submission_repository.get("missing-short-profit").status == SubmissionStatus.QUEUED
+    )
     assert services.submission_repository.get("missing-short-profit").metrics is None
-    assert services.submission_repository.get("already-backfilled").status == SubmissionStatus.COMPLETED
+    assert (
+        services.submission_repository.get("already-backfilled").status
+        == SubmissionStatus.COMPLETED
+    )
     assert services.submission_repository.get("failed-missing").status == SubmissionStatus.FAILED
 
 

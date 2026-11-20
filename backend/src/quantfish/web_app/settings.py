@@ -16,9 +16,7 @@ class WebSettings:
     max_upload_bytes: int = 1_000_000
     submission_cooldown_seconds: float = 2.0
     engine_version: str = field(default_factory=lambda: _default_engine_version())
-    cors_allowed_origins: tuple[str, ...] = field(
-        default_factory=lambda: _cors_allowed_origins()
-    )
+    cors_allowed_origins: tuple[str, ...] = field(default_factory=lambda: _cors_allowed_origins())
     student_exports_enabled: bool = True
     admin_password: str = field(
         default_factory=lambda: os.environ.get("QUANTFISH_ADMIN_PASSWORD", "")

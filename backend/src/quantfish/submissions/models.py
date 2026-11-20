@@ -75,9 +75,7 @@ class Team:
             display_name=str(data["display_name"]),
             password_hash=str(password_hash),
             created_at=str(data.get("created_at") or _utc_now()),
-            archived_at=(
-                str(data["archived_at"]) if data.get("archived_at") is not None else None
-            ),
+            archived_at=(str(data["archived_at"]) if data.get("archived_at") is not None else None),
         )
 
 
@@ -254,20 +252,14 @@ class SubmissionMetrics:
             sharpe=_optional_float(summary.get("sharpe")),
             max_drawdown=_optional_float(summary.get("max_drawdown")),
             average_turnover=_optional_float(summary.get("average_turnover")),
-            average_short_exposure=_optional_float(
-                summary.get("average_short_exposure")
-            ),
+            average_short_exposure=_optional_float(summary.get("average_short_exposure")),
             long_total_return=_optional_float(summary.get("long_total_return")),
             short_total_return=_optional_float(summary.get("short_total_return")),
-            annualized_short_profit=_optional_float(
-                summary.get("annualized_short_profit")
-            ),
+            annualized_short_profit=_optional_float(summary.get("annualized_short_profit")),
             calmar=_optional_float(summary.get("calmar")),
             win_rate=_optional_float(summary.get("win_rate")),
             stale_position_days=_optional_int(summary.get("stale_position_days")),
-            max_stale_gross_exposure=_optional_float(
-                summary.get("max_stale_gross_exposure")
-            ),
+            max_stale_gross_exposure=_optional_float(summary.get("max_stale_gross_exposure")),
             average_stale_gross_exposure=_optional_float(
                 summary.get("average_stale_gross_exposure")
             ),
@@ -291,13 +283,9 @@ class SubmissionMetrics:
             active_annual_return=_optional_float(summary.get("active_annual_return")),
             active_max_drawdown=_optional_float(summary.get("active_max_drawdown")),
             active_calmar=_optional_float(summary.get("active_calmar")),
-            compounded_total_return=_optional_float(
-                summary.get("compounded_total_return")
-            ),
+            compounded_total_return=_optional_float(summary.get("compounded_total_return")),
             cagr=_optional_float(summary.get("cagr")),
-            compounded_max_drawdown=_optional_float(
-                summary.get("compounded_max_drawdown")
-            ),
+            compounded_max_drawdown=_optional_float(summary.get("compounded_max_drawdown")),
             compounded_calmar=_optional_float(summary.get("compounded_calmar")),
             volatility=_optional_float(summary.get("volatility")),
             sortino=_optional_float(summary.get("sortino")),
@@ -306,22 +294,16 @@ class SubmissionMetrics:
             strategy_total_return=_optional_float(summary.get("strategy_total_return")),
             strategy_annual_return=_optional_float(summary.get("strategy_annual_return")),
             benchmark_total_return=_optional_float(summary.get("benchmark_total_return")),
-            benchmark_annual_return=_optional_float(
-                summary.get("benchmark_annual_return")
-            ),
+            benchmark_annual_return=_optional_float(summary.get("benchmark_annual_return")),
             benchmark_cagr=_optional_float(summary.get("benchmark_cagr")),
             excess_total_return=_optional_float(summary.get("excess_total_return")),
             excess_annual_return=_optional_float(summary.get("excess_annual_return")),
-            excess_compounded_return=_optional_float(
-                summary.get("excess_compounded_return")
-            ),
+            excess_compounded_return=_optional_float(summary.get("excess_compounded_return")),
             excess_cagr=_optional_float(summary.get("excess_cagr")),
             excess_max_drawdown=_optional_float(summary.get("excess_max_drawdown")),
             excess_win_rate=_optional_float(summary.get("excess_win_rate")),
             excess_volatility=_optional_float(summary.get("excess_volatility")),
-            excess_information_ratio=_optional_float(
-                summary.get("excess_information_ratio")
-            ),
+            excess_information_ratio=_optional_float(summary.get("excess_information_ratio")),
             excess_beta=_optional_float(summary.get("excess_beta")),
             excess_observations=_optional_int(summary.get("excess_observations")),
         )
@@ -396,9 +378,15 @@ class Submission:
                 if isinstance(data.get("config_snapshot"), Mapping)
                 else None
             ),
-            report_pdf_status=str(data["report_pdf_status"]) if data.get("report_pdf_status") is not None else None,
-            report_pdf_path=str(data["report_pdf_path"]) if data.get("report_pdf_path") is not None else None,
-            report_pdf_created_at=str(data["report_pdf_created_at"]) if data.get("report_pdf_created_at") is not None else None,
+            report_pdf_status=str(data["report_pdf_status"])
+            if data.get("report_pdf_status") is not None
+            else None,
+            report_pdf_path=str(data["report_pdf_path"])
+            if data.get("report_pdf_path") is not None
+            else None,
+            report_pdf_created_at=str(data["report_pdf_created_at"])
+            if data.get("report_pdf_created_at") is not None
+            else None,
         )
 
 
@@ -565,9 +553,7 @@ def submission_detail_payload(
     )
     payload.update(
         {
-            "fingerprints": submission.fingerprints.to_dict()
-            if submission.fingerprints
-            else None,
+            "fingerprints": submission.fingerprints.to_dict() if submission.fingerprints else None,
             "original_filename": submission.original_filename,
             "artifacts": dict(artifacts or {}),
             "execution_parameters": submission_execution_parameters(submission),

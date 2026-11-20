@@ -60,9 +60,7 @@ def test_benchmark_relative_metrics_match_hand_calculated_sample() -> None:
     assert metrics.excess_max_drawdown == pytest.approx(1.0 - 1.01 / 1.04)
     assert metrics.excess_win_rate == pytest.approx(3 / 5)
     assert metrics.excess_volatility == pytest.approx(excess_volatility)
-    assert metrics.excess_information_ratio == pytest.approx(
-        (0.02 * 252 / 5) / excess_volatility
-    )
+    assert metrics.excess_information_ratio == pytest.approx((0.02 * 252 / 5) / excess_volatility)
     assert metrics.excess_beta == pytest.approx(2.5)
 
     fields = metrics.summary_fields()
@@ -148,9 +146,7 @@ def test_benchmark_relative_metrics_drop_days_without_benchmark_return() -> None
     benchmark = _benchmark(BENCHMARK)
     benchmark.loc[len(benchmark)] = {"date": pd.Timestamp("2023-01-20"), "return": None}
 
-    metrics = calculate_benchmark_relative_metrics(
-        _daily(STRATEGY), benchmark, min_observations=5
-    )
+    metrics = calculate_benchmark_relative_metrics(_daily(STRATEGY), benchmark, min_observations=5)
 
     assert metrics.observations == 5
     assert metrics.excess_beta == pytest.approx(2.5)

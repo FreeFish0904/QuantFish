@@ -253,7 +253,8 @@ def test_long_only_active_returns_beta_uses_excess_returns() -> None:
             }
             for date, benchmark_return in zip(
                 ["2023-01-03", "2023-01-04", "2023-01-05", "2023-01-06"],
-                benchmark_returns, strict=True,
+                benchmark_returns,
+                strict=True,
             )
         ]
     )
@@ -262,7 +263,8 @@ def test_long_only_active_returns_beta_uses_excess_returns() -> None:
             {"date": date, "return": benchmark_return}
             for date, benchmark_return in zip(
                 ["2023-01-03", "2023-01-04", "2023-01-05", "2023-01-06"],
-                benchmark_returns, strict=True,
+                benchmark_returns,
+                strict=True,
             )
         ]
     )
@@ -360,14 +362,14 @@ def test_yearly_performance_table_splits_total_and_annualized_returns() -> None:
     assert rows["2023"]["turnover"] == pytest.approx(0.3)
     relative_drawdown = 1.0 - 1.05 / 1.10
     assert rows["2023"]["drawdown"] == pytest.approx(relative_drawdown)
-    assert rows["2023"]["sharpe"] == pytest.approx((0.025 / pd.Series([0.10, -0.05]).std()) * (252 ** 0.5))
+    assert rows["2023"]["sharpe"] == pytest.approx(
+        (0.025 / pd.Series([0.10, -0.05]).std()) * (252**0.5)
+    )
     assert rows["2023"]["fitness"] == pytest.approx(
         rows["2023"]["sharpe"]
         * ((abs(rows["2023"]["annualized_return"]) / rows["2023"]["turnover"]) ** 0.5)
     )
-    assert rows["2023"]["calmar"] == pytest.approx(
-        (0.025 * 252) / relative_drawdown
-    )
+    assert rows["2023"]["calmar"] == pytest.approx((0.025 * 252) / relative_drawdown)
 
     assert rows["2024"]["long"] == pytest.approx(0.8)
     assert rows["2024"]["short"] == pytest.approx(-0.3)
@@ -496,12 +498,28 @@ def test_graph_data_is_json_friendly_with_cumulative_group_series() -> None:
         {"date": "2023-01-04", "drawdown": pytest.approx(1.05 / 1.10 - 1.0)},
     ]
     assert graph_data["daily_pnl"] == [
-        {"date": "2023-01-03", "pnl_cny": pytest.approx(100_000), "daily_return": pytest.approx(0.10)},
-        {"date": "2023-01-04", "pnl_cny": pytest.approx(-50_000), "daily_return": pytest.approx(-0.05)},
+        {
+            "date": "2023-01-03",
+            "pnl_cny": pytest.approx(100_000),
+            "daily_return": pytest.approx(0.10),
+        },
+        {
+            "date": "2023-01-04",
+            "pnl_cny": pytest.approx(-50_000),
+            "daily_return": pytest.approx(-0.05),
+        },
     ]
     assert graph_data["trade_volume"] == [
-        {"date": "2023-01-03", "buy_cny": pytest.approx(250_000), "sell_cny": pytest.approx(150_000)},
-        {"date": "2023-01-04", "buy_cny": pytest.approx(50_000), "sell_cny": pytest.approx(150_000)},
+        {
+            "date": "2023-01-03",
+            "buy_cny": pytest.approx(250_000),
+            "sell_cny": pytest.approx(150_000),
+        },
+        {
+            "date": "2023-01-04",
+            "buy_cny": pytest.approx(50_000),
+            "sell_cny": pytest.approx(150_000),
+        },
     ]
     assert graph_data["benchmark"] == [
         {
@@ -653,7 +671,11 @@ def test_graph_data_omits_benchmark_and_alpha_when_index_data_is_missing() -> No
     assert graph_data["benchmark"] == []
     assert graph_data["alpha"] == []
     assert graph_data["daily_pnl"] == [
-        {"date": "2023-01-03", "pnl_cny": pytest.approx(100_000), "daily_return": pytest.approx(0.10)}
+        {
+            "date": "2023-01-03",
+            "pnl_cny": pytest.approx(100_000),
+            "daily_return": pytest.approx(0.10),
+        }
     ]
 
 
@@ -760,9 +782,7 @@ def test_metrics_report_geometric_basis_alongside_arithmetic_basis() -> None:
     assert summary["annual_return"] == pytest.approx(0.07 / 3 * 252)
     assert summary["compounded_total_return"] == pytest.approx(growth - 1.0)
     assert summary["cagr"] == pytest.approx(growth ** (252 / 3) - 1.0)
-    assert summary["compounded_max_drawdown"] == pytest.approx(
-        1.0 - (1.10 * 0.95) / 1.10
-    )
+    assert summary["compounded_max_drawdown"] == pytest.approx(1.0 - (1.10 * 0.95) / 1.10)
     assert summary["compounded_calmar"] == pytest.approx(
         summary["cagr"] / summary["compounded_max_drawdown"]
     )
@@ -821,4 +841,3 @@ def test_metrics_mark_undefined_statistics_missing_instead_of_infinite() -> None
     assert single_day["volatility"] is None
     assert single_day["sortino"] is None
     assert single_day["t_stat"] is None
-

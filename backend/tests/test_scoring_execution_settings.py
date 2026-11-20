@@ -57,9 +57,7 @@ def test_scoring_weights_use_year_metrics_turnover_penalty_and_minimum_days() ->
 
     assert ranked[0].id == "eligible"
     assert ranked[0].eligible is True
-    assert ranked[0].score == pytest.approx(
-        2.0 + 0.8 - 1.0 - 2.5 - 4.0
-    )
+    assert ranked[0].score == pytest.approx(2.0 + 0.8 - 1.0 - 2.5 - 4.0)
     assert ranked[1].id == "too-short"
     assert ranked[1].eligible is False
     assert ranked[1].badge is None

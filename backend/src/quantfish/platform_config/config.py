@@ -170,9 +170,7 @@ class PlatformConfig:
     def from_dict(cls, data: Mapping[str, Any]) -> PlatformConfig:
         defaults = cls.default()
         return cls(
-            course=CourseConfig(
-                **_merge_section(defaults.course, data.get("course", {}))
-            ),
+            course=CourseConfig(**_merge_section(defaults.course, data.get("course", {}))),
             data_releases=DataReleasesConfig(
                 **_merge_section(
                     defaults.data_releases,
@@ -192,9 +190,7 @@ class PlatformConfig:
                 )
             ),
             execution=ExecutionConfig(
-                **_coerce_execution(
-                    _merge_section(defaults.execution, data.get("execution", {}))
-                )
+                **_coerce_execution(_merge_section(defaults.execution, data.get("execution", {})))
             ),
         ).validate()
 
@@ -236,10 +232,7 @@ class PlatformConfig:
                         "data release output roots must be distinct: "
                         f"{existing_name} and {window.name}"
                     )
-                if (
-                    resolved_root in existing_root.parents
-                    or existing_root in resolved_root.parents
-                ):
+                if resolved_root in existing_root.parents or existing_root in resolved_root.parents:
                     raise ValueError(
                         "data release output roots cannot contain each other: "
                         f"{existing_name} and {window.name}"
@@ -379,9 +372,7 @@ class PlatformConfig:
         if self.execution.submission_timeout_seconds < 1:
             raise ValueError("submission_timeout_seconds must be positive")
         if self.execution.terminal_stale_position_policy not in {"carry", "reject"}:
-            raise ValueError(
-                "terminal_stale_position_policy must be 'carry' or 'reject'"
-            )
+            raise ValueError("terminal_stale_position_policy must be 'carry' or 'reject'")
         return self
 
 
@@ -515,11 +506,7 @@ def _coerce_scoring(values: dict[str, Any]) -> dict[str, Any]:
     has_new_schema = bool(_NEW_SCORING_KEYS.intersection(values))
     minimum_days = values.get("minimum_slice_trading_days")
     if _LEGACY_SCORING_KEYS.intersection(values) and not has_new_schema:
-        return (
-            {"minimum_slice_trading_days": minimum_days}
-            if minimum_days is not None
-            else {}
-        )
+        return {"minimum_slice_trading_days": minimum_days} if minimum_days is not None else {}
     for key in _LEGACY_SCORING_KEYS:
         values.pop(key, None)
     return values

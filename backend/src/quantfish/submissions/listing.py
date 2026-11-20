@@ -91,15 +91,15 @@ def submission_page(
     score_for: Callable[[Submission], float | None] | None = None,
 ) -> SubmissionPage:
     rows = [
-        submission
-        for submission in submissions
-        if _matches_filters(submission, team_names, params)
+        submission for submission in submissions if _matches_filters(submission, team_names, params)
     ]
     rows = _sort_submissions(rows, team_names=team_names, params=params, score_for=score_for)
     total_count = len(rows)
     offset = max(0, params.offset)
     if params.limit is None:
-        return SubmissionPage(items=rows[offset:], total_count=total_count, limit=None, offset=offset)
+        return SubmissionPage(
+            items=rows[offset:], total_count=total_count, limit=None, offset=offset
+        )
     limit = max(1, params.limit)
     return SubmissionPage(
         items=rows[offset : offset + limit],
@@ -262,6 +262,4 @@ def _compare_sort_values(first: Any, second: Any, *, direction: SortDirection) -
 
 
 def _missing_sort_value(value: Any) -> bool:
-    return value is None or (
-        isinstance(value, float) and not math.isfinite(value)
-    )
+    return value is None or (isinstance(value, float) and not math.isfinite(value))

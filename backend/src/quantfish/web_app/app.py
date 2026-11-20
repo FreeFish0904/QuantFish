@@ -126,9 +126,7 @@ def create_app(
             app="QuantFish",
             status=report.status,
             engine_version=resolved.engine_version,
-            checks=[
-                ReadinessCheckResponse(**check.to_payload()) for check in report.checks
-            ],
+            checks=[ReadinessCheckResponse(**check.to_payload()) for check in report.checks],
         )
 
     _include_routes(app)
@@ -162,9 +160,7 @@ def _build_services(
     artifact_reader = ReportArtifactReader()
     runner = submission_runner or BacktestSubmissionRunner(settings)
     config_repository = ConfigRepository(settings.config_path)
-    release_lock_manager = ReleaseLockManager(
-        settings.runtime_root / "locks" / "data-releases"
-    )
+    release_lock_manager = ReleaseLockManager(settings.runtime_root / "locks" / "data-releases")
     settings_history_repository = AdminSettingsHistoryRepository(settings.runtime_root)
     student_export_service = StudentExportService(settings, config_repository)
     submission_service = SubmissionService(
@@ -273,8 +269,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     missing_credentials = _missing_app_credentials(settings)
     if missing_credentials:
         parser.error(
-            "web startup requires explicit credentials; missing: "
-            + ", ".join(missing_credentials)
+            "web startup requires explicit credentials; missing: " + ", ".join(missing_credentials)
         )
     uvicorn.run(create_app(settings), host=args.host, port=args.port)
 
@@ -289,9 +284,7 @@ def _missing_app_credentials(settings: WebSettings) -> tuple[str, ...]:
         ),
     )
     return tuple(
-        name
-        for name, value in required
-        if not isinstance(value, str) or not value.strip()
+        name for name, value in required if not isinstance(value, str) or not value.strip()
     )
 
 

@@ -39,8 +39,7 @@ class ComparisonService:
             artifacts = {}
             report_dir = Path(submission.report_dir)
             if report_dir.exists() and (
-                submission.status.value == "completed"
-                or report_artifacts_available(report_dir)
+                submission.status.value == "completed" or report_artifacts_available(report_dir)
             ):
                 artifacts = self.artifact_reader.read(report_dir, include_parquet=False)
             graph_data_source = artifacts.get("graph_data", {})
@@ -69,9 +68,7 @@ class ComparisonService:
             }
             if include_graph_data:
                 compared_submission["graph_data"] = graph_data
-            submissions.append(
-                compared_submission
-            )
+            submissions.append(compared_submission)
         return {"submissions": submissions}
 
     def _submission_visible(self, submission: Any) -> bool:

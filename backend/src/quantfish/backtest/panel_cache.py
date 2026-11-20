@@ -67,9 +67,7 @@ def _cache_metadata(
         "returns_dataset": returns_dataset,
         "adj_factor_dataset": adj_factor_dataset,
         "allowed_market_types": (
-            list(bundle.allowed_market_types)
-            if bundle.allowed_market_types is not None
-            else None
+            list(bundle.allowed_market_types) if bundle.allowed_market_types is not None else None
         ),
         "files": [
             _file_signature("data_catalog.json", catalog_path),

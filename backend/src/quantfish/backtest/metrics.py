@@ -336,9 +336,7 @@ def _compounded_max_drawdown(returns: pd.Series) -> float | None:
     equity = _compounded_equity(returns)
     if equity is None:
         return None
-    series = pd.concat(
-        [pd.Series([1.0]), equity.reset_index(drop=True)], ignore_index=True
-    )
+    series = pd.concat([pd.Series([1.0]), equity.reset_index(drop=True)], ignore_index=True)
     return abs(float(relative_drawdown_from_equity(series).min()))
 
 
@@ -466,7 +464,9 @@ def _calendar_year_returns(daily: pd.DataFrame, returns: pd.Series) -> pd.Series
         return pd.Series(dtype=float)
     years = pd.to_datetime(daily["date"]).dt.year
     frame = pd.DataFrame({"year": years, "portfolio_return": returns})
-    return frame.groupby("year", sort=True)["portfolio_return"].apply(lambda values: float(values.sum()))
+    return frame.groupby("year", sort=True)["portfolio_return"].apply(
+        lambda values: float(values.sum())
+    )
 
 
 def _fitness(sharpe: float, annual_return: float, average_turnover: float) -> float:

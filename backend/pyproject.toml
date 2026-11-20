@@ -76,6 +76,15 @@ ignore = [
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Query"]
 
+# `ruff format` owns whitespace and quoting; lint above stays advisory on E501 so
+# the two passes do not fight each other. The repository was formatted once, in
+# a commit listed in `.git-blame-ignore-revs`, and CI now runs
+# `ruff format --check backend` so later diffs stay reviewable.
+[tool.ruff.format]
+# Format code inside docstrings too, so the snippets embedded in docstrings
+# cannot drift from the style of the surrounding code.
+docstring-code-format = true
+
 # Coverage settings live in the repository root `.coveragerc`: coverage only
 # reads configuration from the current working directory, so keeping them here
 # meant a run from the repository root silently ignored branch coverage, the

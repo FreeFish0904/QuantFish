@@ -61,8 +61,7 @@ def test_panel_prefers_official_backward_factor_for_front_prices() -> None:
     panel = build_backtest_panel(daily_returns, adj_factor).rows
 
     first = panel.loc[
-        (panel["date"] == pd.Timestamp("2023-01-03"))
-        & (panel["symbol"] == "000001")
+        (panel["date"] == pd.Timestamp("2023-01-03")) & (panel["symbol"] == "000001")
     ].iloc[0]
     assert first["raw_vwap"] == 11.0
     assert first["front_close"] == 30.0

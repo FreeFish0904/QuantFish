@@ -157,7 +157,12 @@ def test_build_runtime_package_runs_conda_pack_and_writes_manifest(tmp_path: Pat
     assert result.zip_path == tmp_path / "dist" / "macos-arm64.zip"
     assert result.manifest_path == tmp_path / "dist" / "macos-arm64.json"
     assert commands[0][:4] == ["conda", "create", "-y", "-p"]
-    assert commands[1][:4] == ["conda", "run", "-p", (tmp_path / "build" / "macos-arm64").as_posix()]
+    assert commands[1][:4] == [
+        "conda",
+        "run",
+        "-p",
+        (tmp_path / "build" / "macos-arm64").as_posix(),
+    ]
     assert "https://pypi.tuna.tsinghua.edu.cn/simple" in commands[1]
     assert commands[2][:2] == ["conda-pack", "-p"]
     assert "--zip-symlinks" in commands[2]
@@ -188,8 +193,8 @@ def test_runtime_wrapper_scripts_use_quantfish_conda_env() -> None:
 
     assert "QUANTFISH_CONDA_ENV" in shell_build
     assert "QUANTFISH_CONDA_ENV" in shell_import
-    assert "conda run -n \"$QUANTFISH_CONDA_ENV\" python" in shell_build
-    assert "conda run -n \"$QUANTFISH_CONDA_ENV\" python" in shell_import
+    assert 'conda run -n "$QUANTFISH_CONDA_ENV" python' in shell_build
+    assert 'conda run -n "$QUANTFISH_CONDA_ENV" python' in shell_import
     assert "QUANTFISH_CONDA_ENV" in powershell_build
     assert "QUANTFISH_CONDA_ENV" in powershell_import
     assert '"conda", "run", "-n", $CondaEnv, "python"' in powershell_build

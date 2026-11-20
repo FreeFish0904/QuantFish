@@ -110,9 +110,7 @@ def build_releases_from_config(
 ) -> dict[str, DataCatalog]:
     config.validate()
     releases = config.data_releases
-    windows_by_name = {
-        window.name: window for window in releases.release_windows()
-    }
+    windows_by_name = {window.name: window for window in releases.release_windows()}
     selected_names = _selected_release_names(release_names, windows_by_name)
     selected_windows = [windows_by_name[name] for name in selected_names]
     source_root = Path(releases.raw_data_root)
@@ -198,9 +196,7 @@ def _selected_release_names(
 def _validate_source_catalog(source_root: Path, source_catalog: DataCatalog) -> None:
     if source_catalog.datasets:
         return
-    raise ValueError(
-        f"no supported datasets found in source data root: {source_root}"
-    )
+    raise ValueError(f"no supported datasets found in source data root: {source_root}")
 
 
 def _validate_required_source_datasets(
@@ -271,8 +267,7 @@ def _validate_required_release_datasets(
         spec = release_catalog.resolve(dataset_id)
         if not spec.row_count:
             raise ValueError(
-                f"{release_name} release has no usable rows for required dataset "
-                f"{dataset_id}"
+                f"{release_name} release has no usable rows for required dataset {dataset_id}"
             )
         dataset_path = target.temp_output_root / spec.relative_path
         columns = _release_dataset_columns(dataset_path, spec)
@@ -294,10 +289,7 @@ def _validate_required_release_datasets(
 
 def _release_dataset_columns(path: Path, spec: DatasetSpec) -> list[str]:
     if spec.format == "csv":
-        return [
-            str(column)
-            for column in pd.read_csv(path, nrows=0, encoding="utf-8-sig").columns
-        ]
+        return [str(column) for column in pd.read_csv(path, nrows=0, encoding="utf-8-sig").columns]
     if spec.format == "parquet":
         try:
             import pyarrow.parquet as pq
@@ -318,16 +310,10 @@ def _validate_release_hs300_rows(
     if code_column is None:
         return
     codes = (
-        frame[code_column]
-        .astype(str)
-        .str.strip()
-        .str.replace(r"\.0$", "", regex=True)
-        .str.zfill(6)
+        frame[code_column].astype(str).str.strip().str.replace(r"\.0$", "", regex=True).str.zfill(6)
     )
     if not bool((codes == HS300_INDEX_CODE).any()):
-        raise ValueError(
-            f"{release_name} release has no HS300 rows in {HS300_DATASET}"
-        )
+        raise ValueError(f"{release_name} release has no HS300 rows in {HS300_DATASET}")
 
 
 def _build_release_targets(
@@ -449,11 +435,7 @@ def _validate_target_output_roots(targets: list[_ReleaseTarget]) -> None:
         resolved = target.output_root.resolve()
         target_name = target.name or target.output_root.name
         for existing, existing_name in resolved_roots:
-            if (
-                resolved == existing
-                or resolved in existing.parents
-                or existing in resolved.parents
-            ):
+            if resolved == existing or resolved in existing.parents or existing in resolved.parents:
                 raise ValueError(
                     "release output roots cannot contain each other: "
                     f"{existing_name} and {target_name}"
@@ -639,10 +621,7 @@ def _pre_window_baseline_rows(
         index=before_window.index,
     )
     latest_indexes = (
-        working.sort_values("date", kind="stable")
-        .groupby("symbol", sort=False)
-        .tail(1)
-        .index
+        working.sort_values("date", kind="stable").groupby("symbol", sort=False).tail(1).index
     )
     return df.loc[sorted(latest_indexes)].copy()
 
@@ -907,9 +886,7 @@ def _copy_dataset_docs(source_root: Path, output_root: Path, spec: DatasetSpec) 
     return copied
 
 
-def _copy_unclaimed_docs(
-    source_root: Path, output_root: Path, copied_docs: Iterable[str]
-) -> None:
+def _copy_unclaimed_docs(source_root: Path, output_root: Path, copied_docs: Iterable[str]) -> None:
     copied = set(copied_docs)
     for path in source_root.rglob("*"):
         if not path.is_file() or _is_hidden(path.relative_to(source_root)):
@@ -930,9 +907,7 @@ def _is_hidden(relative_path: Path) -> bool:
 
 def _replace_output(temp_output_root: Path, output_root: Path) -> None:
     output_root.parent.mkdir(parents=True, exist_ok=True)
-    backup_output_root = temp_output_root.with_name(
-        f"{temp_output_root.name}.previous"
-    )
+    backup_output_root = temp_output_root.with_name(f"{temp_output_root.name}.previous")
     previous_output_moved = False
     if output_root.exists():
         output_root.rename(backup_output_root)

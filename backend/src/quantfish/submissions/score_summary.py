@@ -11,9 +11,7 @@ def score_summary_for_submission(
     submission: Any,
     artifact_reader: Any | None = None,
 ) -> dict[str, Any]:
-    stored_summary = (
-        submission.metrics.to_dict() if getattr(submission, "metrics", None) else {}
-    )
+    stored_summary = submission.metrics.to_dict() if getattr(submission, "metrics", None) else {}
     artifact_summary = _artifact_summary(submission, artifact_reader)
     if not artifact_summary:
         return stored_summary

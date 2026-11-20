@@ -131,10 +131,7 @@ def test_failed_score_worker_logs_the_stderr_tail(
         handle.wait()
 
     lines = [record.getMessage() for record in caplog.records]
-    assert any(
-        "event=score_worker_failed" in line and "ValueError: boom" in line
-        for line in lines
-    )
+    assert any("event=score_worker_failed" in line and "ValueError: boom" in line for line in lines)
 
 
 def test_stderr_tail_is_empty_for_blank_output() -> None:

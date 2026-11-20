@@ -113,4 +113,3 @@ class DataCatalog:
         catalog_path = Path(path)
         catalog_path.parent.mkdir(parents=True, exist_ok=True)
         catalog_path.write_text(self.to_json() + "\n", encoding="utf-8")
-

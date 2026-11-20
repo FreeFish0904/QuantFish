@@ -88,9 +88,7 @@ def run_student_backtest(
             bundle,
             panel,
             scores,
-            min_listing_days=int(
-                _config_value(platform_execution, "min_listing_days", 60)
-            ),
+            min_listing_days=int(_config_value(platform_execution, "min_listing_days", 60)),
         )
     scores_for_backtest, industry_summary = _maybe_neutralize_scores(
         bundle,
@@ -99,9 +97,7 @@ def run_student_backtest(
     )
     capital = float(_config_value(backtest_config, "capital", 1_000_000))
     if mode == "longonly":
-        simulation_top_k = int(
-            _config_value(platform_execution, "long_only_target_count", 50)
-        )
+        simulation_top_k = int(_config_value(platform_execution, "long_only_target_count", 50))
     else:
         simulation_top_k = _config_value(platform_execution, "top_k", None)
     simulated = simulate_backtest(
@@ -111,9 +107,7 @@ def run_student_backtest(
         mode=mode,
         commission_rate=float(_config_value(platform_execution, "commission_rate", 0.0)),
         slippage_rate=float(_config_value(platform_execution, "slippage_rate", 0.0)),
-        sell_stamp_duty_rate=float(
-            _config_value(platform_execution, "sell_stamp_duty_rate", 0.0)
-        ),
+        sell_stamp_duty_rate=float(_config_value(platform_execution, "sell_stamp_duty_rate", 0.0)),
         max_leverage=float(_config_value(platform_execution, "max_leverage", 1.0)),
         top_k=simulation_top_k,
         long_only_weighting=str(
@@ -144,9 +138,7 @@ def run_student_backtest(
     )
     scoring_result = _scoring_result(simulated, group_returns, scoring_start, scoring_end)
     benchmark = load_hs300_benchmark(bundle, scoring_start, scoring_end)
-    risk_free_rate = float(
-        _config_value(backtest_config, "long_only_risk_free_rate", 0.0175)
-    )
+    risk_free_rate = float(_config_value(backtest_config, "long_only_risk_free_rate", 0.0175))
     risk_free_daily_return = risk_free_rate / TRADING_DAYS_PER_YEAR
     raw_metrics = calculate_backtest_metrics(
         scoring_result,
@@ -162,9 +154,7 @@ def run_student_backtest(
             _config_value(backtest_config, "long_only_benchmark", "hs300")
         )
         if long_only_benchmark_name not in {"hs300", "none"}:
-            raise ValueError(
-                f"unsupported long_only_benchmark: {long_only_benchmark_name}"
-            )
+            raise ValueError(f"unsupported long_only_benchmark: {long_only_benchmark_name}")
         if long_only_benchmark_name == "hs300":
             active = calculate_long_only_active_returns(
                 scoring_result.daily,
@@ -231,13 +221,11 @@ def run_student_backtest(
         scoring_result.daily,
         return_column=scoring_return_column,
     )
-    net_value = daily_returns.assign(
-        net_value=lambda df: 1.0 + df["daily_return"].cumsum()
-    ).loc[:, ["date", "net_value"]]
+    net_value = daily_returns.assign(net_value=lambda df: 1.0 + df["daily_return"].cumsum()).loc[
+        :, ["date", "net_value"]
+    ]
     turnover = scoring_result.daily.loc[:, ["date", "turnover"]].copy()
-    group_daily_returns = scoring_result.group_returns.rename(
-        columns={"return": "daily_return"}
-    )
+    group_daily_returns = scoring_result.group_returns.rename(columns={"return": "daily_return"})
     performance_by_year = build_yearly_performance_table(
         scoring_result,
         return_column=scoring_return_column,
@@ -341,8 +329,7 @@ def run_student_backtest(
         "scoring_start": scoring_start.date().isoformat(),
         "scoring_end": scoring_end.date().isoformat(),
         "scoring_dates": [
-            pd.Timestamp(date).date().isoformat()
-            for date in scoring_result.daily["date"].tolist()
+            pd.Timestamp(date).date().isoformat() for date in scoring_result.daily["date"].tolist()
         ],
         "price_inputs": {
             "daily_returns": RETURNS_DATASET,
@@ -483,25 +470,15 @@ def _filter_investable_universe(
     rows["date"] = pd.to_datetime(rows["date"]).dt.normalize()
     rows["symbol"] = rows["symbol"].map(normalize_stock_code)
     tradable = (
-        rows["tradable"]
-        if "tradable" in rows.columns
-        else pd.Series(False, index=rows.index)
+        rows["tradable"] if "tradable" in rows.columns else pd.Series(False, index=rows.index)
     )
     front_vwap = (
-        rows["front_vwap"]
-        if "front_vwap" in rows.columns
-        else pd.Series(0.0, index=rows.index)
+        rows["front_vwap"] if "front_vwap" in rows.columns else pd.Series(0.0, index=rows.index)
     )
     front_close = (
-        rows["front_close"]
-        if "front_close" in rows.columns
-        else pd.Series(0.0, index=rows.index)
+        rows["front_close"] if "front_close" in rows.columns else pd.Series(0.0, index=rows.index)
     )
-    dnvaltrd = (
-        rows["dnvaltrd"]
-        if "dnvaltrd" in rows.columns
-        else pd.Series(0.0, index=rows.index)
-    )
+    dnvaltrd = rows["dnvaltrd"] if "dnvaltrd" in rows.columns else pd.Series(0.0, index=rows.index)
     valid_universe = (
         tradable.fillna(False).astype(bool)
         & (pd.to_numeric(front_vwap, errors="coerce") > 0)
@@ -551,9 +528,7 @@ def _filter_investable_universe(
         recent_listing = filtered["_listdt"].notna() & (age_days < min_listing_days)
         summary["missing_listing_date_rows"] = int(missing_listing.sum())
         summary["recent_listing_rows"] = int(recent_listing.sum())
-        filtered = filtered.loc[~missing_listing & ~recent_listing].drop(
-            columns=["_listdt"]
-        )
+        filtered = filtered.loc[~missing_listing & ~recent_listing].drop(columns=["_listdt"])
 
     filtered = filtered.sort_values("_order").drop(columns=["_order"])
     summary["final_rows"] = len(filtered)
@@ -613,9 +588,7 @@ def _calculate_group_returns(
     dates = pd.Index(rows["date"]).drop_duplicates().sort_values()
     if len(dates) < 2:
         return pd.DataFrame(columns=["date", "group", "return"])
-    next_dates = pd.DataFrame(
-        {"source_date": dates[:-1], "trade_date": dates[1:]}
-    )
+    next_dates = pd.DataFrame({"source_date": dates[:-1], "trade_date": dates[1:]})
     ranked = scores.dropna(subset=["score"]).copy()
     if ranked.empty:
         return pd.DataFrame(columns=["date", "group", "return"])
@@ -665,12 +638,8 @@ def _calculate_group_returns(
             "market_type",
         ],
     ].copy()
-    day_returns["front_vwap"] = pd.to_numeric(
-        day_returns["front_vwap"], errors="coerce"
-    )
-    day_returns["front_close"] = pd.to_numeric(
-        day_returns["front_close"], errors="coerce"
-    )
+    day_returns["front_vwap"] = pd.to_numeric(day_returns["front_vwap"], errors="coerce")
+    day_returns["front_close"] = pd.to_numeric(day_returns["front_close"], errors="coerce")
     day_returns["tradable"] = day_returns["tradable"].fillna(False).astype(bool)
     for numeric_column in (
         "limit_status",
@@ -678,9 +647,7 @@ def _calculate_group_returns(
         "front_limit_down",
         "market_type",
     ):
-        day_returns[numeric_column] = pd.to_numeric(
-            day_returns[numeric_column], errors="coerce"
-        )
+        day_returns[numeric_column] = pd.to_numeric(day_returns[numeric_column], errors="coerce")
     day_returns = day_returns.sort_values(["symbol", "date"]).reset_index(drop=True)
     valid_close_history = day_returns["front_close"].where(day_returns["front_close"] > 0)
     previous_close = valid_close_history.groupby(day_returns["symbol"]).ffill()
@@ -699,20 +666,25 @@ def _calculate_group_returns(
             fallback_price_limit_threshold(market_type, trading_date)
             for market_type, trading_date in zip(
                 day_returns["market_type"],
-                day_returns["date"], strict=True,
+                day_returns["date"],
+                strict=True,
             )
         ],
         index=day_returns.index,
         dtype=float,
     )
-    source_limit = (day_returns["limit_status"].fillna(0.0) != 0) | (
-        day_returns["front_limit_up"].notna()
-        & valid_close
-        & (day_returns["front_close"] >= day_returns["front_limit_up"] - 1e-10)
-    ) | (
-        day_returns["front_limit_down"].notna()
-        & valid_close
-        & (day_returns["front_close"] <= day_returns["front_limit_down"] + 1e-10)
+    source_limit = (
+        (day_returns["limit_status"].fillna(0.0) != 0)
+        | (
+            day_returns["front_limit_up"].notna()
+            & valid_close
+            & (day_returns["front_close"] >= day_returns["front_limit_up"] - 1e-10)
+        )
+        | (
+            day_returns["front_limit_down"].notna()
+            & valid_close
+            & (day_returns["front_close"] <= day_returns["front_limit_down"] + 1e-10)
+        )
     )
     fallback_limit_up = (
         previous_close_valid
@@ -727,17 +699,9 @@ def _calculate_group_returns(
         & (close_return < -fallback_threshold)
     )
     limit_blocked = source_limit | fallback_limit_up | fallback_limit_down
-    executable = (
-        valid_close
-        & valid_vwap
-        & day_returns["tradable"]
-        & ~limit_blocked
-    )
+    executable = valid_close & valid_vwap & day_returns["tradable"] & ~limit_blocked
     day_returns = day_returns.loc[executable].copy()
-    day_returns["return"] = (
-        day_returns["front_close"] / day_returns["front_vwap"]
-        - 1.0
-    )
+    day_returns["return"] = day_returns["front_close"] / day_returns["front_vwap"] - 1.0
 
     merged = signal_groups.merge(
         day_returns.loc[:, ["date", "symbol", "return"]],
@@ -766,16 +730,13 @@ def _scoring_result(
     daily["date"] = pd.to_datetime(daily["date"]).dt.normalize()
     positions["date"] = pd.to_datetime(positions["date"]).dt.normalize()
     daily = daily[(daily["date"] >= scoring_start) & (daily["date"] <= scoring_end)]
-    positions = positions[
-        (positions["date"] >= scoring_start) & (positions["date"] <= scoring_end)
-    ]
+    positions = positions[(positions["date"] >= scoring_start) & (positions["date"] <= scoring_end)]
     public_positions = positions.rename(columns={"symbol": "code"})
     if not group_returns.empty:
         group_returns = group_returns.copy()
         group_returns["date"] = pd.to_datetime(group_returns["date"]).dt.normalize()
         group_returns = group_returns[
-            (group_returns["date"] >= scoring_start)
-            & (group_returns["date"] <= scoring_end)
+            (group_returns["date"] >= scoring_start) & (group_returns["date"] <= scoring_end)
         ]
     return BacktestResult(
         daily=daily.reset_index(drop=True),

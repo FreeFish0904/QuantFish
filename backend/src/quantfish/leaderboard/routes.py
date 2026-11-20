@@ -21,7 +21,9 @@ from quantfish.web_app.response_models import DashboardResponse, LeaderboardResp
 router = APIRouter(tags=["leaderboard"])
 
 
-@router.get("/api/leaderboard", response_model=LeaderboardResponse, response_model_exclude_unset=True)
+@router.get(
+    "/api/leaderboard", response_model=LeaderboardResponse, response_model_exclude_unset=True
+)
 def leaderboard(
     request: Request,
     limit: Annotated[int | None, Query(ge=1, le=100)] = None,
@@ -37,13 +39,10 @@ def leaderboard(
         LeaderboardMetric,
         Query(description="Objective metric to rank"),
     ] = "sharpe",
-    ) -> dict[str, Any]:
+) -> dict[str, Any]:
     services = request.app.state.services
     stale_submission_ids = _active_stale_submission_ids(services)
-    team_names = {
-        team.team_id: team.display_name
-        for team in services.team_repository.list_all()
-    }
+    team_names = {team.team_id: team.display_name for team in services.team_repository.list_all()}
     records = [
         _leaderboard_record(
             services,
@@ -97,10 +96,7 @@ def dashboard(request: Request) -> dict[str, Any]:
         if submission.data_track == SubmissionDataTrack.HIDDEN_TEST
     ]
     stale_submission_ids = _active_stale_submission_ids(services)
-    team_names = {
-        team.team_id: team.display_name
-        for team in services.team_repository.list_all()
-    }
+    team_names = {team.team_id: team.display_name for team in services.team_repository.list_all()}
     records = [
         _leaderboard_record(services, submission, stale_submission_ids, team_names)
         for submission in hidden_submissions
@@ -305,7 +301,8 @@ def _filter_leaderboard_rows(rows: list[dict[str, Any]], search: str) -> list[di
     return [
         row
         for row in rows
-        if query in " ".join(
+        if query
+        in " ".join(
             [
                 str(row.get("id", "")),
                 str(row.get("team_name", "")),
@@ -393,6 +390,4 @@ def _compare_leaderboard_sort_values(
 
 
 def _missing_leaderboard_sort_value(value: Any) -> bool:
-    return value is None or (
-        isinstance(value, float) and not math.isfinite(value)
-    )
+    return value is None or (isinstance(value, float) and not math.isfinite(value))

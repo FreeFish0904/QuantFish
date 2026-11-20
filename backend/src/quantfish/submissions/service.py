@@ -25,21 +25,18 @@ class SubmissionRunner(Protocol):
         self,
         strategy_path: Path,
         data_track: SubmissionDataTrack = SubmissionDataTrack.HIDDEN_TEST,
-    ) -> ScoreFingerprints:
-        ...
+    ) -> ScoreFingerprints: ...
 
     def score(
         self,
         strategy_path: Path,
         report_dir: Path,
         data_track: SubmissionDataTrack = SubmissionDataTrack.HIDDEN_TEST,
-    ) -> SubmissionMetrics | None:
-        ...
+    ) -> SubmissionMetrics | None: ...
 
 
 class SubmissionQueue(Protocol):
-    def pump(self) -> None:
-        ...
+    def pump(self) -> None: ...
 
 
 class SubmissionCooldownError(ValueError):

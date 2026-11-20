@@ -89,15 +89,11 @@ def calculate_benchmark_relative_metrics(
     if strategy.empty:
         raise ValueError("benchmark-relative metrics require daily strategy returns")
     if "date" not in strategy.columns or return_column not in strategy.columns:
-        raise ValueError(
-            f"benchmark-relative metrics require date and {return_column} columns"
-        )
+        raise ValueError(f"benchmark-relative metrics require date and {return_column} columns")
     if benchmark is None or benchmark.empty:
         raise ValueError("benchmark-relative metrics require benchmark observations")
     if "date" not in benchmark.columns or "return" not in benchmark.columns:
-        raise ValueError(
-            "benchmark-relative metrics require benchmark date and return columns"
-        )
+        raise ValueError("benchmark-relative metrics require benchmark date and return columns")
 
     strategy["date"] = pd.to_datetime(strategy["date"]).dt.normalize()
     strategy[return_column] = pd.to_numeric(strategy[return_column], errors="coerce")
@@ -144,17 +140,13 @@ def calculate_benchmark_relative_metrics(
         benchmark_cagr=_cagr(benchmark_returns),
         excess_total_return=excess_total_return,
         excess_annual_return=excess_annual_return,
-        excess_compounded_return=_excess_compounded_return(
-            strategy_returns, benchmark_returns
-        ),
+        excess_compounded_return=_excess_compounded_return(strategy_returns, benchmark_returns),
         excess_cagr=_excess_cagr(strategy_returns, benchmark_returns),
         excess_max_drawdown=_max_drawdown(excess_returns),
         excess_win_rate=float((excess_returns > 0).mean()),
         excess_volatility=excess_volatility,
         excess_information_ratio=(
-            _safe_float(excess_annual_return / excess_volatility)
-            if excess_volatility > 0
-            else None
+            _safe_float(excess_annual_return / excess_volatility) if excess_volatility > 0 else None
         ),
         excess_beta=_beta(strategy_returns, benchmark_returns),
     )
@@ -204,9 +196,7 @@ def _excess_compounded_return(
     return _safe_float(float(strategy_equity.iloc[-1]) / benchmark_ending - 1.0)
 
 
-def _excess_cagr(
-    strategy_returns: pd.Series, benchmark_returns: pd.Series
-) -> float | None:
+def _excess_cagr(strategy_returns: pd.Series, benchmark_returns: pd.Series) -> float | None:
     relative = _excess_compounded_return(strategy_returns, benchmark_returns)
     if relative is None:
         return None

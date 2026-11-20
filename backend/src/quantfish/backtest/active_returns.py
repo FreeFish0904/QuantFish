@@ -92,11 +92,7 @@ def calculate_long_only_active_returns(
         else 0.0
     )
     annual_active_return = float(active_return.mean() * TRADING_DAYS_PER_YEAR)
-    information_ratio = (
-        float(annual_active_return / tracking_error)
-        if tracking_error > 0
-        else 0.0
-    )
+    information_ratio = float(annual_active_return / tracking_error) if tracking_error > 0 else 0.0
 
     return LongOnlyActiveReturns(
         daily=scored.reset_index(drop=True),

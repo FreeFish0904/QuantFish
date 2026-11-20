@@ -84,10 +84,7 @@ class BacktestSubmissionRunner:
             )
             self._fingerprint_context_cache[cache_key] = context
             self._fingerprint_context_cache.move_to_end(cache_key)
-            while (
-                len(self._fingerprint_context_cache)
-                > self._fingerprint_context_cache_entries
-            ):
+            while len(self._fingerprint_context_cache) > self._fingerprint_context_cache_entries:
                 self._fingerprint_context_cache.popitem(last=False)
             return context
 
@@ -184,9 +181,7 @@ class ScoreWorkerHandle:
             stdout, stderr = self.process.communicate(timeout=self.timeout)
         except subprocess.TimeoutExpired as exc:
             self.terminate()
-            raise TimeoutError(
-                f"scoring timed out after {self.timeout} seconds"
-            ) from exc
+            raise TimeoutError(f"scoring timed out after {self.timeout} seconds") from exc
         if self.process.returncode != 0:
             log_event(
                 _LOGGER,
@@ -196,9 +191,7 @@ class ScoreWorkerHandle:
                 report_dir=self.report_dir.as_posix(),
                 stderr_tail=_tail(stderr),
             )
-            raise RuntimeError(
-                worker_failure_message(self.report_dir) or "score worker failed"
-            )
+            raise RuntimeError(worker_failure_message(self.report_dir) or "score worker failed")
         try:
             summary = json.loads(stdout or "{}")
         except json.JSONDecodeError as exc:
@@ -235,11 +228,7 @@ def _tail(text: str | None) -> str | None:
 
 
 def _worker_environment() -> dict[str, str]:
-    return {
-        key: value
-        for key, value in os.environ.items()
-        if not key.startswith("QUANTFISH_")
-    }
+    return {key: value for key, value in os.environ.items() if not key.startswith("QUANTFISH_")}
 
 
 def _track_catalog_path(config: Any, data_track: SubmissionDataTrack) -> Path:

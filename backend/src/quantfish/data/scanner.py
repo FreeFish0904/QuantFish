@@ -203,11 +203,7 @@ def _parse_xlsx_descriptions(
 
     column_names = set(columns)
     for index, row in enumerate(rows):
-        header = {
-            str(value).strip(): position
-            for position, value in enumerate(row)
-            if value
-        }
+        header = {str(value).strip(): position for position, value in enumerate(row) if value}
         field_index = header.get("字段")
         description_index = header.get("字段说明")
         data_type_index = header.get("数据类型")
@@ -220,9 +216,7 @@ def _parse_xlsx_descriptions(
                 continue
             entry: dict[str, str] = {}
             data_type = (
-                _row_value(value_row, data_type_index)
-                if data_type_index is not None
-                else ""
+                _row_value(value_row, data_type_index) if data_type_index is not None else ""
             )
             description = _row_value(value_row, description_index)
             if data_type:
@@ -250,10 +244,7 @@ def _xlsx_shared_strings(archive: ZipFile) -> list[str]:
     strings = []
     for item in root.findall(f".//{{{SPREADSHEET_NS}}}si"):
         strings.append(
-            "".join(
-                text.text or ""
-                for text in item.findall(f".//{{{SPREADSHEET_NS}}}t")
-            )
+            "".join(text.text or "" for text in item.findall(f".//{{{SPREADSHEET_NS}}}t"))
         )
     return strings
 
@@ -327,10 +318,7 @@ def _xlsx_column_index(reference: str) -> int:
 def _xlsx_cell_value(cell: ET.Element, shared_strings: list[str]) -> str:
     cell_type = cell.attrib.get("t")
     if cell_type == "inlineStr":
-        return "".join(
-            text.text or ""
-            for text in cell.findall(f".//{{{SPREADSHEET_NS}}}t")
-        )
+        return "".join(text.text or "" for text in cell.findall(f".//{{{SPREADSHEET_NS}}}t"))
     value = cell.find(f"{{{SPREADSHEET_NS}}}v")
     if value is None or value.text is None:
         return ""

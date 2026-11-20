@@ -30,6 +30,21 @@ docker compose -f deploy/docker-compose.yml exec quantfish \
 docker compose -f deploy/docker-compose.yml down -v          # reset everything
 ```
 
+## Health
+
+`docker compose … ps` reports `healthy` once `/api/ready` answers `200`; the
+image's `HEALTHCHECK` and the compose override both run
+[`deploy/healthcheck.py`](healthcheck.py), which exits `1` on a `503`, a refused
+connection or a slow answer and prints the readiness payload so the reason shows
+up in `docker inspect`:
+
+```bash
+docker compose -f deploy/docker-compose.yml ps
+docker compose -f deploy/docker-compose.yml exec quantfish python deploy/healthcheck.py
+docker inspect --format '{{json .State.Health}}' \
+  "$(docker compose -f deploy/docker-compose.yml ps -q quantfish)" | python -m json.tool
+```
+
 ## Ports and state
 
 - `8010` is the only exposed port; the API and the built frontend share it.

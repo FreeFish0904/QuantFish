@@ -42,7 +42,7 @@ COPY config/ ./config/
 COPY docs/ ./docs/
 COPY examples/ ./examples/
 COPY scripts/ ./scripts/
-COPY deploy/entrypoint.sh deploy/seed_demo.py ./deploy/
+COPY deploy/entrypoint.sh deploy/healthcheck.py deploy/seed_demo.py ./deploy/
 RUN chmod +x ./deploy/entrypoint.sh
 
 # Build the synthetic dataset into the image so the container starts fast.
@@ -50,7 +50,10 @@ RUN python scripts/gen_sample_dataset.py --config config/platform.demo.yaml
 
 EXPOSE 8010
 
+# The probe script exits 0 only for HTTP 200 from /api/ready, so a container
+# with a broken config or an unreachable store reports unhealthy instead of
+# merely "process started". Run it by hand with `python deploy/healthcheck.py`.
 HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=12 \
-  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8010/api/ready').status==200 else 1)"
+  CMD ["python", "deploy/healthcheck.py"]
 
 ENTRYPOINT ["./deploy/entrypoint.sh"]

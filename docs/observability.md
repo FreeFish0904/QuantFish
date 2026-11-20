@@ -44,6 +44,78 @@ The container healthcheck (`deploy/Dockerfile`, `deploy/docker-compose.yml`)
 probes `/api/ready`, so a container with a broken config reports unhealthy
 instead of merely "process started".
 
+### The probe
+
+Both container definitions run the same script, `deploy/healthcheck.py`, so the
+check cannot drift between `docker build` and `docker compose up`:
+
+```bash
+python deploy/healthcheck.py                      # http://127.0.0.1:8010/api/ready
+python deploy/healthcheck.py http://127.0.0.1:8011/api/ready
+```
+
+It exits `0` only for HTTP `200`; a `503`, a refused connection or a response
+slower than its 3-second timeout exits `1`. The readiness body is echoed to
+stderr on failure, so `docker compose logs` and
+`docker inspect --format '{{json .State.Health}}'` show *which* check failed
+rather than just "unhealthy". Docker's own `--timeout=5s` stays above the
+script's timeout so the script wins the race and prints the reason.
+
+| Situation | Probe output | Exit |
+| --- | --- | --- |
+| Ready (`status: "ok"`) | `healthy: … returned 200` | `0` |
+| Degraded, only optional checks fail | `healthy: … returned 200` | `0` |
+| A critical check fails | `unhealthy: … returned 503: {"status": "unavailable", …}` | `1` |
+| Server stopped / wrong port | `unhealthy: … is unreachable (… Connection refused)` | `1` |
+
+### Verifying it locally
+
+Start the API the way the container does and probe it:
+
+```bash
+QUANTFISH_ADMIN_PASSWORD=demo-admin-pass \
+QUANTFISH_ADMIN_SESSION_SECRET=hc-admin-secret \
+QUANTFISH_PARTICIPANT_SESSION_SECRET=hc-participant-secret \
+  ./.venv/bin/quantfish-web --host 127.0.0.1 --port 8013 \
+    --config config/platform.demo.yaml --runtime-root /tmp/qf-hc-runtime &
+
+./.venv/bin/python deploy/healthcheck.py http://127.0.0.1:8013/api/ready
+# healthy: http://127.0.0.1:8013/api/ready returned 200   (exit 0)
+```
+
+Then prove the failure paths: remove the config file the instance was started
+with (a critical check) and the probe turns red with the payload attached, and
+stopping the process turns it red with `Connection refused`.
+
+```bash
+mv /tmp/qf-hc.yaml /tmp/qf-hc.yaml.bak
+./.venv/bin/python deploy/healthcheck.py http://127.0.0.1:8014/api/ready
+# unhealthy: … returned 503: {"status": "unavailable", … "platform_config" …}   (exit 1)
+
+kill %1
+./.venv/bin/python deploy/healthcheck.py http://127.0.0.1:8013/api/ready
+# unhealthy: … is unreachable (<urlopen error [Errno 61] Connection refused>)   (exit 1)
+```
+
+`backend/tests/test_deploy_healthcheck.py` runs those cases against a throwaway
+`http.server` instance, and `backend/tests/test_web_readiness.py` asserts that
+both container definitions call the script and that it probes `/api/ready`
+rather than `/api/health`.
+
+The image itself was rebuilt and run to check the wiring end to end:
+
+```text
+docker build -f deploy/Dockerfile -t quantfish-demo:hc-check .   # ok
+docker run -d --name qf-hc -p 8016:8010 quantfish-demo:hc-check
+docker inspect --format '{{.State.Health.Status}}' qf-hc         # starting → healthy (10s)
+docker inspect --format '{{range .State.Health.Log}}{{.ExitCode}} {{.Output}}{{end}}' qf-hc
+# 0 healthy: http://127.0.0.1:8010/api/ready returned 200
+docker exec qf-hc rm config/platform.demo.yaml                   # break a critical check
+docker exec qf-hc python deploy/healthcheck.py                   # exit 1 + 503 payload
+docker stop qf-hc && python deploy/healthcheck.py http://127.0.0.1:8016/api/ready
+# exit 1: unreachable (Connection refused)
+```
+
 ## Log lines
 
 `quantfish.observability.configure_logging()` installs a single stderr handler
@@ -113,6 +185,6 @@ submission id.
 QUANTFISH_LOG_LEVEL=DEBUG scripts/start-quantfish.sh --mode dev
 
 # probe readiness the way the container does
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7860/api/ready
+python deploy/healthcheck.py                       # exit 0 = serving students
 curl -s http://127.0.0.1:7860/api/ready | python -m json.tool
 ```

@@ -222,8 +222,14 @@ def test_container_healthcheck_probes_readiness_not_liveness() -> None:
 
     dockerfile = (project_root / "deploy" / "Dockerfile").read_text(encoding="utf-8")
     compose = (project_root / "deploy" / "docker-compose.yml").read_text(encoding="utf-8")
+    probe = (project_root / "deploy" / "healthcheck.py").read_text(encoding="utf-8")
 
-    assert "/api/ready" in dockerfile
-    assert "/api/ready" in compose
+    # Both container definitions run the same script, so the check cannot drift
+    # between `docker build` and `docker compose up`.
+    assert "deploy/healthcheck.py" in dockerfile
+    assert "deploy/healthcheck.py" in compose
+    # And the probe asks the readiness question, not the liveness one.
+    assert "/api/ready" in probe
+    assert "/api/health" not in probe
     assert "/api/health" not in dockerfile
     assert "/api/health" not in compose

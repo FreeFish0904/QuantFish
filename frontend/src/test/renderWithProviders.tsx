@@ -3,7 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 
 import { I18nProvider } from "../shared/i18n";
-import { ThemeProvider } from "../shared/theme/ThemeContext";
+import { ThemeProvider } from "../shared/theme";
 
 export function createTestQueryClient() {
   return new QueryClient({

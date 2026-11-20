@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import type { ReactNode } from "react";
 
 import { I18nProvider } from "../../i18n";
-import { ComposedChart, PerformanceTooltip, visibleAxisTicks } from "./ComposedChart";
+import { ComposedChart, PerformanceTooltip } from "./ComposedChart";
+import { visibleAxisTicks } from "./axisTicks";
 
 const chartStylesText = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), "ComposedChart.module.css"),

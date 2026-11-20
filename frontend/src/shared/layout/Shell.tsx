@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 
 import { useParticipantLogout, useParticipantSession } from "../../features/session/model";
 import { useI18n } from "../i18n";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../theme";
 import { MobileNav } from "./MobileNav";
 import { Sidebar } from "./Sidebar";
 import styles from "./Layout.module.css";

@@ -30,11 +30,10 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       // Pre-existing patterns kept as warnings rather than silent breakage:
-      // these rules are off so `--max-warnings=0` still gates everything else.
-      // TODO(quality): burn down the 10 setState-in-effect and 18
-      // only-export-components sites, then drop these two overrides.
+      // this rule is off so `--max-warnings=0` still gates everything else.
+      // TODO(quality): burn down the setState-in-effect sites, then drop this
+      // override.
       "react-hooks/set-state-in-effect": "off",
-      "react-refresh/only-export-components": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

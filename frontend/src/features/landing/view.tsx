@@ -2,10 +2,9 @@ import { ArrowRight, ExternalLink, Layers, Moon, ShieldCheck, Sun, Zap } from "l
 import { Link } from "react-router-dom";
 
 import { useI18n } from "../../shared/i18n";
-import { useTheme } from "../../shared/theme/ThemeContext";
+import { useTheme } from "../../shared/theme";
+import { REPOSITORY_URL } from "./links";
 import styles from "./view.module.css";
-
-export const REPOSITORY_URL = "https://github.com/FreeFish0904/QuantFish";
 
 const featureCards = [
   { key: "engine", icon: Zap, tone: styles.toneCyan },

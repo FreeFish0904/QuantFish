@@ -1,20 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 
 import { readPreference, writePreference } from "../preferences/storage";
+import { I18nContext, LANGUAGE_STORAGE_KEY, parseLanguage } from "./context";
 import { translations, type Language } from "./translations";
-
-type I18nContextValue = {
-  language: Language;
-  setLanguage: (language: Language) => void;
-  t: (key: string, variables?: Record<string, string | number>) => string;
-};
-
-const I18nContext = createContext<I18nContextValue | null>(null);
-const LANGUAGE_STORAGE_KEY = "quantfish-language";
-
-function parseLanguage(value: unknown): Language | null {
-  return value === "en" || value === "zh" ? value : null;
-}
 
 function detectBrowserLanguage(fallback: Language): Language {
   if (typeof navigator === "undefined") {
@@ -81,12 +69,4 @@ export function I18nProvider({
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
-}
-
-export function useI18n(): I18nContextValue {
-  const context = useContext(I18nContext);
-  if (!context) {
-    throw new Error("useI18n must be used within an I18nProvider");
-  }
-  return context;
 }

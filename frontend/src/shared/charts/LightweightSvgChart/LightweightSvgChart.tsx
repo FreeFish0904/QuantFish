@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 
+import { lightweightTicks, readSeriesValue } from "./scale";
 import styles from "./LightweightSvgChart.module.css";
 
 const DEFAULT_VIEW_BOX_WIDTH = 760;
@@ -78,13 +79,6 @@ type HoverPoint = {
 
 type TooltipSide = "left" | "right";
 
-function numberValue(value: unknown): number | null {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    return null;
-  }
-  return Math.abs(value) < AXIS_EPSILON ? 0 : value;
-}
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -115,10 +109,6 @@ function yPosition(value: number, domain: [number, number], plot: PlotArea): num
   const [min, max] = domain;
   const span = max - min || 1;
   return plot.bottom - ((value - min) / span) * plot.height;
-}
-
-function readSeriesValue<T extends Record<string, unknown>>(point: T, dataKey: string): number | null {
-  return numberValue(point[dataKey]);
 }
 
 function buildLinePath<T extends Record<string, unknown>>(
@@ -193,75 +183,6 @@ function formatCompactNumber(value: number): string {
     return `${(normalized / 1_000).toFixed(0)}K`;
   }
   return normalized.toFixed(abs > 0 && abs < 1 ? 2 : 0);
-}
-
-function niceStep(value: number): number {
-  if (!Number.isFinite(value) || value <= 0) {
-    return 1;
-  }
-  const magnitude = 10 ** Math.floor(Math.log10(value));
-  const normalized = value / magnitude;
-  if (normalized <= 1) {
-    return magnitude;
-  }
-  if (normalized <= 2) {
-    return 2 * magnitude;
-  }
-  if (normalized <= 5) {
-    return 5 * magnitude;
-  }
-  return 10 * magnitude;
-}
-
-export function lightweightDomainForSeries<T extends Record<string, unknown>>(
-  data: T[],
-  dataKeys: string[],
-  includeZero = false
-): [number, number] {
-  const values: number[] = includeZero ? [0] : [];
-  for (const point of data) {
-    for (const key of dataKeys) {
-      const value = readSeriesValue(point, key);
-      if (value !== null) {
-        values.push(value);
-      }
-    }
-  }
-  if (values.length === 0) {
-    return includeZero ? [0, 1] : [0, 1];
-  }
-  let min = Math.min(...values);
-  let max = Math.max(...values);
-  if (min === max) {
-    const padding = Math.max(Math.abs(min) * 0.08, 1);
-    min -= padding;
-    max += padding;
-  } else {
-    const padding = (max - min) * 0.08;
-    min -= padding;
-    max += padding;
-  }
-  if (includeZero) {
-    min = Math.min(min, 0);
-    max = Math.max(max, 0);
-  }
-  return [min, max];
-}
-
-export function lightweightTicks(domain: [number, number], targetIntervals = 4): number[] {
-  const [min, max] = domain;
-  if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) {
-    return [0, 1];
-  }
-  const step = niceStep((max - min) / Math.max(1, targetIntervals));
-  const start = Math.floor(min / step) * step;
-  const end = Math.ceil(max / step) * step;
-  const ticks: number[] = [];
-  const count = Math.max(1, Math.round((end - start) / step));
-  for (let index = 0; index <= count; index += 1) {
-    ticks.push(Number((start + step * index).toPrecision(12)));
-  }
-  return ticks;
 }
 
 function tooltipPayload<T extends Record<string, unknown>>(

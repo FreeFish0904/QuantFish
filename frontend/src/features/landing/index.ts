@@ -1,1 +1,2 @@
-export { LandingView, REPOSITORY_URL } from "./view";
+export { LandingView } from "./view";
+export { REPOSITORY_URL } from "./links";

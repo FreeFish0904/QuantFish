@@ -2,7 +2,7 @@ import { LoaderCircle, LogIn, LogOut, Moon, Sun, UserRound } from "lucide-react"
 import { Link } from "react-router-dom";
 
 import { useI18n } from "../i18n";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../theme";
 import styles from "./Layout.module.css";
 
 type ParticipantSession = {

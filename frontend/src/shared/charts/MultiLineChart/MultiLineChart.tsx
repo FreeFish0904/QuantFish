@@ -1,8 +1,5 @@
-import {
-  LightweightSvgChart,
-  lightweightDomainForSeries,
-  lightweightTicks
-} from "../LightweightSvgChart/LightweightSvgChart";
+import { LightweightSvgChart } from "../LightweightSvgChart/LightweightSvgChart";
+import { lightweightDomainForSeries, lightweightTicks } from "../LightweightSvgChart/scale";
 import { useI18n } from "../../i18n";
 import { EmptyState } from "../../ui/EmptyState/EmptyState";
 import styles from "./MultiLineChart.module.css";

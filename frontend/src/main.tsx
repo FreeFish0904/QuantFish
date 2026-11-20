@@ -10,7 +10,7 @@ import {
 import { DEMO_MODE, DemoBanner, enableDemoMode } from "./demo";
 import { routes } from "./routes";
 import { I18nProvider } from "./shared/i18n";
-import { ThemeProvider } from "./shared/theme/ThemeContext";
+import { ThemeProvider } from "./shared/theme";
 import "./theme/globals.css";
 
 const queryClient = new QueryClient();

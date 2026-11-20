@@ -5,7 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 
 import { I18nProvider } from "../shared/i18n";
-import { ThemeProvider } from "../shared/theme/ThemeContext";
+import { ThemeProvider } from "../shared/theme";
 import { createTestQueryClient } from "../test/renderWithProviders";
 import { server } from "../test/server";
 

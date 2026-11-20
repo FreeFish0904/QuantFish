@@ -6,7 +6,8 @@ import sqlite3
 import tempfile
 import threading
 import uuid
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
@@ -179,7 +180,7 @@ class SubmissionRepository:
 
     def list_all(self) -> list[Submission]:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 rows = connection.execute(
                     """
                     SELECT * FROM submissions
@@ -193,7 +194,7 @@ class SubmissionRepository:
 
     def list_for_team(self, team_id: str) -> list[Submission]:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 rows = connection.execute(
                     """
                     SELECT * FROM submissions
@@ -209,7 +210,7 @@ class SubmissionRepository:
 
     def list_for_track(self, data_track: SubmissionDataTrack) -> list[Submission]:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 rows = connection.execute(
                     """
                     SELECT * FROM submissions
@@ -240,7 +241,7 @@ class SubmissionRepository:
             values.extend(excluded)
         values.append(limit)
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 rows = connection.execute(
                     f"""
                     SELECT * FROM submissions
@@ -257,7 +258,7 @@ class SubmissionRepository:
 
     def requeue_running(self) -> int:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 cursor = connection.execute(
                     """
                     UPDATE submissions
@@ -273,7 +274,7 @@ class SubmissionRepository:
 
     def get(self, submission_id: str) -> Submission | None:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 row = connection.execute(
                     "SELECT * FROM submissions WHERE submission_id = ?",
                     (submission_id,),
@@ -282,7 +283,7 @@ class SubmissionRepository:
 
     def count_for_team(self, team_id: str) -> int:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 value = connection.execute(
                     "SELECT COUNT(*) FROM submissions WHERE team_id = ?",
                     (team_id,),
@@ -291,7 +292,7 @@ class SubmissionRepository:
 
     def count_all(self) -> int:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 value = connection.execute("SELECT COUNT(*) FROM submissions").fetchone()[0]
             return int(value)
 
@@ -306,7 +307,7 @@ class SubmissionRepository:
 
     def count_by_team(self) -> dict[str, int]:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 rows = connection.execute(
                     """
                     SELECT team_id, COUNT(*) AS count
@@ -318,7 +319,7 @@ class SubmissionRepository:
 
     def status_counts(self) -> dict[str, int]:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 rows = connection.execute(
                     """
                     SELECT status, COUNT(*) AS count
@@ -330,7 +331,7 @@ class SubmissionRepository:
 
     def next_submission_number(self) -> int:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 value = connection.execute(
                     "SELECT COALESCE(MAX(submission_number), 0) + 1 FROM submissions"
                 ).fetchone()[0]
@@ -341,19 +342,19 @@ class SubmissionRepository:
             if submission.submission_number is None:
                 next_number = self.next_submission_number()
                 submission = replace(submission, submission_number=next_number)
-            with self._connect() as connection:
+            with self._connection() as connection:
                 _upsert_submission(connection, submission)
                 connection.commit()
             return submission
 
     def save(self, submission: Submission) -> None:
-        with self._lock, self._connect() as connection:
+        with self._lock, self._connection() as connection:
             _upsert_submission(connection, submission)
             connection.commit()
 
     def delete(self, submission_id: str) -> bool:
         with self._lock:
-            with self._connect() as connection:
+            with self._connection() as connection:
                 cursor = connection.execute(
                     "DELETE FROM submissions WHERE submission_id = ?",
                     (submission_id,),
@@ -378,7 +379,7 @@ class SubmissionRepository:
             team_names,
             sql_sort_expressions or {},
         )
-        with self._lock, self._connect() as connection:
+        with self._lock, self._connection() as connection:
             total_count = int(
                 connection.execute(
                     f"SELECT COUNT(*) FROM submissions {where_sql}",
@@ -407,7 +408,7 @@ class SubmissionRepository:
         team_names: dict[str, str],
     ) -> list[Submission]:
         where_sql, values = _submission_where(params, team_names)
-        with self._lock, self._connect() as connection:
+        with self._lock, self._connection() as connection:
             rows = connection.execute(
                 f"""
                     SELECT * FROM submissions
@@ -426,8 +427,23 @@ class SubmissionRepository:
         connection.execute("PRAGMA foreign_keys=ON")
         return connection
 
+    @contextmanager
+    def _connection(self) -> Iterator[sqlite3.Connection]:
+        """Open a connection that is committed and closed on the way out.
+
+        `with self._connect() as connection` only commits (or rolls back); the
+        connection itself is left to the garbage collector, which leaks a file
+        descriptor plus the WAL/-shm handles for every repository call.
+        """
+        connection = self._connect()
+        try:
+            with connection:
+                yield connection
+        finally:
+            connection.close()
+
     def _ensure_storage(self) -> None:
-        with self._connect() as connection:
+        with self._connection() as connection:
             _create_submission_schema(connection)
             count = int(connection.execute("SELECT COUNT(*) FROM submissions").fetchone()[0])
             if count == 0 and self.path.exists():

@@ -75,6 +75,11 @@ data/                    placeholder for generated datasets (git-ignored)
   and `frontend/eslint.config.js`. `E501` and the two noisy React rules are
   deliberately off for now so the gate stays about behaviour rather than
   reflowing files; `ruff format` is a separate, opt-in change.
+- **Close what you open.** `pytest` promotes `ResourceWarning` and unraisable
+  warnings to errors (`[tool.pytest.ini_options] filterwarnings`), so a leaked
+  `sqlite3.Connection`, file handle or subprocess cannot hide behind garbage
+  collection. Use the repository's `_connection()` context manager rather than
+  `sqlite3.Connection` as a context manager — the latter only commits.
 - **Config over constants.** Tunables belong in `config/platform.yaml` and are
   validated by `quantfish.platform_config`. Avoid duplicate defaults in code.
 - **Log events, not sentences.** Use

@@ -1,9 +1,11 @@
+import gc
 import json
 import re
 import subprocess
 import sys
 import threading
 import time
+import warnings
 from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -297,6 +299,46 @@ def test_submission_repository_migrates_json_to_sqlite_once(tmp_path: Path) -> N
         "legacy-two",
         "new-sqlite-only",
     ]
+
+
+def test_submission_repository_closes_its_connections(tmp_path: Path) -> None:
+    """Repository calls must release the SQLite handle instead of leaving it to the GC.
+
+    `with sqlite3.Connection` only commits or rolls back; it never closes. Every
+    read and write used to leak a descriptor plus the -wal/-shm handles, which
+    surfaced as `ResourceWarning: unclosed database` only once warnings were on.
+    """
+    repository = SubmissionRepository(tmp_path / "runtime")
+    submission = Submission(
+        submission_id="leak-check",
+        team_id="team-alpha",
+        status=SubmissionStatus.QUEUED,
+        strategy_path="/tmp/leak-check.py",
+        report_dir="/tmp/leak-check-report",
+        fingerprints=None,
+        original_filename="leak.py",
+        submitted_at="2026-06-20T12:00:00+00:00",
+    )
+    repository.save(submission)
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        assert repository.get("leak-check") is not None
+        repository.list_all()
+        repository.list_for_team("team-alpha")
+        repository.count_for_team("team-alpha")
+        repository.count_all()
+        repository.count_by_team()
+        repository.status_counts()
+        repository.next_submission_number()
+        repository.requeue_running()
+        repository.save(submission)
+        repository.ping()
+        assert repository.delete("leak-check") is True
+        gc.collect()
+
+    leaked = [warning for warning in caught if issubclass(warning.category, ResourceWarning)]
+    assert leaked == []
 
 
 def test_submission_repository_pages_filtered_rows_and_counts_by_team(tmp_path: Path) -> None:

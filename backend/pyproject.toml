@@ -44,6 +44,15 @@ quantfish = ["**/*.html", "**/*.css", "**/*.svg", "**/*.j2"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+# A leaked `sqlite3.Connection` (and its file descriptor plus WAL handles) only
+# surfaces as a `ResourceWarning` when someone turns warnings back on, so the
+# leak in `SubmissionRepository` stayed invisible for a long time. Fail the run
+# instead: `PytestUnraisableExceptionWarning` is how pytest reports those
+# warnings when they fire during garbage collection.
+filterwarnings = [
+  "error::ResourceWarning",
+  "error::pytest.PytestUnraisableExceptionWarning",
+]
 
 # Lint gate for `backend/`. Run from the repository root: `ruff check backend`.
 # E501 (line length) stays disabled for now so the first pass is behavioural

@@ -87,10 +87,12 @@ Append the hash whenever another wholesale reformat lands.
   `python -m ruff format --check backend` and
   `npm --prefix frontend run lint` must all be clean; CI runs them and fails the
   build otherwise. Rules live in `backend/pyproject.toml` (`[tool.ruff]`) and
-  `frontend/eslint.config.js`. `E501` and the two noisy React rules are
-  deliberately off in lint so it stays about behaviour; `ruff format` owns
-  whitespace, quoting and wrapping, which is why line length is not policed
-  twice.
+  `frontend/eslint.config.js`, and every `react-hooks` recommended rule is on,
+  including `set-state-in-effect` and `react-refresh/only-export-components`.
+  Derive values during render, or store state together with the input it belongs
+  to, instead of copying props into state from an effect; keep component modules
+  exporting components only, so Fast Refresh keeps working. `E501` is off in lint
+  because `ruff format` owns whitespace, quoting and wrapping.
 - **Close what you open.** `pytest` promotes `ResourceWarning` and unraisable
   warnings to errors (`[tool.pytest.ini_options] filterwarnings`), so a leaked
   `sqlite3.Connection`, file handle or subprocess cannot hide behind garbage

@@ -1,6 +1,6 @@
 import { AlertTriangle, ExternalLink, FileCode, FileText, Filter, GitCompare, Search } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useI18n } from "../../shared/i18n";
@@ -186,11 +186,13 @@ export function HistoryView() {
     [selectedRowsById]
   );
 
-  useEffect(() => {
-    if (page !== safePage) {
-      setPage(safePage);
-    }
-  }, [page, safePage]);
+  // The result set can shrink under the current page (another team's submission
+  // disappears, a filter now matches less). Clamp during render rather than in an
+  // effect so the table never commits an out-of-range page; `totalPages` only
+  // becomes known after the query answers, which is why it cannot be derived.
+  if (page !== safePage) {
+    setPage(safePage);
+  }
 
   function updateSearch(value: string) {
     setSearch(value);

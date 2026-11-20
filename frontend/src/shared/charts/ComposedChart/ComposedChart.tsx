@@ -73,6 +73,16 @@ type PointWindow = {
   end: number;
 };
 
+// Scroll-dependent view of the series. The value carries the signature of the
+// inputs it was measured against, so a new range/length/width makes the stored
+// value stale and the render falls back to the freshly computed default instead
+// of writing state from an effect.
+type ScrollWindow = {
+  scrollLeft: number;
+  signature: string;
+  visibleRange: PointWindow;
+};
+
 type TooltipPayloadItem = {
   color?: string;
   dataKey?: unknown;
@@ -463,16 +473,30 @@ export function ComposedChart({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<number | null>(null);
   const [viewportWidth, setViewportWidth] = useState(VIRTUAL_SCROLL_FALLBACK_WIDTH);
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [visibleRange, setVisibleRange] = useState<PointWindow>({
-    start: 0,
-    end: Math.max(0, points.length - 1)
-  });
+  const [userScroll, setUserScroll] = useState<ScrollWindow | null>(null);
   const visibleCount = visiblePointCount(range, points.length);
   const isScrollable = range !== "ALL" && points.length > visibleCount;
   const plotWidth = isScrollable
     ? Math.max(viewportWidth, Math.ceil((points.length / Math.max(visibleCount, 1)) * viewportWidth))
     : viewportWidth;
+  const scrollSignature = [range, points.length, Math.round(viewportWidth), Math.round(plotWidth)].join(":");
+  const defaultScroll = useMemo<ScrollWindow>(() => {
+    const total = points.length;
+    const windowSize = visiblePointCount(range, total);
+    const end = Math.max(0, total - 1);
+    if (!isScrollable || total <= windowSize) {
+      return { scrollLeft: 0, signature: scrollSignature, visibleRange: { start: 0, end } };
+    }
+    const maxScroll = Math.max(0, plotWidth - viewportWidth);
+    return {
+      scrollLeft: maxScroll,
+      signature: scrollSignature,
+      visibleRange: { start: Math.max(0, total - windowSize), end }
+    };
+  }, [isScrollable, plotWidth, points.length, range, scrollSignature, viewportWidth]);
+  const activeScroll = userScroll?.signature === scrollSignature ? userScroll : defaultScroll;
+  const scrollLeft = activeScroll.scrollLeft;
+  const visibleRange = activeScroll.visibleRange;
   const isGroupChart = chartMode === "groups";
   const stackHeight = isGroupChart
     ? height + STACK_VERTICAL_PADDING * 2
@@ -516,30 +540,27 @@ export function ComposedChart({
     };
   }, []);
 
+  // Only the DOM needs syncing here: the visible window itself is derived above,
+  // so there is no state to write. Writing the scroll position keeps the
+  // browser's scrollbar in step with the rendered window; the scroll handler
+  // turns the position back into state.
   useEffect(() => {
-    const total = points.length;
-    const windowSize = visiblePointCount(range, total);
-    const start = range === "ALL" ? 0 : Math.max(0, total - windowSize);
-    const end = range === "ALL" ? Math.max(0, total - 1) : Math.max(0, total - 1);
-    setVisibleRange({ start, end });
-    if (!isScrollable) {
-      setScrollLeft(0);
-      return;
+    const node = scrollRef.current;
+    if (node && Math.abs(node.scrollLeft - scrollLeft) >= 1) {
+      node.scrollLeft = scrollLeft;
     }
-    const maxScroll = Math.max(0, plotWidth - viewportWidth);
-    setScrollLeft(maxScroll);
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = maxScroll;
-    }
-  }, [isScrollable, plotWidth, points.length, range, viewportWidth]);
+  }, [scrollLeft]);
 
   function updateVisibleRange() {
     const node = scrollRef.current;
     const total = points.length;
     const windowSize = visiblePointCount(range, total);
     if (!node || range === "ALL" || total <= windowSize) {
-      setScrollLeft(0);
-      setVisibleRange({ start: 0, end: Math.max(0, total - 1) });
+      setUserScroll({
+        scrollLeft: 0,
+        signature: scrollSignature,
+        visibleRange: { start: 0, end: Math.max(0, total - 1) }
+      });
       return;
     }
     const maxScroll = Math.max(1, plotWidth - viewportWidth);
@@ -547,8 +568,11 @@ export function ComposedChart({
     const ratio = nextScrollLeft / maxScroll;
     const start = Math.round((total - windowSize) * ratio);
     const end = Math.min(total - 1, start + windowSize - 1);
-    setScrollLeft(nextScrollLeft);
-    setVisibleRange((current) => (current.start === start && current.end === end ? current : { start, end }));
+    setUserScroll({
+      scrollLeft: nextScrollLeft,
+      signature: scrollSignature,
+      visibleRange: { start, end }
+    });
   }
 
   function scheduleVisibleRangeUpdate() {
@@ -807,7 +831,9 @@ export function ComposedChart({
           data-rendered-points={decoratedPoints.length}
           data-scroll-throttled="true"
           data-testid="chart-scroll-frame"
+          data-visible-end={visibleRange.end}
           data-visible-points={visibleCount}
+          data-visible-start={visibleRange.start}
           onScroll={scheduleVisibleRangeUpdate}
           ref={scrollRef}
         >

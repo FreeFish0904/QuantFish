@@ -74,12 +74,6 @@ export function SubmissionView() {
     ? dataTrack
     : availableDataTracks[0] ?? "learning";
 
-  useEffect(() => {
-    if (!availableDataTracks.includes(dataTrack)) {
-      setDataTrack(availableDataTracks[0] ?? "learning");
-    }
-  }, [availableDataTracks, dataTrack]);
-
   useEffect(() => () => {
     if (cooldownTimeoutRef.current !== null) {
       window.clearTimeout(cooldownTimeoutRef.current);
@@ -234,11 +228,11 @@ export function SubmissionView() {
                 {availableDataTracks.map((track) => (
                   <label
                     className={styles.trackOption}
-                    data-selected={dataTrack === track}
+                    data-selected={selectedDataTrack === track}
                     key={track}
                   >
                     <input
-                      checked={dataTrack === track}
+                      checked={selectedDataTrack === track}
                       name="dataTrack"
                       onChange={() => setDataTrack(track)}
                       type="radio"

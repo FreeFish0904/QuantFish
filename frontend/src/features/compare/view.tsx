@@ -1,5 +1,5 @@
 import { Activity, ArrowLeft, LoaderCircle, TrendingUp } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { ComposedChart } from "../../shared/charts/ComposedChart/ComposedChart";
@@ -16,6 +16,7 @@ import { ErrorState } from "../../shared/ui/ErrorState/ErrorState";
 import { MultiLineChart } from "../../shared/charts/MultiLineChart/MultiLineChart";
 import type { CompareDetailedSubmission, CompareSubmission, CompareModel } from "./model";
 import { useCompareSubmissions } from "./model";
+import { useSeriesVisibility } from "../../shared/charts/useSeriesVisibility";
 import styles from "./view.module.css";
 
 type RangeKey = "1M" | "3M" | "1YR" | "ALL";
@@ -173,37 +174,26 @@ function DetailedCompareChart({
 }) {
   const { t } = useI18n();
   const [range, setRange] = useState<RangeKey>("ALL");
-  const [showBenchmark, setShowBenchmark] = useState(false);
-  const [showAlpha, setShowAlpha] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const graphOptions = useMemo(
     () => detailedSubmissions.filter((submission) => submission.hasGraphData),
     [detailedSubmissions]
   );
+  // No effect needed to keep `selectedId` valid: an id that no longer exists (or
+  // an empty one) simply falls back to the first option that has graph data.
   const selected =
     graphOptions.find((submission) => submission.id === selectedId) ?? graphOptions[0];
-
-  useEffect(() => {
-    if (!selected) {
-      setSelectedId("");
-      return;
-    }
-    if (selected.id !== selectedId) {
-      setSelectedId(selected.id);
-    }
-  }, [selected, selectedId]);
-
-  useEffect(() => {
-    if (!selected) {
-      return;
-    }
-    if (!selected.availability.hasBenchmark) {
-      setShowBenchmark(false);
-    }
-    if (!selected.availability.hasAlpha || isLongShortExecutionMode(selected.executionParameters)) {
-      setShowAlpha(false);
-    }
-  }, [selected]);
+  const seriesKey = selected
+    ? [
+        selected.id,
+        selected.availability.hasBenchmark,
+        selected.availability.hasAlpha,
+        isLongShortExecutionMode(selected.executionParameters)
+      ].join(":")
+    : "none";
+  const { setAlpha, setBenchmark, visibility } = useSeriesVisibility(seriesKey);
+  const showAlpha = visibility.alpha;
+  const showBenchmark = visibility.benchmark;
 
   if (isLoading && graphOptions.length === 0) {
     return (
@@ -267,7 +257,7 @@ function DetailedCompareChart({
           <input
             checked={benchmarkEnabled && showBenchmark}
             disabled={!benchmarkEnabled}
-            onChange={(event) => setShowBenchmark(event.target.checked)}
+            onChange={(event) => setBenchmark(event.target.checked)}
             type="checkbox"
           />
           <span>{t("submissionDetail.benchmarkToggle")}</span>
@@ -277,7 +267,7 @@ function DetailedCompareChart({
             <input
               checked={alphaEnabled && showAlpha}
               disabled={!alphaEnabled}
-              onChange={(event) => setShowAlpha(event.target.checked)}
+              onChange={(event) => setAlpha(event.target.checked)}
               type="checkbox"
             />
             <span>{t("submissionDetail.alphaToggle")}</span>

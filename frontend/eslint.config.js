@@ -29,11 +29,6 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // Pre-existing patterns kept as warnings rather than silent breakage:
-      // this rule is off so `--max-warnings=0` still gates everything else.
-      // TODO(quality): burn down the setState-in-effect sites, then drop this
-      // override.
-      "react-hooks/set-state-in-effect": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

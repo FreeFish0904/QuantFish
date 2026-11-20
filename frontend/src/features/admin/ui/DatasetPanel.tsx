@@ -60,13 +60,17 @@ export function DatasetPanel({
   const { t, language } = useI18n();
   const fallbackUpdate = useUpdateAdminSettings();
   const [form, setForm] = useState<DatasetPayload>(() => toForm(settings));
+  const [formSource, setFormSource] = useState(settings);
   const [selectedReleases, setSelectedReleases] = useState<HistoricalReleaseName[]>([]);
   const [confirmingReleaseBuild, setConfirmingReleaseBuild] = useState(false);
   const releaseSelectionInitialized = useRef(false);
 
-  useEffect(() => {
+  // Re-seed the draft while rendering when the server settings change, so the
+  // form never paints a stale value and no effect has to copy props into state.
+  if (settings !== formSource) {
+    setFormSource(settings);
     setForm(toForm(settings));
-  }, [settings]);
+  }
 
   useEffect(() => {
     if (!releaseState || releaseSelectionInitialized.current) {

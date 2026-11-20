@@ -1,5 +1,5 @@
 import { Save } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { useI18n } from "../../../shared/i18n";
 import { Button } from "../../../shared/ui/Button/Button";
@@ -60,10 +60,14 @@ export function ScoringPanel({ settings, isSaving, onSave }: ScoringPanelProps) 
   const { t } = useI18n();
   const fallbackUpdate = useUpdateAdminSettings();
   const [form, setForm] = useState<ScoringPayload>(() => toForm(settings));
+  const [formSource, setFormSource] = useState(settings);
 
-  useEffect(() => {
+  // Re-seed the draft while rendering when the server settings change, so the
+  // form never paints a stale value and no effect has to copy props into state.
+  if (settings !== formSource) {
+    setFormSource(settings);
     setForm(toForm(settings));
-  }, [settings]);
+  }
 
   const updateField = (field: keyof ScoringPayload, value: string) => {
     setForm((current) => ({

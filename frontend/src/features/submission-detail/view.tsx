@@ -1,9 +1,10 @@
 import { CircleQuestionMark, FileDown, TableProperties } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useI18n } from "../../shared/i18n";
 import { ComposedChart } from "../../shared/charts/ComposedChart/ComposedChart";
+import { useSeriesVisibility } from "../../shared/charts/useSeriesVisibility";
 import { downloadTextFile, toCsv } from "../../shared/downloads/download";
 import { Badge, type BadgeStatus } from "../../shared/ui/Badge/Badge";
 import { dataTrackLabelKey } from "../../shared/submissions/dataTrack";
@@ -197,9 +198,22 @@ export function SubmissionDetailView() {
   const { submissionId } = useParams<{ submissionId: string }>();
   const { data, isLoading, error, refetch } = useSubmissionDetail(submissionId ?? "");
   const [range, setRange] = useState<RangeKey>("ALL");
-  const [showBenchmark, setShowBenchmark] = useState(false);
-  const [showAlpha, setShowAlpha] = useState(false);
   const display = useMemo(() => (data ? toSubmissionDetailDisplay(data) : null), [data]);
+  // The benchmark/alpha toggles belong to this submission. Encoding the id and
+  // the series it can offer in the key means a different submission (or a
+  // refetch that no longer carries a series) starts with both overlays hidden,
+  // without an effect copying state.
+  const seriesKey = data
+    ? [
+        data.submissionId,
+        data.performanceAvailability.hasBenchmark,
+        data.performanceAvailability.hasAlpha,
+        isLongShortExecutionMode(data.executionParameters)
+      ].join(":")
+    : "none";
+  const { setAlpha, setBenchmark, visibility } = useSeriesVisibility(seriesKey);
+  const showBenchmark = visibility.benchmark;
+  const showAlpha = visibility.alpha;
   const groupChartSeries = useMemo(
     () =>
       (data?.groupSeries ?? [])
@@ -210,18 +224,6 @@ export function SubmissionDetailView() {
         })),
     [data?.groupSeries, t]
   );
-
-  useEffect(() => {
-    if (!data) {
-      return;
-    }
-    if (!data.performanceAvailability.hasBenchmark) {
-      setShowBenchmark(false);
-    }
-    if (!data.performanceAvailability.hasAlpha || isLongShortExecutionMode(data.executionParameters)) {
-      setShowAlpha(false);
-    }
-  }, [data]);
 
   if (error) {
     return (
@@ -395,7 +397,7 @@ export function SubmissionDetailView() {
                 <input
                   checked={benchmarkEnabled && showBenchmark}
                   disabled={!benchmarkEnabled}
-                  onChange={(event) => setShowBenchmark(event.target.checked)}
+                  onChange={(event) => setBenchmark(event.target.checked)}
                   type="checkbox"
                 />
                 {t("submissionDetail.benchmarkToggle")}
@@ -405,7 +407,7 @@ export function SubmissionDetailView() {
                   <input
                     checked={alphaEnabled && showAlpha}
                     disabled={!alphaEnabled}
-                    onChange={(event) => setShowAlpha(event.target.checked)}
+                    onChange={(event) => setAlpha(event.target.checked)}
                     type="checkbox"
                   />
                   {t("submissionDetail.alphaToggle")}

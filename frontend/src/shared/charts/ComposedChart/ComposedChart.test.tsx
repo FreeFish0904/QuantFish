@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -131,6 +131,24 @@ describe("ComposedChart", () => {
 
     expect(scrollFrame).toHaveAttribute("data-visible-points", "22");
     expect(Number(scrollFrame.getAttribute("data-rendered-points"))).toBeLessThan(120);
+  });
+
+  it("opens a finite range at the latest points and follows the scroll position", async () => {
+    render(<ComposedChart points={makeLongPoints(120)} title="Cumulative return and drawdown" range="1M" />, {
+      wrapper: Wrapper,
+    });
+
+    const scrollFrame = screen.getByTestId("chart-scroll-frame");
+    // The window is derived, not stored: the initial render already points at
+    // the newest bars instead of painting the first window and correcting itself.
+    expect(scrollFrame).toHaveAttribute("data-visible-start", "98");
+    expect(scrollFrame).toHaveAttribute("data-visible-end", "119");
+
+    Object.defineProperty(scrollFrame, "scrollLeft", { configurable: true, value: 0, writable: true });
+    fireEvent.scroll(scrollFrame);
+
+    await waitFor(() => expect(scrollFrame).toHaveAttribute("data-visible-start", "0"));
+    expect(scrollFrame).toHaveAttribute("data-visible-end", "21");
   });
 
   it("downsamples dense ALL ranges for cheaper initial rendering", () => {

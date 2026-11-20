@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle, CircleQuestionMark, History, RotateCcw, Save, X } from "lucide-react";
-import { useEffect, useId, useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 
 import { useI18n } from "../../../shared/i18n";
 import { Button } from "../../../shared/ui/Button/Button";
@@ -415,15 +415,19 @@ export function ExecutionPanel({
   const fallbackMarkStale = useMarkAdminStaleSubmissions();
   const fallbackRevertStale = useRevertAdminStaleMark();
   const [form, setForm] = useState<ExecutionForm>(() => toForm(settings));
+  const [formSource, setFormSource] = useState(settings);
   const marketScopeEmpty = form.allowed_market_types.length === 0;
   const marketTypeOptions = marketTypeOrder.map((option) => ({
     value: option.value,
     label: `${option.value} ${t(option.key)}`
   }));
 
-  useEffect(() => {
+  // Re-seed the draft while rendering when the server settings change, so the
+  // form never paints a stale value and no effect has to copy props into state.
+  if (settings !== formSource) {
+    setFormSource(settings);
     setForm(toForm(settings));
-  }, [settings]);
+  }
 
   const updateNumber = (field: NumericFieldKey, value: string) => {
     setForm((current) => ({

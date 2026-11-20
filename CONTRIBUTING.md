@@ -37,6 +37,7 @@ you if they are missing.
 | Backend tests | `python -m pytest backend/tests -q` |
 | Backend coverage | `python -m pytest backend/tests -q --cov=quantfish --cov-report=term-missing` (fails below 81%, config in `.coveragerc`) |
 | Backend lint | `python -m ruff check backend` |
+| Backend format | `python -m ruff format backend` (`python -m ruff format --check backend` to verify) |
 | Frontend tests | `npm --prefix frontend test -- --run` |
 | Frontend lint | `npm --prefix frontend run lint` |
 | Regenerate API types | `npm --prefix frontend run api-types` |
@@ -64,17 +65,32 @@ deploy/                  Dockerfile and docker-compose for the demo
 data/                    placeholder for generated datasets (git-ignored)
 ```
 
+## Reading history
+
+One commit only reformats the backend (`chore(format): apply ruff format across
+the backend`). It is recorded in `.git-blame-ignore-revs`; teach git to skip it
+once per clone so `git blame` and `git log -L` keep pointing at the commit that
+changed behaviour:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+Append the hash whenever another wholesale reformat lands.
+
 ## Conventions
 
 - **Tests first.** Every behavioural change should come with a pytest or
   vitest case. `backend/tests/test_project_naming.py` guards the branding and
   package layout, so keep module paths consistent with `quantfish`.
-- **Lint before pushing.** `python -m ruff check backend` and
-  `npm --prefix frontend run lint` must both be clean; CI runs them and fails
-  the build otherwise. Rules live in `backend/pyproject.toml` (`[tool.ruff]`)
-  and `frontend/eslint.config.js`. `E501` and the two noisy React rules are
-  deliberately off for now so the gate stays about behaviour rather than
-  reflowing files; `ruff format` is a separate, opt-in change.
+- **Lint and format before pushing.** `python -m ruff check backend`,
+  `python -m ruff format --check backend` and
+  `npm --prefix frontend run lint` must all be clean; CI runs them and fails the
+  build otherwise. Rules live in `backend/pyproject.toml` (`[tool.ruff]`) and
+  `frontend/eslint.config.js`. `E501` and the two noisy React rules are
+  deliberately off in lint so it stays about behaviour; `ruff format` owns
+  whitespace, quoting and wrapping, which is why line length is not policed
+  twice.
 - **Close what you open.** `pytest` promotes `ResourceWarning` and unraisable
   warnings to errors (`[tool.pytest.ini_options] filterwarnings`), so a leaked
   `sqlite3.Connection`, file handle or subprocess cannot hide behind garbage

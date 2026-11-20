@@ -1,0 +1,8 @@
+# Revisions that only reformat code. Listing them here keeps `git blame` and
+# `git log -L` pointing at the commit that last changed behaviour instead of the
+# formatting pass. Enable it once per clone:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub honours this file automatically for blame views.
+a22c186402a0b736fa2b982d288b19f76ae1b547

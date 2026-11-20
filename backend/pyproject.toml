@@ -76,17 +76,8 @@ ignore = [
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Query"]
 
-[tool.coverage.run]
-branch = true
-source = ["quantfish"]
-
-# Report only for now: the first measured baseline is 88% (8350 statements,
-# 991 missed). Once the number is stable in CI, add
-# `fail_under = <baseline - 3>` so new untested code cannot slip in.
-[tool.coverage.report]
-exclude_also = [
-  "if TYPE_CHECKING:",
-  "raise NotImplementedError",
-  "\\.\\.\\.",
-]
+# Coverage settings live in the repository root `.coveragerc`: coverage only
+# reads configuration from the current working directory, so keeping them here
+# meant a run from the repository root silently ignored branch coverage, the
+# exclusions and the gate.
 

@@ -35,7 +35,7 @@ you if they are missing.
 | Task | Command |
 | --- | --- |
 | Backend tests | `python -m pytest backend/tests -q` |
-| Backend coverage | `python -m pytest backend/tests -q --cov=quantfish --cov-report=term-missing` |
+| Backend coverage | `python -m pytest backend/tests -q --cov=quantfish --cov-report=term-missing` (fails below 81%, config in `.coveragerc`) |
 | Backend lint | `python -m ruff check backend` |
 | Frontend tests | `npm --prefix frontend test -- --run` |
 | Frontend lint | `npm --prefix frontend run lint` |
@@ -80,6 +80,12 @@ data/                    placeholder for generated datasets (git-ignored)
   `sqlite3.Connection`, file handle or subprocess cannot hide behind garbage
   collection. Use the repository's `_connection()` context manager rather than
   `sqlite3.Connection` as a context manager — the latter only commits.
+- **Coverage is a gate, not a report.** `--cov=quantfish` fails the run below
+  `fail_under` in the root `.coveragerc` (currently 81%: the 84% branch
+  baseline minus three points of churn). Coverage only reads a config file from
+  the current working directory, which is why the settings live at the root
+  instead of `backend/pyproject.toml`; raise the floor deliberately, in its own
+  commit, after checking the new measurement.
 - **Config over constants.** Tunables belong in `config/platform.yaml` and are
   validated by `quantfish.platform_config`. Avoid duplicate defaults in code.
 - **Log events, not sentences.** Use

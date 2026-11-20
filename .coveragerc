@@ -1,0 +1,23 @@
+# Coverage configuration for the backend.
+#
+# It lives at the repository root, not in `backend/pyproject.toml`, because
+# coverage only reads a config file from the current working directory (it does
+# not walk up towards the package). Every documented command runs from the
+# repository root, so this is the location that actually applies -- see the
+# "Running things" table in CONTRIBUTING.md.
+[run]
+branch = true
+source = quantfish
+
+[report]
+# The gate is the measured baseline minus three points: ordinary churn stays
+# green while a large untested feature cannot land. Baseline at the time of the
+# first gate (8950 statements, 1085 missed): 84.37% with branch coverage, 84%
+# as reported. Re-measure with
+#   python -m pytest backend/tests -q --cov=quantfish --cov-report=term-missing
+# before moving this number and explain the move in the commit message.
+fail_under = 81
+exclude_also =
+    if TYPE_CHECKING:
+    raise NotImplementedError
+    \.\.\.

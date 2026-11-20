@@ -151,9 +151,10 @@ with no server at all. `.github/workflows/pages.yml` publishes it on every push 
   (see [docs/observability.md](docs/observability.md)). Every `/api/*` request logs one
   `event=request` line with a request id, and scoring failures keep their traceback in the
   server log instead of only a truncated `error_message` in the database.
-- **Gated in CI.** `ruff check`, `eslint --max-warnings=0`, pytest with a coverage floor
-  (branch coverage, fails below 81%), vitest, `tsc -b && vite build`, plus a job that
-  regenerates `api-types.ts` from the live OpenAPI schema and fails on drift.
+- **Gated in CI.** `ruff check`, `ruff format --check`, `eslint --max-warnings=0`, pytest
+  with a coverage floor (branch coverage, fails below 81%), vitest, `tsc -b && vite build`,
+  plus a job that regenerates `api-types.ts` from the live OpenAPI schema and fails on
+  drift.
 
 ## Repository layout
 

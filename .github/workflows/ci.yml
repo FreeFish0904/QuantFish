@@ -31,6 +31,9 @@ jobs:
       - name: Ruff
         run: python -m ruff check backend --output-format=github
 
+      - name: Ruff format
+        run: python -m ruff format --check backend
+
   backend:
     name: Backend tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
